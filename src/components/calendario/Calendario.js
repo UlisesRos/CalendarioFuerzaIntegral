@@ -41,7 +41,7 @@ const initialCalendar = {
         },
         tarde: {
             16: ["Irina R","Ale G","Marcelo M","Cande B","Marian G",null],
-            17: ["Ale A","Melina L","Facu A","Cuervo","Sofia F",null,null],
+            17: ["Ale A","Melina L","Facu A","Cuervo","Sofia F",null],
             18: ["Uli","Flor M","Laura F","Franco S","Bruno","Mica P"],
             19: ["Frances","Juli",null,null,null,null],
         }
@@ -188,13 +188,10 @@ const Calendario = () => {
         }
     };
     
-    
-
-
     return (
         <Box>
             <Box
-                margin='30px 0 0 50px'
+                margin='30px 0 0 0'
                 textAlign='center'
                 >
                 <FormLabel
@@ -204,7 +201,7 @@ const Calendario = () => {
                 </FormLabel>
                 <Input
                     border='1px solid black'
-                    w='30%'
+                    w={["80%",'40%','30%']}
                     type="text" 
                     value={name} 
                     onChange={(e) => setName(e.target.value)} 
@@ -213,18 +210,22 @@ const Calendario = () => {
             </Box>
             
             <Box
-                margin='30px 0 30px 50px'
+                margin='30px 0 30px 0px'
                 textAlign='center'
                 >
                 <Heading
                     fontFamily='"Poppins", sans-serif;'
+                    fontSize={['1.6rem','2rem','2.3rem']}
                     >Selecciona un día y una hora para inscribirte</Heading>
                 <Flex
                     marginTop='20px'
-                    columnGap='30px'
+                    columnGap={['0','30px','30px']}
+                    rowGap={['10px','0','0']}
                     justifyContent='center'
+                    alignItems='center'
+                    flexDir={['column', 'column', 'row']}
                     >
-                    <Select w='200px' onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay}>
+                    <Select w='250px' onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay}>
                     <option value="">Seleccionar Día</option>
                     {Object.keys(calendar).map((day) => (
                         <option key={day} value={day}>{day}</option>
@@ -235,6 +236,8 @@ const Calendario = () => {
                         <Box
                             display='flex'
                             columnGap='30px'
+                            flexDir={['column', 'column', 'row']}
+                            rowGap={['10px','0','0']}
                             >
                             {selectedDay === 'sábado' ? 
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift}>
@@ -249,7 +252,7 @@ const Calendario = () => {
                             }
 
                             {selectedShift && 
-                                <Select w='200px' onChange={(e) => setSelectedHour(e.target.value)} value={selectedHour}>
+                                <Select w='250px' onChange={(e) => setSelectedHour(e.target.value)} value={selectedHour}>
                                     <option value="">Seleccionar Hora</option>
                                     {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                                         Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
@@ -263,7 +266,8 @@ const Calendario = () => {
                     }
                     
 
-                    <Button 
+                    <Button
+                    
                     onClick={() => {
                         if (selectedDay && selectedShift && selectedHour && name) {
                         handleAddPerson(selectedDay, selectedShift, selectedHour, name);
@@ -288,24 +292,28 @@ const Calendario = () => {
                     >
                     <Text
                         fontWeight='bold'
-                        fontSize='2rem'
+                        fontSize={['1.5rem','2rem','2rem']}
                         textDecor='underline'
                         textTransform='capitalize'
+                        textAlign='center'
                         >{selectedDay} - Turno {selectedShift === 'mañana' ? 'Mañana' : 'Tarde'}</Text>
                     <Flex
                         justifyContent='center'
+                        alignItems='center'
+                        flexDir={['column','row','row']}
                         columnGap='60px'
-                        w='90%'
+                        rowGap={['10px','0','0']}
+                        w={['100%','90%','90%']}
                         >
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                             Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                <Flex key={hour} flexDir='column' w='300px' alignItems='center' border='1px solid black' padding='15px'>
+                                <Flex key={hour} flexDir='column' w={['95%','250px','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
                                     {selectedDay === 'sábado' ?
                                     <Text textDecor='underline' fontWeight='bold' margin='0 20px 0 20px'>{hour}:30</Text> :
                                     <Text textDecor='underline' fontWeight='bold' margin='0 20px 0 20px'>{hour}:00</Text>
                                 }
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
-                                        <Box key={index} backgroundColor={person ? 'rgba(255, 192, 192, 1)' : 'rgba(152, 255, 152, 1)'} border='1px solid black' w='80%' margin='10px' display='flex' flexDir='column' alignItems='center' rowGap='3px' paddingTop='5px' paddingBottom='5px'>
+                                        <Box key={index} backgroundColor={person ? 'rgba(255, 192, 192, 1)' : 'rgba(152, 255, 152, 1)'} border='1px solid black' borderRadius='10px' w='80%' margin='10px' display='flex' flexDir='column' alignItems='center' rowGap='3px' paddingTop='5px' paddingBottom='5px'>
                                             <Button color='red' fontSize='.9rem' w='50%' h='5vh' onClick={() => handleRemovePerson(selectedDay, selectedShift, hour, index)}>Eliminar</Button>
                                             <span style={{fontWeight: 'bold', margin: '5px 0 10px 0'}}>{person || "Disponible"}</span>
                                             <Button fontSize='.8rem' w='90%' onClick={() => {
