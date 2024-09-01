@@ -191,7 +191,7 @@ const Calendario = () => {
     return (
         <Box>
             <Box
-                margin='30px 0 0 0'
+                margin='15px 0 0 0'
                 textAlign='center'
                 >
                 <FormLabel
@@ -200,7 +200,7 @@ const Calendario = () => {
                     Nombre
                 </FormLabel>
                 <Input
-                    border='1px solid black'
+                    border='1px solid #80c687'
                     w={["80%",'40%','30%']}
                     type="text" 
                     value={name} 
@@ -225,7 +225,7 @@ const Calendario = () => {
                     alignItems='center'
                     flexDir={['column', 'column', 'row']}
                     >
-                    <Select w='250px' onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay}>
+                    <Select w='250px' onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay} border='1px solid #80c687'>
                     <option value="">Seleccionar Día</option>
                     {Object.keys(calendar).map((day) => (
                         <option key={day} value={day}>{day}</option>
@@ -240,11 +240,11 @@ const Calendario = () => {
                             rowGap={['10px','0','0']}
                             >
                             {selectedDay === 'sábado' ? 
-                            <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift}>
+                            <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
                                 <option value="mañana">Mañana (09:30 - 11:30)</option>
                             </Select> :
-                            <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift}>
+                            <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
                                 <option value="mañana">Mañana (08:00 - 11:00)</option>
                                 <option value="tarde">Tarde (16:00 - 19:00)</option>
@@ -252,7 +252,7 @@ const Calendario = () => {
                             }
 
                             {selectedShift && 
-                                <Select w='250px' onChange={(e) => setSelectedHour(e.target.value)} value={selectedHour}>
+                                <Select w='250px' onChange={(e) => setSelectedHour(e.target.value)} value={selectedHour} border='1px solid #80c687'>
                                     <option value="">Seleccionar Hora</option>
                                     {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                                         Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
@@ -267,15 +267,25 @@ const Calendario = () => {
                     
 
                     <Button
-                    
-                    onClick={() => {
-                        if (selectedDay && selectedShift && selectedHour && name) {
-                        handleAddPerson(selectedDay, selectedShift, selectedHour, name);
-                        } else {
-                        alert("Selecciona un día, un turno, una hora y proporciona tu nombre.");
-                        }
-                    }}
-                    disabled={!name || !selectedDay || !selectedShift || !selectedHour}
+                        backgroundColor='white'
+                        color='black'
+                        border='1px solid #80c687'
+                        box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                        transition='all 0.3s ease'
+                        _hover={{
+                            boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                            transform: 'translateY(-2px)',
+                            backgroundColor:'#80c687',
+                            color: 'white'
+                        }}
+                        onClick={() => {
+                            if (selectedDay && selectedShift && selectedHour && name) {
+                            handleAddPerson(selectedDay, selectedShift, selectedHour, name);
+                            } else {
+                            alert("Selecciona un día, un turno, una hora y proporciona tu nombre.");
+                            }
+                        }}
+                        disabled={!name || !selectedDay || !selectedShift || !selectedHour}
                     >
                     Inscribirme
                     </Button>
@@ -314,9 +324,29 @@ const Calendario = () => {
                                 }
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
                                         <Box key={index} backgroundColor={person ? 'rgba(255, 192, 192, 1)' : 'rgba(152, 255, 152, 1)'} border='1px solid black' borderRadius='10px' w='80%' margin='10px' display='flex' flexDir='column' alignItems='center' rowGap='3px' paddingTop='5px' paddingBottom='5px'>
-                                            <Button color='red' fontSize='.9rem' w='50%' h='5vh' onClick={() => handleRemovePerson(selectedDay, selectedShift, hour, index)}>Eliminar</Button>
-                                            <span style={{fontWeight: 'bold', margin: '5px 0 10px 0'}}>{person || "Disponible"}</span>
-                                            <Button fontSize='.8rem' w='90%' onClick={() => {
+                                            <Button 
+                                                backgroundColor='white'
+                                                color='black'
+                                                box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                                                transition='all 0.3s ease'
+                                                _hover={{
+                                                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                    transform: 'translateY(-2px)',
+                                                    color: 'red'
+                                                }}
+                                                fontSize='.9rem' w='50%' h='5vh' onClick={() => handleRemovePerson(selectedDay, selectedShift, hour, index)}>Eliminar</Button>
+                                            <span style={{fontWeight: 'bold', margin: '5px 0 10px 0', color: 'black'}} >{person || "Disponible"}</span>
+                                            <Button 
+                                                backgroundColor='white'
+                                                color='black'
+                                                box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                                                transition='all 0.3s ease'
+                                                _hover={{
+                                                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                    transform: 'translateY(-2px)',
+                                                    color: 'black'
+                                                }}
+                                                fontSize='.8rem' w='90%' onClick={() => {
                                                 handleMovePerson(selectedDay, selectedShift, hour, index);
                                             }}>
                                                 Mover a otro turno
@@ -338,6 +368,17 @@ const Calendario = () => {
                 justifyContent='center'
                 >
                 <Button
+                    backgroundColor='white'
+                    color='black'
+                    border='1px solid #80c687'
+                    box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                    transition='all 0.3s ease'
+                    _hover={{
+                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                        transform: 'translateY(-2px)',
+                        backgroundColor:'#80c687',
+                        color: 'white'
+                    }}
                     onClick={handleResetCalendar}
                     >
                     Resetear Initial
