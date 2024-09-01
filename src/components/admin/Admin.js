@@ -2,7 +2,7 @@ import { Flex, Image, Box, Button, Text, Input } from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
 import logo from '../../img/logofuerza.png'
 
-function Admin() {
+function Admin({theme}) {
     return (
         <Box>
             <Flex
@@ -14,9 +14,9 @@ function Admin() {
                     to='/'
                     >
                     <Button
-                        marginRight='20px'
-                        backgroundColor='white'
-                        color='black'
+                        marginRight={['0','20px','20px']}
+                        backgroundColor={theme == 'light' ? 'white' : 'black'}
+                        color={theme == 'light' ? 'black' : 'white'}
                         border='1px solid #80c687'
                         box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                         transition='all 0.3s ease'
@@ -24,8 +24,8 @@ function Admin() {
                             boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
                             transform: 'translateY(-2px)',
                             backgroundColor:'#80c687',
-                            color: 'white'
-                        }}  
+                            color: theme == 'light' ? 'white' : 'black'
+                        }}
                         >
                         Volver
                     </Button>
@@ -53,8 +53,8 @@ function Admin() {
                         <Input placeholder='clave' w='200px' textAlign='center' border='1px solid #80c687' />
                         <Button
                             type='submit'
-                            backgroundColor='white'
-                            color='black'
+                            backgroundColor={theme == 'light' ? 'white' : 'black'}
+                            color={theme == 'light' ? 'black' : 'white'}
                             border='1px solid #80c687'
                             box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                             transition='all 0.3s ease'
@@ -62,7 +62,7 @@ function Admin() {
                                 boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
                                 transform: 'translateY(-2px)',
                                 backgroundColor:'#80c687',
-                                color: 'white'
+                                color: theme == 'light' ? 'white' : 'black'
                             }}  
                             >
                             Entrar

@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
-import '../../css/Calendario.css'
+import '../../css/calendario/Calendario.css'
 import { Box, Button, Flex, FormLabel, Heading, Input, Select, Text } from '@chakra-ui/react';
 
 const initialCalendar = {
     lunes: {
         mañana: {
-            8: ["Isabel C", "Joaco", "Nanci", "Javier R", null, null],
-            9: ["Valen O", "Pau", "Beti F", "Mauri L", null, null],
-            10: ["Omar B", "Facu Azar", null, null, null, null],
-            11: ["Bruno", "Damian O", null, null, null, null]
+            8: [null, null, "Isabel C", "Joaco", "Nanci", "Javier R"],
+            9: [null, null, "Valen O", "Pau", "Beti F", "Mauri L"],
+            10: [null, null, null, null,"Omar B", "Facu Azar"],
+            11: [null, null, null, null,"Bruno", "Damian O"]
         },
         tarde: {
             16: ["Jor P", "Ale G", "Irina Roman", "Mayra N", "Marian G", "Cuervo"],
-            17: ['Clari S', "Ale A", "Belu A", "Facu A", null, null],
+            17: [ null, null, 'Clari S', "Ale A", "Belu A", "Facu A"],
             18: ["Franco S", "Alicia N", "Melina L", "Uli", "Maela G", "Mica P"],
-            19: ["Rama R", "Maia B", "Marian F", "Lu S", "Dani R", null],
+            19: [ null, "Rama R", "Maia B", "Marian F", "Lu S", "Dani R"],
         }
     },
     martes: {
@@ -27,7 +27,7 @@ const initialCalendar = {
         },
         tarde: {
             16: ["Dani E", "Juli V", "Clari O", "Liliana V", null, null],
-            17: ["Guille SC", "Pau F", "Eva A", "Elba", "Irina R", "Juan Jose", null],
+            17: ["Guille SC", "Pau F", "Eva A", "Elba", "Irina R", "Juan Jose"],
             18: ["Frances", "Sofia F", "Eve V", "Celeste G", "Patricio", "Dani R"],
             19: Array(6).fill("Cerrado"),
         }
@@ -83,7 +83,7 @@ const initialCalendar = {
     }
 };
 
-const Calendario = () => {
+const Calendario = ({theme}) => {
     
     const [calendar, setCalendar] = useState(() => {
         const savedCalendar = localStorage.getItem("calendar");
@@ -220,7 +220,7 @@ const Calendario = () => {
                 <Flex
                     marginTop='20px'
                     columnGap={['0','30px','30px']}
-                    rowGap={['10px','0','0']}
+                    rowGap={['10px','10px','0']}
                     justifyContent='center'
                     alignItems='center'
                     flexDir={['column', 'column', 'row']}
@@ -237,7 +237,7 @@ const Calendario = () => {
                             display='flex'
                             columnGap='30px'
                             flexDir={['column', 'column', 'row']}
-                            rowGap={['10px','0','0']}
+                            rowGap={['10px','10px','0']}
                             >
                             {selectedDay === 'sábado' ? 
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
@@ -267,8 +267,8 @@ const Calendario = () => {
                     
 
                     <Button
-                        backgroundColor='white'
-                        color='black'
+                        backgroundColor={theme == 'light' ? 'white' : 'black'}
+                        color={theme == 'light' ? 'black' : 'white'}
                         border='1px solid #80c687'
                         box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                         transition='all 0.3s ease'
@@ -276,7 +276,7 @@ const Calendario = () => {
                             boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
                             transform: 'translateY(-2px)',
                             backgroundColor:'#80c687',
-                            color: 'white'
+                            color: theme == 'light' ? 'white' : 'black'
                         }}
                         onClick={() => {
                             if (selectedDay && selectedShift && selectedHour && name) {
@@ -310,47 +310,62 @@ const Calendario = () => {
                     <Flex
                         justifyContent='center'
                         alignItems='center'
-                        flexDir={['column','row','row']}
-                        columnGap='60px'
-                        rowGap={['10px','0','0']}
+                        flexDir={['column','column','row']}
+                        columnGap='50px'
+                        rowGap={['10px','10px','0']}
                         w={['100%','90%','90%']}
+                        flexWrap={['wrap','wrap','nowrap']}
                         >
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                             Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                <Flex key={hour} flexDir='column' w={['95%','250px','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
+                                <Flex key={hour} flexDir='column' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
                                     {selectedDay === 'sábado' ?
                                     <Text textDecor='underline' fontWeight='bold' margin='0 20px 0 20px'>{hour}:30</Text> :
                                     <Text textDecor='underline' fontWeight='bold' margin='0 20px 0 20px'>{hour}:00</Text>
                                 }
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
-                                        <Box key={index} backgroundColor={person ? 'rgba(255, 192, 192, 1)' : 'rgba(152, 255, 152, 1)'} border='1px solid black' borderRadius='10px' w='80%' margin='10px' display='flex' flexDir='column' alignItems='center' rowGap='3px' paddingTop='5px' paddingBottom='5px'>
-                                            <Button 
-                                                backgroundColor='white'
-                                                color='black'
-                                                box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                                                transition='all 0.3s ease'
-                                                _hover={{
-                                                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                    transform: 'translateY(-2px)',
-                                                    color: 'red'
-                                                }}
-                                                fontSize='.9rem' w='50%' h='5vh' onClick={() => handleRemovePerson(selectedDay, selectedShift, hour, index)}>Eliminar</Button>
-                                            <span style={{fontWeight: 'bold', margin: '5px 0 10px 0', color: 'black'}} >{person || "Disponible"}</span>
-                                            <Button 
-                                                backgroundColor='white'
-                                                color='black'
-                                                box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                                                transition='all 0.3s ease'
-                                                _hover={{
-                                                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                    transform: 'translateY(-2px)',
-                                                    color: 'black'
-                                                }}
-                                                fontSize='.8rem' w='90%' onClick={() => {
-                                                handleMovePerson(selectedDay, selectedShift, hour, index);
-                                            }}>
-                                                Mover a otro turno
-                                            </Button>
+                                        <Box key={index} w='100%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
+                                            <Text 
+                                                style={{fontWeight: 'bold', margin: '5px 0 10px 0'}} 
+                                                color={person ? 'auto' : 'green'}
+                                                >{person || "Disponible"}</Text>
+                                            <Flex   
+                                                flexDir='column'
+                                                alignItems='center'
+                                                rowGap='3px'
+                                                >
+                                                <Button 
+                                                    backgroundColor={theme == 'light' ? 'white' : 'black'}
+                                                    color='black'
+                                                    box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                                                    transition='all 0.3s ease'
+                                                    border='1px solid #80c687'
+                                                    _hover={{
+                                                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                        transform: 'translateY(-2px)',
+                                                        backgroundColor:'red'
+                                                    }}
+                                                    fontSize='.9rem' w='auto' h='5vh' onClick={() => handleRemovePerson(selectedDay, selectedShift, hour, index)}>
+                                                        🗑️
+                                                    </Button>
+                                                <Button 
+                                                    backgroundColor={theme == 'light' ? 'white' : 'black'}
+                                                    color={theme == 'light' ? 'black' : 'white'}
+                                                    border='1px solid #80c687'
+                                                    box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                                                    transition='all 0.3s ease'
+                                                    _hover={{
+                                                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                        transform: 'translateY(-2px)',
+                                                        backgroundColor:'#80c687',
+                                                        color: theme == 'light' ? 'white' : 'black'
+                                                    }}
+                                                    fontSize='.8rem' w='90%' onClick={() => {
+                                                    handleMovePerson(selectedDay, selectedShift, hour, index);
+                                                }}>
+                                                    Mover
+                                                </Button>
+                                            </Flex>
                                         </Box>
                                     ))}
                                 </Flex>
