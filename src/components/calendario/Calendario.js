@@ -311,7 +311,7 @@ const Calendario = ({theme}) => {
                         justifyContent='center'
                         alignItems='center'
                         flexDir={['column','column','row']}
-                        columnGap='50px'
+                        columnGap='40px'
                         rowGap={['10px','10px','0']}
                         w={['100%','90%','90%']}
                         flexWrap={['wrap','wrap','nowrap']}
@@ -325,47 +325,43 @@ const Calendario = ({theme}) => {
                                 }
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
                                         <Box key={index} w='100%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
-                                            <Text 
-                                                style={{fontWeight: 'bold', margin: '5px 0 10px 0'}} 
-                                                color={person ? 'auto' : 'green'}
-                                                >{person || "Disponible"}</Text>
-                                            <Flex   
-                                                flexDir='column'
-                                                alignItems='center'
-                                                rowGap='3px'
-                                                >
-                                                <Button 
-                                                    backgroundColor={theme == 'light' ? 'white' : 'black'}
-                                                    color='black'
-                                                    box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                                                    transition='all 0.3s ease'
-                                                    border='1px solid #80c687'
-                                                    _hover={{
-                                                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                        transform: 'translateY(-2px)',
-                                                        backgroundColor:'red'
-                                                    }}
-                                                    fontSize='.9rem' w='auto' h='5vh' onClick={() => handleRemovePerson(selectedDay, selectedShift, hour, index)}>
-                                                        🗑️
-                                                    </Button>
-                                                <Button 
-                                                    backgroundColor={theme == 'light' ? 'white' : 'black'}
-                                                    color={theme == 'light' ? 'black' : 'white'}
-                                                    border='1px solid #80c687'
-                                                    box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                                                    transition='all 0.3s ease'
-                                                    _hover={{
-                                                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                        transform: 'translateY(-2px)',
-                                                        backgroundColor:'#80c687',
-                                                        color: theme == 'light' ? 'white' : 'black'
-                                                    }}
-                                                    fontSize='.8rem' w='90%' onClick={() => {
-                                                    handleMovePerson(selectedDay, selectedShift, hour, index);
-                                                }}>
-                                                    Mover
+                                            <Button 
+                                                backgroundColor={theme == 'light' ? 'white' : 'black'}
+                                                color='black'
+                                                box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                                                transition='all 0.3s ease'
+                                                border='1px solid #80c687'
+                                                _hover={{
+                                                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                    transform: 'translateY(-2px)',
+                                                    backgroundColor:'red'
+                                                }}
+                                                fontSize='.9rem' w='auto' h='5vh' onClick={() => handleRemovePerson(selectedDay, selectedShift, hour, index)}>
+                                                    🗑️
                                                 </Button>
-                                            </Flex>
+                                                <Text
+                                                    textAlign='center'
+                                                    w='100%'
+                                                    style={{fontWeight: 'bold', margin: '5px 0 10px 0'}} 
+                                                    color={person ? 'auto' : 'green'}
+                                                    >{person || "Disponible"}</Text>
+                                            <Button 
+                                                backgroundColor={theme == 'light' ? 'white' : 'black'}
+                                                color={theme == 'light' ? 'black' : 'white'}
+                                                border='1px solid #80c687'
+                                                box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                                                transition='all 0.3s ease'
+                                                _hover={{
+                                                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                                                    transform: 'translateY(-2px)',
+                                                    backgroundColor:'#80c687',
+                                                    color: theme == 'light' ? 'white' : 'black'
+                                                }}
+                                                fontSize='.8rem' w='40%' onClick={() => {
+                                                handleMovePerson(selectedDay, selectedShift, hour, index);
+                                            }}>
+                                                Mover
+                                            </Button>
                                         </Box>
                                     ))}
                                 </Flex>

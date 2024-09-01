@@ -14,7 +14,7 @@ function Admin({theme}) {
                     to='/'
                     >
                     <Button
-                        marginRight={['0','20px','20px']}
+                        marginRight='20px'
                         backgroundColor={theme == 'light' ? 'white' : 'black'}
                         color={theme == 'light' ? 'black' : 'white'}
                         border='1px solid #80c687'
