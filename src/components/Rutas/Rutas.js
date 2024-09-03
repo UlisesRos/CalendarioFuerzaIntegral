@@ -2,6 +2,7 @@ import { Flex } from '@chakra-ui/react'
 import Calendario from '../calendario/Calendario'
 import Navbar from '../Navbar/Navbar'
 import '../../css/nav/Navbar.css'
+import Footer from '../footer/Footer'
 
 function Rutas({toggleTheme, theme}) {
 
@@ -11,6 +12,7 @@ function Rutas({toggleTheme, theme}) {
             >
             <Navbar toggleTheme={toggleTheme} theme={theme} />
             <Calendario theme={theme}/>
+            <Footer />
         </Flex>
     )
 }

@@ -6,95 +6,99 @@ import { Box, Button, Flex, FormLabel, Heading, Input, Select, Text } from '@cha
 const initialCalendar = {
     lunes: {
         mañana: {
-            8: [null, null, "Isabel C", "Joaco", "Nanci", "Javier R"],
-            9: [null, null, "Valen O", "Pau", "Beti F", "Mauri L"],
-            10: [null, null, null, null,"Omar B", "Facu Azar"],
-            11: [null, null, null, null,"Bruno", "Damian O"]
+            8: [null, null, "isabel c", "joaco", "nanci", "javier r"],
+            9: [null, null, "valen o", "pau", "beti f", "mauri l"],
+            10: [null, null, null, null,"omar b", "facu a"],
+            11: [null, null, null, null,"bruno", "damian o"]
         },
         tarde: {
-            16: ["Jor P", "Ale G", "Irina Roman", "Mayra N", "Marian G", "Cuervo"],
-            17: [ null, null, 'Clari S', "Ale A", "Belu A", "Facu A"],
-            18: ["Franco S", "Alicia N", "Melina L", "Uli", "Maela G", "Mica P"],
-            19: [ null, "Rama R", "Maia B", "Marian F", "Lu S", "Dani R"],
+            16: ["jor p", "ale g", "irina roman", "mayra n", "marian g", "cuervo"],
+            17: [ null, null, 'clari s', "ale a", "belu a", "facu a"],
+            18: ["franco s", "alicia n", "melina l", "uli", "maela g", "mica p"],
+            19: [ null, "rama", "maia b", "marian f", "lu s", "dani r"],
         }
     },
     martes: {
         mañana: {
-            8: ["Agos P", "Joaco", "Juan Jose F", "Belu", null, null],
-            9: ["Marina M", "Sabri V", "Lucas Kalu", "Flor P", "Martina G", null],
-            10: ["Betty J", "Adri F", "Ailen", "Marina M", null, null],
-            11: ["Mer S", "Flor B", "Mayra N", null, null, null]
+            8: ["agos p", "joaco", "juan jose f", "belu", null, null],
+            9: ["mariana m", "sabri v", "lucas k", "flor p", "martina g", null],
+            10: ["betty j", "adri f", "ailen", "mariana m", null, null],
+            11: ["mer s", "flor b", "mayra n", null, null, null]
         },
         tarde: {
-            16: ["Dani E", "Juli V", "Clari O", "Liliana V", null, null],
-            17: ["Guille SC", "Pau F", "Eva A", "Elba", "Irina R", "Juan Jose"],
-            18: ["Frances", "Sofia F", "Eve V", "Celeste G", "Patricio", "Dani R"],
+            16: ["dani e", "juli v", "clari o", "liliana v", null, null],
+            17: ["guille sc", "pau f", "eva a", "elba", "irina r", "juan jose"],
+            18: ["frances", "sofia f", "eve v", "celeste g", "patricio", "dani r"],
             19: Array(6).fill("Cerrado"),
         }
     },
     miércoles: {
         mañana: {
-            8: ["Lu W", "Isabel C", "Nanci G", "Romi M", null, null],
-            9: ["Daniela A", "Mauri L", "Ale P", "Yas", null, null],
-            10: ["Ailen M","Omar B",null,null,null,null],
+            8: ["lu w", "isabel c", "nanci g", "romi m", null, null],
+            9: ["daniela a", "mauri l", "Ale P", "Yas", null, null],
+            10: ["ailen m","omar b",null,null,null,null],
             11: ["Lu S",null,null,null,null,null]
         },
         tarde: {
-            16: ["Irina R","Ale G","Marcelo M","Cande B","Marian G",null],
-            17: ["Ale A","Melina L","Facu A","Cuervo","Sofia F",null],
-            18: ["Uli","Flor M","Laura F","Franco S","Bruno","Mica P"],
-            19: ["Frances","Juli",null,null,null,null],
+            16: ["irina r","ale G","marcelo m","cande b","marian g",null],
+            17: ["ale a","melina l","facu a","cuervo","sofia f",null],
+            18: ["ulises","flor m","laura f","franco s","bruno","mica p"],
+            19: ["frances","juli",null,null,null,null],
         }
     },
     jueves: {
         mañana: {
-            8: ["Joaco M","Javier R",null,null,null,null],
-            9: ["Yaz","Belu","Licha R","Martina G",null,null],
-            10: ["Ro B","Mayra","Betty J",null,null,null],
+            8: ["joaco m","javier r",null,null,null,null],
+            9: ["Yaz","belu","Licha R","martina g",null,null],
+            10: ["ro b","mayra","betty j",null,null,null],
             11: Array(6).fill("Cerrado")
         },
         tarde: {
-            16: ["Juli Pau","Dona R","Jor P","Alicia N","Ziomara R","Malvi R"],
-            17: ["Agos P","Facu A","Cori O","Liliana V","Dani R","Guille S","Eva A"],
-            18: ["Frances","Celesta G",null,null,null,null],
-            19: ["Mariano F","Lucas K","Rama",null,null,null],
+            16: ["juli pau","dona r","jor p","alicia n","ziomara r","malvi r"],
+            17: ["agos p","facu a","cori o","liliana v","dani r","guille s","eva a"],
+            18: ["frances","celesta g",null,null,null,null],
+            19: ["mariano f","lucas k","rama",null,null,null],
         }
     },
     viernes: {
         mañana: {
-            8: ["Daniela A","Isabel C",null,null,null,null],
-            9: ["Lu W","Flor B",null,null,null,null],
-            10: ["Dani R","Mauri","Damian O","Cori O",null,null],
+            8: ["daniela a","isabel c",null,null,null,null],
+            9: ["lu w","flor b",null,null,null,null],
+            10: ["dani r","mauri l","damian o","cori o",null,null],
             11: Array(6).fill("Cerrado")
         },
         tarde: {
-            16: ["Ale G","Marian G","Belu A","Cande B","Irina R",null],
-            17: ["Sofia F","Melina L","Eve V",null,null,null],
-            18: ["Ro B","Belu","Irina R","Maela G","Mica P", null],
-            19: ["Maia B","Rama R","Frances","Juli B","Uli","Flor M"],
+            16: ["ale g","marian g","belu a","cande b","irina r",null],
+            17: ["sofia f","melina l","eve v",null,null,null],
+            18: ["ro b","belu","irina r","Maela G","mica p", null],
+            19: ["maia b","rama","frances","juli b","uli","flor m"],
         }
     },
     sábado: {
         mañana: {
-            9: ["Fatima D","Dani R","Flor P","Lu S","Cori O",null],
-            10: ["Marian M","Eve v","Sofia F","Ro B",null,null],
-            11: ["Mayran", "Dona R",null,null,null,null]
+            9: ["fatima d","dani r","flor p","lu s","cori o",null],
+            10: ["marian m","eve v","sofia f","ro b",null,null],
+            11: ["mayran", "dona r",null,null,null,null]
         }
     }
 };
 
 const Calendario = ({theme}) => {
     
+    // Calendario que se guarda en el LOCALSTORAGE
     const [calendar, setCalendar] = useState(() => {
         const savedCalendar = localStorage.getItem("calendar");
         return savedCalendar ? JSON.parse(savedCalendar) : initialCalendar;
     });
     
+    //UseState para manejar las distintas cosas (nombre, dia, turno y hora)
     const [name, setName] = useState("");
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
 
+
+    // Funcion para resetear el calendario al que estaba en el comienzo
     const handleResetCalendar = () => {
         setCalendar(initialCalendar);
         localStorage.setItem("calendar", JSON.stringify(initialCalendar));
@@ -105,33 +109,44 @@ const Calendario = ({theme}) => {
         localStorage.setItem("calendar", JSON.stringify(calendar));
     }, [calendar]);
 
-    // Resetear el calendario cada sabado a las 15hs
-    useEffect(() => {
-        const now = moment();
-        const saturday15h = moment().day(6).hour(15).minute(0).second(0);
-    
-        if (now.isAfter(saturday15h)) {
-            saturday15h.add(1, 'week');
+    // Funcion para resetear el calendario todos los sabados a las 15hs
+    const resetSaturday = () => {
+        const ahora = moment();
+        const sabado = ahora.day() === 6;
+        const quinceHoras = ahora.hour() === 15 && ahora.minute() === 0;
+
+        if(sabado && quinceHoras) {
+            console.log('Ejecutando reseteo del Initial Calendar.')
+            handleResetCalendar()
         }
-    
-        const timeUntilReset = saturday15h.diff(now);
-    
+    }
+
+    // Ejecutar la funcion resetSaturday cada una hora para ver si es sabado.
+    useEffect(() => {
+        
+        //Timer para recargar la pagina cada 1 hora
         const timer = setTimeout(() => {
-            setCalendar(initialCalendar);
-            localStorage.setItem("calendar", JSON.stringify(initialCalendar));
-        }, timeUntilReset);
-    
-        return () => clearTimeout(timer);
-    }, []);
+            window.location.reload()
+        }, 3600000)
+        // ejecutando la funcion que resetea el Initial Calendar
+        resetSaturday()
+
+        return() => clearTimeout(timer)
+    })
 
     const handleAddPerson = (day, shift, hour, name) => {
         setCalendar((prev) => {
             // Crear una copia profunda del estado previo
             const updated = JSON.parse(JSON.stringify(prev));
             const availableSlot = updated[day][shift][hour].indexOf(null);
-    
-            if (availableSlot !== -1) {
-                updated[day][shift][hour][availableSlot] = name;
+            const personaRepetida = updated[day][shift][hour].map(pers => pers === name)
+
+            if(personaRepetida.filter(p => p === true).length > 0){
+                alert(`Hola ${name}, ya estas registrado en este horario. Elije otro.`)
+                return prev
+            } else if (availableSlot !== -1) {
+                day === 'sábado' ? alert(`Turno Confirmado: ${day}, ${hour}:30 hs`) : alert(`Turno Confirmado: ${day}, ${hour}:00 hs`)
+                updated[day][shift][hour][availableSlot] = name.toLowerCase();
                 setName(""); // Limpia el campo de entrada
                 return updated;
             } else {
@@ -154,7 +169,7 @@ const Calendario = ({theme}) => {
     
         // Pedir al usuario que ingrese el turno de destino (mañana o tarde)
         const toShift = prompt("Ingresa el turno de destino (mañana o tarde):");
-    
+        
         // Validar que el turno sea válido
         if (toShift !== "mañana" && toShift !== "tarde") {
             alert("Turno inválido. Por favor ingresa 'mañana' o 'tarde'.");
@@ -169,10 +184,14 @@ const Calendario = ({theme}) => {
     
         // Validar que toHourNumber sea un número válido y que exista en el turno seleccionado
         if (!isNaN(toHourNumber) && calendar[fromDay] && calendar[fromDay][toShift] && calendar[fromDay][toShift].hasOwnProperty(toHourNumber)) {
-            // Remover la persona de su horario actual
-            handleRemovePerson(fromDay, fromShift, fromHour, index);
-    
+            
             const emptyIndex = calendar[fromDay][toShift][toHourNumber].indexOf(null);
+
+            // Remover la persona de su horario actual
+            const personaRepetida = calendar[fromDay][toShift][toHourNumber].map(pers => pers === person)
+            if(!(personaRepetida.filter(p => p === true).length > 0)){
+                handleRemovePerson(fromDay, fromShift, fromHour, index);
+            }
             if (emptyIndex !== -1) {
                 // Mover a la persona al nuevo horario
                 handleAddPerson(fromDay, toShift, toHourNumber, person);
@@ -197,7 +216,7 @@ const Calendario = ({theme}) => {
                 <FormLabel
                     textAlign='center'
                     >
-                    Nombre
+                    Nombre Habitual
                 </FormLabel>
                 <Input
                     border='1px solid #80c687'
@@ -205,7 +224,8 @@ const Calendario = ({theme}) => {
                     type="text" 
                     value={name} 
                     onChange={(e) => setName(e.target.value)} 
-                    placeholder="Ingresa tu nombre" 
+                    fontSize='0.9rem'
+                    placeholder="Ingresa el nombre con el que te registras siempre" 
                 />
             </Box>
             
@@ -267,8 +287,8 @@ const Calendario = ({theme}) => {
                     
 
                     <Button
-                        backgroundColor={theme == 'light' ? 'white' : 'black'}
-                        color={theme == 'light' ? 'black' : 'white'}
+                        backgroundColor={theme === 'light' ? 'white' : 'black'}
+                        color={theme === 'light' ? 'black' : 'white'}
                         border='1px solid #80c687'
                         box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                         transition='all 0.3s ease'
@@ -276,7 +296,7 @@ const Calendario = ({theme}) => {
                             boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
                             transform: 'translateY(-2px)',
                             backgroundColor:'#80c687',
-                            color: theme == 'light' ? 'white' : 'black'
+                            color: theme === 'light' ? 'white' : 'black'
                         }}
                         onClick={() => {
                             if (selectedDay && selectedShift && selectedHour && name) {
@@ -320,13 +340,14 @@ const Calendario = ({theme}) => {
                             Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
                                 <Flex key={hour} flexDir='column' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
                                     {selectedDay === 'sábado' ?
-                                    <Text textDecor='underline' fontWeight='bold' margin='0 20px 0 20px'>{hour}:30</Text> :
-                                    <Text textDecor='underline' fontWeight='bold' margin='0 20px 0 20px'>{hour}:00</Text>
+                                    <Text textDecor='underline' fontWeight='bold' fontSize='2rem' margin='0 20px 0 20px'>{hour}:30</Text> :
+                                    <Text textDecor='underline' fontWeight='bold' fontSize='1.6rem' margin='0 20px 0 20px'>{hour}:00</Text>
                                 }
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
                                         <Box key={index} w='100%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
-                                            <Button 
-                                                backgroundColor={theme == 'light' ? 'white' : 'black'}
+                                            <Button
+                                                display={name === person ? 'flex' : 'none'}
+                                                backgroundColor={theme === 'light' ? 'white' : 'black'}
                                                 color='black'
                                                 box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                                                 transition='all 0.3s ease'
@@ -340,14 +361,17 @@ const Calendario = ({theme}) => {
                                                     🗑️
                                                 </Button>
                                                 <Text
+                                                    textTransform='capitalize'
+                                                    textDecor={name === person ? 'underline' : 'none'}
                                                     textAlign='center'
                                                     w='100%'
                                                     style={{fontWeight: 'bold', margin: '5px 0 10px 0'}} 
                                                     color={person ? 'auto' : 'green'}
                                                     >{person || "Disponible"}</Text>
-                                            <Button 
-                                                backgroundColor={theme == 'light' ? 'white' : 'black'}
-                                                color={theme == 'light' ? 'black' : 'white'}
+                                            <Button
+                                                display={name === person ? 'flex' : 'none'}
+                                                backgroundColor={theme === 'light' ? 'white' : 'black'}
+                                                color={theme === 'light' ? 'black' : 'white'}
                                                 border='1px solid #80c687'
                                                 box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                                                 transition='all 0.3s ease'
@@ -355,9 +379,9 @@ const Calendario = ({theme}) => {
                                                     boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
                                                     transform: 'translateY(-2px)',
                                                     backgroundColor:'#80c687',
-                                                    color: theme == 'light' ? 'white' : 'black'
+                                                    color: theme === 'light' ? 'white' : 'black'
                                                 }}
-                                                fontSize='.8rem' w='40%' onClick={() => {
+                                                fontSize='.8rem' w='32%' h='32px' onClick={() => {
                                                 handleMovePerson(selectedDay, selectedShift, hour, index);
                                             }}>
                                                 Mover
@@ -379,6 +403,7 @@ const Calendario = ({theme}) => {
                 justifyContent='center'
                 >
                 <Button
+                    display={name === 'manuel' ? 'flex' : 'none'}
                     backgroundColor='white'
                     color='black'
                     border='1px solid #80c687'
