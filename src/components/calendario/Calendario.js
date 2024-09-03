@@ -146,7 +146,7 @@ const Calendario = ({theme}) => {
                 return prev
             } else if (availableSlot !== -1) {
                 day === 'sábado' ? alert(`Turno Confirmado: ${day}, ${hour}:30 hs`) : alert(`Turno Confirmado: ${day}, ${hour}:00 hs`)
-                updated[day][shift][hour][availableSlot] = name.toLowerCase();
+                updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
                 setName(""); // Limpia el campo de entrada
                 return updated;
             } else {
@@ -346,7 +346,7 @@ const Calendario = ({theme}) => {
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
                                         <Box key={index} w='100%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
                                             <Button
-                                                display={name === person ? 'flex' : 'none'}
+                                                display={name.toLocaleLowerCase() === person ? 'flex' : 'none'}
                                                 backgroundColor={theme === 'light' ? 'white' : 'black'}
                                                 color='black'
                                                 box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
@@ -362,14 +362,14 @@ const Calendario = ({theme}) => {
                                                 </Button>
                                                 <Text
                                                     textTransform='capitalize'
-                                                    textDecor={name === person ? 'underline' : 'none'}
+                                                    textDecor={name.toLocaleLowerCase() === person ? 'underline' : 'none'}
                                                     textAlign='center'
                                                     w='100%'
                                                     style={{fontWeight: 'bold', margin: '5px 0 10px 0'}} 
                                                     color={person ? 'auto' : 'green'}
                                                     >{person || "Disponible"}</Text>
                                             <Button
-                                                display={name === person ? 'flex' : 'none'}
+                                                display={name.toLocaleLowerCase() === person ? 'flex' : 'none'}
                                                 backgroundColor={theme === 'light' ? 'white' : 'black'}
                                                 color={theme === 'light' ? 'black' : 'white'}
                                                 border='1px solid #80c687'
@@ -403,7 +403,7 @@ const Calendario = ({theme}) => {
                 justifyContent='center'
                 >
                 <Button
-                    display={name === 'manuel' ? 'flex' : 'none'}
+                    display={name.toLocaleLowerCase() === 'manuel' ? 'flex' : 'none'}
                     backgroundColor='white'
                     color='black'
                     border='1px solid #80c687'
