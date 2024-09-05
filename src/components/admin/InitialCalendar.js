@@ -146,7 +146,6 @@ const InitialCalendar = ({toggleTheme,theme}) => {
             const availableSlot = updated[day][shift][hour].indexOf(null);
             const personaRepetida = updated[day][shift][hour].map(pers => pers === name.toLocaleLowerCase())
 
-            console.log(updated)
 
             if(personaRepetida.filter(p => p === true).length > 0){
                 alert(`Hola ${name}, ya estas registrado en este horario. Elije otro.`)
