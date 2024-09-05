@@ -385,7 +385,7 @@ const InitialCalendar = ({toggleTheme,theme}) => {
                         flexDir={['column','column','row']}
                         columnGap='40px'
                         rowGap={['10px','10px','0']}
-                        w={['100%','90%','90%']}
+                        w={['80%','80%','90%']}
                         flexWrap={['wrap','wrap','nowrap']}
                         >
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
