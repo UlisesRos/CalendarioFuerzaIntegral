@@ -4,14 +4,14 @@ import Navbar from '../Navbar/Navbar'
 import '../../css/nav/Navbar.css'
 import Footer from '../footer/Footer'
 
-function Rutas({toggleTheme, theme}) {
+function Rutas({toggleTheme, theme, adminCalendar}) {
 
     return (
         <Flex
             flexDir='column'
             >
             <Navbar toggleTheme={toggleTheme} theme={theme} />
-            <Calendario theme={theme}/>
+            <Calendario theme={theme} adminCalendar={adminCalendar}/>
             <Footer />
         </Flex>
     )

@@ -83,7 +83,7 @@ const initialCalendar = {
     }
 };
 
-const Calendario = ({theme}) => {
+const Calendario = ({ theme, adminCalendar }) => {
     
     // Calendario que se guarda en el LOCALSTORAGE
     const [calendar, setCalendar] = useState(() => {
@@ -97,11 +97,9 @@ const Calendario = ({theme}) => {
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
 
-
     // Funcion para resetear el calendario al que estaba en el comienzo
     const handleResetCalendar = () => {
-        setCalendar(initialCalendar);
-        localStorage.setItem("calendar", JSON.stringify(initialCalendar));
+        setCalendar(JSON.parse(localStorage.getItem("calendarAdmin", JSON.stringify(adminCalendar))));    
     };
 
     // Persistencia 
@@ -400,30 +398,6 @@ const Calendario = ({theme}) => {
                 </Box>
                 )
             }
-            <Box
-                margin='20px 0 20px 0'
-                display='flex'
-                alignItems='center'
-                justifyContent='center'
-                >
-                <Button
-                    display={name.toLocaleLowerCase() === 'manuel' ? 'flex' : 'none'}
-                    backgroundColor='white'
-                    color='black'
-                    border='1px solid #80c687'
-                    box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                    transition='all 0.3s ease'
-                    _hover={{
-                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                        transform: 'translateY(-2px)',
-                        backgroundColor:'#80c687',
-                        color: 'white'
-                    }}
-                    onClick={handleResetCalendar}
-                    >
-                    Resetear Initial
-                </Button>
-            </Box>
         </Box>
     );
 };
