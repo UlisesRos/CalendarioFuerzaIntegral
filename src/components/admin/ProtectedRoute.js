@@ -1,7 +1,13 @@
-import { Navigate } from "react-router-dom";
+import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ children, isAuthenticated }) => {
-    return isAuthenticated ? children : <Navigate to='/' />
-}
+const ProtectedRoute = ({ isAuthenticated, children }) => {
+    if (!isAuthenticated) {
+        // Si no está autenticado, redirige al inicio o a la página de login
+        return <Navigate to="/admin" />;
+    }
 
-export default ProtectedRoute
+    // Si está autenticado, renderiza los componentes hijos
+    return children;
+};
+
+export default ProtectedRoute;

@@ -3,10 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import logo from '../../img/logofuerza.png'
 import { useState } from 'react'
 
-function Admin({theme}) {
+function Admin({theme, setIsAuthenticated}) {
 
     const [codigo, setCodigo] = useState('')
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
     const navigate = useNavigate()
     const codigoCorrecto = process.env.REACT_APP_CLAVE
 
@@ -14,14 +13,14 @@ function Admin({theme}) {
     const handleCodigoButton = () => {
         if(codigo === codigoCorrecto) {
             setIsAuthenticated(true)
-            localStorage.setItem('isAuthenticated', true)
+            localStorage.setItem('adminAuthenticated', 'true')
             navigate('/initialcalendar')
         } else {
             alert('CLAVE INCORRECTA')
             setCodigo('')
         }
     }
-
+    
     // Funcion para que la tecla entrar funcione con el ENTER
     const handleEnter = (e) => {
         if(e.key === 'Enter'){

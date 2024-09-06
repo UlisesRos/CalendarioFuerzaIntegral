@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import '../../css/calendario/Calendario.css'
 import { Box, Button, Flex, FormLabel, Heading, Input, Select, Text } from '@chakra-ui/react';
+import Swal from 'sweetalert2'
 
 const initialCalendar = {
     lunes: {
@@ -139,18 +140,64 @@ const Calendario = ({ theme, adminCalendar }) => {
             const availableSlot = updated[day][shift][hour].indexOf(null);
             const personaRepetida = updated[day][shift][hour].map(pers => pers === name.toLocaleLowerCase())
 
-            console.log(updated)
-
             if(personaRepetida.filter(p => p === true).length > 0){
-                alert(`Hola ${name}, ya estas registrado en este horario. Elije otro.`)
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "warning",
+                    title: `Hola ${name}, ya estas registrado en este horario. Elije otro.`
+                });
                 return prev
             } else if (availableSlot !== -1) {
-                day === 'sábado' ? alert(`Turno Confirmado: ${day}, ${hour} hs`) : alert(`Turno Confirmado: ${day}, ${hour}:00 hs`)
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                day === 'sábado' ?
+                Toast.fire({
+                    icon: "success",
+                    title: `Turno confirmado: ${day}, ${hour} hs`
+                })
+                : 
+                Toast.fire({
+                    icon: "success",
+                    title: `Turno confirmado: ${day}, ${hour}:00 hs`
+                })
                 updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
                 setName(""); // Limpia el campo de entrada
                 return updated;
             } else {
-                alert("No hay espacios disponibles en este horario.");
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "error",
+                    title: "No hay espacios disponibles en este horario."
+                })
                 return prev;
             }
         });
@@ -162,7 +209,22 @@ const Calendario = ({ theme, adminCalendar }) => {
             updated[day][shift][hour][index] = null;
             return updated;
             });
-    };
+            const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "error",
+                    title: "Usuario eliminado"
+                });
+        };
 
     const handleMovePerson = (fromDay, fromShift, fromHour, index) => {
         const person = calendar[fromDay][fromShift][fromHour][index];
@@ -172,7 +234,21 @@ const Calendario = ({ theme, adminCalendar }) => {
         
         // Validar que el turno sea válido
         if (toShift !== "mañana" && toShift !== "tarde") {
-            alert("Turno inválido. Por favor ingresa 'mañana' o 'tarde'.");
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "error",
+                title: "Turno invalido. Por favor ingresa mañana o tarde."
+            });
             return;
         }
     
@@ -196,12 +272,40 @@ const Calendario = ({ theme, adminCalendar }) => {
                 // Mover a la persona al nuevo horario
                 handleAddPerson(fromDay, toShift, toHourNumber, person);
             } else {
-                alert("El horario de destino está completo.");
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "warning",
+                    title: "El horario de destino esta completo."
+                });
                 // Si el horario de destino está completo, la persona se vuelve a añadir al horario original
                 handleAddPerson(fromDay, fromShift, fromHour, person);
             }
         } else {
-            alert("Hora inválida o el horario no existe en el calendario.");
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "warning",
+                title: "Hora inválida o el horario no existe en el calendario"
+            });
             // Si la hora es inválida, la persona se vuelve a añadir al horario original
             handleAddPerson(fromDay, fromShift, fromHour, person);
         }
@@ -304,7 +408,21 @@ const Calendario = ({ theme, adminCalendar }) => {
                             if (selectedDay && selectedShift && selectedHour && name) {
                             handleAddPerson(selectedDay, selectedShift, selectedHour, name);
                             } else {
-                            alert("Selecciona un día, un turno, una hora y proporciona tu nombre.");
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: "top-end",
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    didOpen: (toast) => {
+                                    toast.onmouseenter = Swal.stopTimer;
+                                    toast.onmouseleave = Swal.resumeTimer;
+                                    }
+                                });
+                                Toast.fire({
+                                    icon: "info",
+                                    title: "Selecciona un dia, un turno, una hora y proporciona tu nombre"
+                                });
                             }
                         }}
                         disabled={!name || !selectedDay || !selectedShift || !selectedHour}

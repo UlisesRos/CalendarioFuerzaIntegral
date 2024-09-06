@@ -29,7 +29,7 @@ function Navbar({toggleTheme, theme}) {
                             transform: 'translateY(-2px)',
                             backgroundColor:'#80c687',
                             color: theme === 'light' ? 'white' : 'black'
-                        }}  
+                        }}
                         >
                         Admin
                     </Button>
