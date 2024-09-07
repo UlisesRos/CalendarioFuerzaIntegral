@@ -8,30 +8,30 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 const adminCalendar = {
     lunes: {
         mañana: {
-            8: [null, 'ulises', "isabel c", "joaco", "nanci", "javier r"],
-            9: ['ulises', null, "valen o", "pau", "beti f", "mauri l"],
-            10: [null, null, null, null,"omar b", "facu a"],
-            11: [null, null, null, null,"bruno", "damian o"]
+            8: ['isabel c', 'belu s', 'joaco m', "hugo d", "nanci g", "javier r", "miriam p"],
+            9: ['valen o', "lu s", "ale p", "mauri l", "beti f", null],
+            10: ["ro b", "ailen m", "facu a","omar b", null, null],
+            11: ["bruno",null,null,null,null,null]
         },
         tarde: {
-            16: ["jor p", "ale g", "irina roman", "mayra n", "marian g", "cuervo"],
-            17: [ null, null, 'clari s', "ale a", "belu a", "facu a"],
-            18: ["franco s", "alicia n", "melina l", "uli", "maela g", "mica p"],
-            19: [ null, "rama", "maia b", "marian f", "lu s", "dani r"],
+            16: ["jor p", "dona r", "irina roman", "mayra n", "marian g", "cuervo", null],
+            17: ['clari s', "ale a", "ale g", "facu a",null,null,null],
+            18: ["franco s", "alicia n", "belu a", "damian o", "maela g", "eze s"],
+            19: ["rama r", "maia b", "mariano f", "uli", "mica p",null],
         }
     },
     martes: {
         mañana: {
-            8: ["agos p", "joaco", "juan jose f", "belu", null, null],
-            9: ["mariana m", "sabri v", "lucas k", "flor p", "martina g", null],
-            10: ["betty j", "adri f", "ailen", "mariana m", null, null],
-            11: ["mer s", "flor b", "mayra n", null, null, null]
+            8: ["agos p", "joaco m", "juan jose f", "pato c", null, null,null],
+            9: ["marina m", "sabri v", "lu w", "flor p", "martina g", "mayra m"],
+            10: ["betty j", "adri f", "marian m", null, null,null],
+            11: ["dani r", null,null, null, null, null]
         },
         tarde: {
-            16: ["dani e", "juli v", "clari o", "liliana v", null, null],
-            17: ["guille sc", "pau f", "eva a", "elba", "irina r", "juan jose"],
-            18: ["frances", "sofia f", "eve v", "celeste g", "patricio", "dani r"],
-            19: Array(6).fill("Cerrado"),
+            16: ["dani e", "zio r", "malvi r", "liliana v", "rocio g", null, null],
+            17: ["guille sc","elba g", "irina r", null, null, null,null],
+            18: ["frances", "sofia f", "eve v",null,null,null],
+            19: ["lucas k",null,null,null,null,null],
         }
     },
     miércoles: {
