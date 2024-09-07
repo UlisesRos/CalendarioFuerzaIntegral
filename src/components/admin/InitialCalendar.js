@@ -26,7 +26,43 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
     const handleResetCalendar = () => {
         setCalendar(calendar);
         localStorage.setItem("calendar", JSON.stringify(calendar));
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "success",
+            title: "Calendario reseteado."
+        });
     };
+
+    // Funcion para resetear el calendario al del adminCalendar
+    const handleResetAdminCalendar = () => {
+        setCalendar(adminCalendar)
+        localStorage.setItem("calendar", JSON.stringify(adminCalendar));
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "success",
+            title: "Calendario reseteado al ADMIN CALENDAR."
+        });
+    }
 
     // Persistencia 
     useEffect(() => {
@@ -130,12 +166,12 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
 
     const handleMovePerson = (fromDay, fromShift, fromHour, index) => {
         const person = calendar[fromDay][fromShift][fromHour][index];
-    
-        // Pedir al usuario que ingrese el turno de destino (mañana o tarde)
-        const toShift = prompt("Ingresa el turno de destino (mañana o tarde):").toLocaleLowerCase();
         
-        // Validar que el turno sea válido
-        if (toShift !== "mañana" && toShift !== "tarde") {
+        // Pedir al usuario que ingrese el turno de destino (mañana o tarde)
+        const toShift = prompt("Ingresa el turno de destino (mañana o tarde):");
+        if(toShift !== null){
+            // Validar que el turno sea válido
+        if (toShift.toLocaleLowerCase() !== "mañana" && toShift.toLocaleLowerCase() !== "tarde") {
             const Toast = Swal.mixin({
                 toast: true,
                 position: "top-end",
@@ -153,10 +189,11 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
             });
             return;
         }
-    
+        }
+        
         // Pedir al usuario que ingrese la hora de destino
         const toHour = prompt("Ingresa la hora de destino (por ejemplo, 16):");
-    
+        
         // Convertir la hora ingresada a un número
         let toHourNumber = parseInt(toHour, 10);
     
@@ -492,9 +529,9 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
                         backgroundColor:'#80c687',
                         color: theme === 'light' ? 'white' : 'black'
                     }} 
-                    onClick={handleResetCalendar}
+                    onClick={name === 'ulises gaston ros' ? handleResetAdminCalendar : handleResetCalendar}
                     >
-                    Resetear Initial
+                    {name.toLocaleLowerCase() === 'ulises gaston ros' ? 'Resetear calendario por ULISES' : 'Resetear Initial'} 
                 </Button>
             </Box>
         </Box>

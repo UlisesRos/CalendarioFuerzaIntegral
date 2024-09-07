@@ -2,6 +2,7 @@ import { Flex, Image, Box, Button, Text, Input } from '@chakra-ui/react'
 import { Link, useNavigate } from 'react-router-dom'
 import logo from '../../img/logofuerza.png'
 import { useState } from 'react'
+import Swal from 'sweetalert2'
 
 function Admin({theme, setIsAuthenticated}) {
 
@@ -16,7 +17,21 @@ function Admin({theme, setIsAuthenticated}) {
             localStorage.setItem('adminAuthenticated', 'true')
             navigate('/initialcalendar')
         } else {
-            alert('CLAVE INCORRECTA')
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "error",
+                title: "CLAVE INCORRECTA."
+            });
             setCodigo('')
         }
     }
@@ -76,6 +91,7 @@ function Admin({theme, setIsAuthenticated}) {
                             Escribir la clave
                         </Text>
                         <Input 
+                            type='password'
                             placeholder='clave' 
                             w='200px' 
                             textAlign='center' 

@@ -7,79 +7,79 @@ import Swal from 'sweetalert2'
 const initialCalendar = {
     lunes: {
         mañana: {
-            8: [null, null, "isabel c", "joaco", "nanci", "javier r"],
-            9: [null, null, "valen o", "pau", "beti f", "mauri l"],
-            10: [null, null, null, null,"omar b", "facu a"],
-            11: [null, null, null, null,"bruno", "damian o"]
+            8: ["isabel c","belu s","joaco m","hugo d","nanci g","javier r","miriam p"],
+            9: ["valen o","lu s","ale p","beti f","mauri l",null],
+            10: ["ro b","ailen m","facu a","omar b",null,null],
+            11: ["bruno",null,null,null,null,null]
         },
         tarde: {
-            16: ["jor p", "ale g", "irina roman", "mayra n", "marian g", "cuervo"],
-            17: [ null, null, 'clari s', "ale a", "belu a", "facu a"],
-            18: ["franco s", "alicia n", "melina l", "uli", "maela g", "mica p"],
-            19: [ null, "rama", "maia b", "marian f", "lu s", "dani r"],
+            16: ["jor p","dona r","irina r","mayra n","marian g","cuervo",null],
+            17: ["clari s","ale a","ale g","facu a",null,null,null],
+            18: ["franco s","alicia n","belu a","damian o","maela g","eze s"],
+            19: ["rama r","maia b","mariano f","uli","mica p",null],
         }
     },
     martes: {
         mañana: {
-            8: ["agos p", "joaco", "juan jose f", "belu", null, null],
-            9: ["mariana m", "sabri v", "lucas k", "flor p", "martina g", null],
-            10: ["betty j", "adri f", "ailen", "mariana m", null, null],
-            11: ["mer s", "flor b", "mayra n", null, null, null]
+            8: ["joaco m","agos p","juan jose f","pato c",null,null,null],
+            9: ["marina m","sabri v","lu w","flor p","mayra n","martina g"],
+            10: ["adri f","marian m","betty j",null,null,null],
+            11: ["dani r",null,null, null, null, null]
         },
         tarde: {
-            16: ["dani e", "juli v", "clari o", "liliana v", null, null],
-            17: ["guille sc", "pau f", "eva a", "elba", "irina r", "juan jose"],
-            18: ["frances", "sofia f", "eve v", "celeste g", "patricio", "dani r"],
-            19: Array(6).fill("Cerrado"),
+            16: ["dani e","ziu r","malvi r","liliana v","rocio g",null,null],
+            17: ["guille sc","irina r","elba g",null,null,null,null],
+            18: ["frances","sofi f","eve v",null,null,null],
+            19: ["lucas k",null,null,null,null,null]
         }
     },
     miércoles: {
         mañana: {
-            8: ["lu w", "isabel c", "nanci g", "romi m", null, null],
-            9: ["daniela a", "mauri l", "Ale P", "Yas", null, null],
-            10: ["ailen m","omar b",null,null,null,null],
-            11: ["Lu S",null,null,null,null,null]
+            8: ["daniela a","belu s","isabel c","nanci g","romi m",null,null],
+            9: ["beti f","valen o","lu s","mauri l","yaz w",null],
+            10: ["ro b","flor b","ailen m","omar b",null,null],
+            11: ["dani r",null,null,null,null,null]
         },
         tarde: {
-            16: ["irina r","ale G","marcelo m","cande b","marian g",null],
-            17: ["ale a","melina l","facu a","cuervo","sofia f",null],
-            18: ["ulises","flor m","laura f","franco s","bruno","mica p"],
-            19: ["frances","juli",null,null,null,null],
+            16: ["irina r","fati d","mayra n","cande b","marian g",null,null],
+            17: ["clari s","ale a","ale g","cuervo","facu a",null,null],
+            18: ["maela g","eze s","vero t","franco s","bruno",null],
+            19: ["rama r","maia b","uli","mica p",null,null],
         }
     },
     jueves: {
         mañana: {
-            8: ["joaco m","javier r",null,null,null,null],
-            9: ["Yaz","belu","Licha R","martina g",null,null],
-            10: ["ro b","mayra","betty j",null,null,null],
-            11: Array(6).fill("Cerrado")
+            8: ["joaco m","javier r",null,null,null,null,null],
+            9: ["marina m","ale p","flor p","martina g","sabri v",null],
+            10: ["dani e","facu a","marian m",null,null,null],
+            11: [null,null,null,null,null,null]
         },
         tarde: {
-            16: ["juli pau","dona r","jor p","alicia n","ziomara r","malvi r"],
-            17: ["agos p","facu a","cori o","liliana v","dani r","guille s","eva a"],
-            18: ["frances","celesta g",null,null,null,null],
-            19: ["mariano f","lucas k","rama",null,null,null],
+            16: ["dona r","jor p","mayra n","ziomara r","malvi r",null,null],
+            17: ["agos p","facu a","rocio g","liliana v","elba","guille sc","pato c"],
+            18: ["frances","belu a","irina r",null,null,null],
+            19: ["mariano f","flor m","lucas k","sofi f","eve v",null],
         }
     },
     viernes: {
         mañana: {
-            8: ["daniela a","isabel c",null,null,null,null],
-            9: ["lu w","flor b",null,null,null,null],
-            10: ["dani r","mauri l","damian o","cori o",null,null],
-            11: Array(6).fill("Cerrado")
+            8: ["juan jose f","miriam p","daniela a","isabel c","romi m","belu s","hugo d"],
+            9: ["martina g","yaz w","lu w","beti f","nanci g","mauri l"],
+            10: ["ro b","dani r","adri f","flor b","ailen m",null],
+            11: [null,null,null,null,null,null]
         },
         tarde: {
-            16: ["ale g","marian g","belu a","cande b","irina r",null],
-            17: ["sofia f","melina l","eve v",null,null,null],
-            18: ["ro b","belu","irina r","Maela G","mica p", null],
-            19: ["maia b","rama","frances","juli b","uli","flor m"],
+            16: ["jor p","marian g","mayra n","cande b","dona r","irina r",null],
+            17: ["ale g","bruno","liliana v","rocio g","damian o","irina r",null],
+            18: ["alicia n","eze s","maela g","vero t", null,null],
+            19: ["maia b","rama r","mica p","uli",null,null],
         }
     },
     sábado: {
         mañana: {
-            930: ["fatima d","dani r","flor p","lu s","cori o",null],
-            1030: ["marian m","eve v","sofia f","ro b",null,null],
-            1130: ["mayran", "dona r",null,null,null,null]
+            930: ["yaz w","fatima d","dani r","flor p","licha r",null],
+            1030: ["lu s","marian m","eve v","sofia f",null,null],
+            1130: ["flor m",null,null,null,null,null,null]
         }
     }
 };
