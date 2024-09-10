@@ -8,13 +8,14 @@ import axios from 'axios'
 const socket = io('/')
 
 const Calendario = ({ theme }) => {
-    
+
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
     useEffect(() => {
         const fetchCalendar = async () => {
             try {
                 const response = await axios.get('/api/calendar');
+                console.log(response.data)
                 setCalendar(response.data);
             } catch (error) {
                 console.error('Error fetching calendar', error)
