@@ -6,10 +6,9 @@ import io from 'socket.io-client'
 import axios from 'axios'
 
 const socket = io('/')
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const Calendario = ({ theme }) => {
-
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
@@ -17,7 +16,7 @@ const Calendario = ({ theme }) => {
         const fetchCalendar = async () => {
             try {
                 console.log(apiUrl)
-                const response = await axios.get(`https://calendarioback.onrender.com/api/calendar`);
+                const response = await axios.get(`${apiUrl}/api/calendar`);
                 setCalendar(response.data);
             } catch (error) {
                 console.error('Error fetching calendar', error)
