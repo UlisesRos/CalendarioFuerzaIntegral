@@ -16,6 +16,7 @@ const Calendario = ({ theme }) => {
     useEffect(() => {
         const fetchCalendar = async () => {
             try {
+                console.log(apiUrl)
                 const response = await axios.get(`${apiUrl}/api/calendar`);
                 setCalendar(response.data);
             } catch (error) {
