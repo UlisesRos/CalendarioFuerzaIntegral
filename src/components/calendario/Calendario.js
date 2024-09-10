@@ -32,13 +32,14 @@ const Calendario = ({ theme }) => {
             socket.off('updateCalendar');
         }
     }, [])
-    
+
     //UseState para manejar las distintas cosas (nombre, dia, turno y hora)
     const [name, setName] = useState("");
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
 
+    console.log(Object.keys(calendar).map((day) => day))
     const handleAddPerson = (day, shift, hour, name) => {
         setCalendar((prev) => {
             // Crear una copia profunda del estado previo
