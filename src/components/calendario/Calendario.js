@@ -9,12 +9,14 @@ const socket = io('/')
 
 const Calendario = ({ theme }) => {
 
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
     useEffect(() => {
         const fetchCalendar = async () => {
             try {
-                const response = await axios.get('/api/calendar');
+                const response = await axios.get(`${apiUrl}/api/calendar`);
                 console.log(response)
                 setCalendar(response.data);
             } catch (error) {
@@ -90,7 +92,7 @@ const Calendario = ({ theme }) => {
                 })
                 updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
                 setName(""); // Limpia el campo de entrada
-                axios.put('/api/calendar', { day, shift, hour, updatedHour: updated[day][shift][hour] })
+                axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
                 return updated;
             } else {
                 const Toast = Swal.mixin({
@@ -123,7 +125,7 @@ const Calendario = ({ theme }) => {
             updated[day][shift][hour] = updatedHour;
     
             // Enviar solicitud PUT con datos correctos
-            axios.put('/api/calendar/remove', { 
+            axios.put(`${apiUrl}/api/calendar/remove`, { 
                 day, 
                 shift, 
                 hour, 

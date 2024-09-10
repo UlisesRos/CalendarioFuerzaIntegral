@@ -21,7 +21,6 @@
     "sweetalert2": "^11.13.2",
     "web-vitals": "^2.1.4"
   },
-  "proxy": "https://calendarioback.onrender.com",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

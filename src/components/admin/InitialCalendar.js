@@ -12,12 +12,14 @@ const socket = io('/')
 
 const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
     
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
     useEffect(() => {
         const fetchCalendar = async () => {
             try {
-                const response = await axios.get('/api/admincalendar');
+                const response = await axios.get(`${apiUrl}/api/admincalendar`);
                 setCalendar(response.data);
             } catch (error) {
                 console.error('Error fetching calendar', error)
@@ -46,7 +48,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
     // Funcion para resetear el calendario al que estaba en el comienzo
     const handleResetCalendar = async () => {
         try {
-            await axios.put('/api/admincalendar/reset')
+            await axios.put(`${apiUrl}/api/admincalendar/reset`)
             const Toast = Swal.mixin({
                 toast: true,
                 position: "top-end",
@@ -130,7 +132,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 })
                 updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
                 setName(""); // Limpia el campo de entrada
-                axios.put('/api/admincalendar', { day, shift, hour, updatedHour: updated[day][shift][hour] })
+                axios.put(`${apiUrl}/api/admincalendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
                 return updated;
             } else {
                 const Toast = Swal.mixin({
@@ -163,7 +165,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
             updated[day][shift][hour] = updatedHour;
     
             // Enviar solicitud PUT con datos correctos
-            axios.put('/api/admincalendar/remove', { 
+            axios.put(`${apiUrl}/api/admincalendar/remove`, { 
                 day, 
                 shift, 
                 hour, 
