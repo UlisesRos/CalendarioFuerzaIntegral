@@ -17,7 +17,7 @@ const Calendario = ({ theme }) => {
         const fetchCalendar = async () => {
             try {
                 console.log(apiUrl)
-                const response = await axios.get(`${apiUrl}/api/calendar`);
+                const response = await axios.get(`https://calendarioback.onrender.com/api/calendar`);
                 setCalendar(response.data);
             } catch (error) {
                 console.error('Error fetching calendar', error)
