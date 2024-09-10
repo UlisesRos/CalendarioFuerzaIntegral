@@ -17,7 +17,6 @@ const Calendario = ({ theme }) => {
         const fetchCalendar = async () => {
             try {
                 const response = await axios.get(`${apiUrl}/api/calendar`);
-                console.log(response)
                 setCalendar(response.data);
             } catch (error) {
                 console.error('Error fetching calendar', error)
@@ -41,8 +40,6 @@ const Calendario = ({ theme }) => {
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
-
-    console.log(calendar)
     
     const handleAddPerson = (day, shift, hour, name) => {
         setCalendar((prev) => {
