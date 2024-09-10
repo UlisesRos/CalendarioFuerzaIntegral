@@ -40,6 +40,7 @@ const Calendario = ({ theme }) => {
     const [selectedHour, setSelectedHour] = useState("");
 
     console.log(Object.keys(calendar).map((day) => day))
+
     const handleAddPerson = (day, shift, hour, name) => {
         setCalendar((prev) => {
             // Crear una copia profunda del estado previo
@@ -279,8 +280,8 @@ const Calendario = ({ theme }) => {
                     >
                     <Select w='250px' onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay} border='1px solid #80c687'>
                     <option value="">Seleccionar Día</option>
-                    {Object.keys(calendar).map((day) => (
-                        <option key={day} value={day} > {day} </option>
+                    {Object.keys(calendar).map((day, index) => (
+                        <option key={index} value={day} > {day} </option>
                     ))}
                     </Select>
 
