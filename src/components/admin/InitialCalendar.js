@@ -5,70 +5,82 @@ import logo from '../../img/logofuerza.png'
 import { useNavigate } from 'react-router-dom'
 import { Box, Button, Flex, FormLabel, Heading, Input, Select, Text, Image } from '@chakra-ui/react';
 import Swal from 'sweetalert2'
+import io from 'socket.io-client'
+import axios from 'axios'
 
-const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }) => {
+const socket = io('/')
+
+const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
     
-    // Calendario que se guarda en el LOCALSTORAGE
-    const [calendar, setCalendar] = useState(() => {
-        const savedCalendar = localStorage.getItem("calendarAdmin");
-        return savedCalendar ? JSON.parse(savedCalendar) : adminCalendar;
-    });
+    // Calendario que se guarda en MONGODB
+    const [calendar, setCalendar] = useState('')
+    useEffect(() => {
+        const fetchCalendar = async () => {
+            try {
+                const response = await axios.get('/api/admincalendar');
+                setCalendar(response.data);
+            } catch (error) {
+                console.error('Error fetching calendar', error)
+            }
+        };
+        
+        fetchCalendar();
+
+        // Escuchar el evento de actualizacion del calendario desde el servidor
+        socket.on('adminupdateCalendar', (adminupdateCalendar) => {
+            setCalendar(adminupdateCalendar);
+        });
+
+        return () => {
+            socket.off('adminupdateCalendar');
+        }
+    }, [])
     
+    console.log(calendar)
     //UseState para manejar las distintas cosas (nombre, dia, turno y hora)
     const [name, setName] = useState("");
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
 
-    const navigate = useNavigate()
-
     // Funcion para resetear el calendario al que estaba en el comienzo
-    const handleResetCalendar = () => {
-        setCalendar(calendar);
-        localStorage.setItem("calendar", JSON.stringify(calendar));
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-            }
-        });
-        Toast.fire({
-            icon: "success",
-            title: "Calendario reseteado."
-        });
+    const handleResetCalendar = async () => {
+        try {
+            await axios.put('/api/admincalendar/reset')
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "success",
+                title: "Calendario reiniciado correctamente"
+            });
+        } catch (error) {
+            console.error('Error al reiniciarse el calendario', error)
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.onmouseenter = Swal.stopTimer;
+                    toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "error",
+                title: "Error al reiniciar el calendario"
+            });
+        }
     };
-
-    // Funcion para resetear el calendario al del adminCalendar
-    const handleResetAdminCalendar = () => {
-        setCalendar(adminCalendar)
-        localStorage.setItem("calendar", JSON.stringify(adminCalendar));
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-            }
-        });
-        Toast.fire({
-            icon: "success",
-            title: "Calendario reseteado al ADMIN CALENDAR."
-        });
-    }
-
-    // Persistencia 
-    useEffect(() => {
-        localStorage.setItem("calendarAdmin", JSON.stringify(calendar));
-    }, [calendar]);
-
 
     const handleAddPerson = (day, shift, hour, name) => {
         setCalendar((prev) => {
@@ -76,7 +88,6 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
             const updated = JSON.parse(JSON.stringify(prev));
             const availableSlot = updated[day][shift][hour].indexOf(null);
             const personaRepetida = updated[day][shift][hour].map(pers => pers === name.toLocaleLowerCase())
-
 
             if(personaRepetida.filter(p => p === true).length > 0){
                 const Toast = Swal.mixin({
@@ -119,6 +130,7 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
                 })
                 updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
                 setName(""); // Limpia el campo de entrada
+                axios.put('/api/admincalendar', { day, shift, hour, updatedHour: updated[day][shift][hour] })
                 return updated;
             } else {
                 const Toast = Swal.mixin({
@@ -142,26 +154,46 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
     };
 
     const handleRemovePerson = (day, shift, hour, index) => {
-            setCalendar((prev) => {
-            const updated = { ...prev };
-            updated[day][shift][hour][index] = null;
+        setCalendar((prev) => {
+            const updated = { ...prev }
+            const updatedHour = [ ...updated[day][shift][hour] ];
+            updatedHour[index] = null;
+
+            // Actualizar el estado con la hora modificada
+            updated[day][shift][hour] = updatedHour;
+    
+            // Enviar solicitud PUT con datos correctos
+            axios.put('/api/admincalendar/remove', { 
+                day, 
+                shift, 
+                hour, 
+                index 
+            })
+
+            .then(() => {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "error",
+                    title: "Usuario eliminado"
+                });
+                
+            })
+            .catch((err) => {
+                console.error("Error removing person:", err.response?.data || err.message);
+            });
+    
             return updated;
-            });
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "error",
-                title: "Usuario eliminado"
-            });
+        });
     };
 
     const handleMovePerson = (fromDay, fromShift, fromHour, index) => {
@@ -251,6 +283,7 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
     };
     
     // Funcion para cerrar sesion del admin
+    const navigate = useNavigate()
     const handleLogout = () => {
         // Limpiar la autenticacion del local storage
         localStorage.removeItem('adminAuthenticated')
@@ -529,9 +562,9 @@ const InitialCalendar = ({ toggleTheme,theme,adminCalendar, setIsAuthenticated }
                         backgroundColor:'#80c687',
                         color: theme === 'light' ? 'white' : 'black'
                     }} 
-                    onClick={name === 'ulises gaston ros' ? handleResetAdminCalendar : handleResetCalendar}
+                    onClick={handleResetCalendar}
                     >
-                    {name.toLocaleLowerCase() === 'ulises gaston ros' ? 'Resetear calendario por ULISES' : 'Resetear Initial'} 
+                    Resetear Calendario
                 </Button>
             </Box>
         </Box>

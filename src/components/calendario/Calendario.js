@@ -1,137 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import moment from 'moment';
 import '../../css/calendario/Calendario.css'
 import { Box, Button, Flex, FormLabel, Heading, Input, Select, Text } from '@chakra-ui/react';
 import Swal from 'sweetalert2'
+import io from 'socket.io-client'
+import axios from 'axios'
 
-const initialCalendar = {
-    lunes: {
-        mañana: {
-            8: ["isabel c","belu s","joaco m","hugo d","nanci g","javier r","miriam p"],
-            9: ["valen o","lu s","ale p","beti f","mauri l",null],
-            10: ["ro b","ailen m","facu a","omar b",null,null],
-            11: ["bruno",null,null,null,null,null]
-        },
-        tarde: {
-            16: ["jor p","dona r","irina r","mayra n","marian g","cuervo",null],
-            17: ["clari s","ale a","ale g","facu a",null,null,null],
-            18: ["franco s","alicia n","belu a","damian o","maela g","eze s"],
-            19: ["rama r","maia b","mariano f","uli","mica p",null],
-        }
-    },
-    martes: {
-        mañana: {
-            8: ["joaco m","agos p","juan jose f","pato c",null,null,null],
-            9: ["marina m","sabri v","lu w","flor p","mayra n","martina g"],
-            10: ["adri f","marian m","betty j",null,null,null],
-            11: ["dani r",null,null, null, null, null]
-        },
-        tarde: {
-            16: ["dani e","ziu r","malvi r","liliana v","rocio g",null,null],
-            17: ["guille sc","irina r","elba g",null,null,null,null],
-            18: ["frances","sofi f","eve v",null,null,null],
-            19: ["lucas k",null,null,null,null,null]
-        }
-    },
-    miércoles: {
-        mañana: {
-            8: ["daniela a","belu s","isabel c","nanci g","romi m",null,null],
-            9: ["beti f","valen o","lu s","mauri l","yaz w",null],
-            10: ["ro b","flor b","ailen m","omar b",null,null],
-            11: ["dani r",null,null,null,null,null]
-        },
-        tarde: {
-            16: ["irina r","fati d","mayra n","cande b","marian g",null,null],
-            17: ["clari s","ale a","ale g","cuervo","facu a",null,null],
-            18: ["maela g","eze s","vero t","franco s","bruno",null],
-            19: ["rama r","maia b","uli","mica p",null,null],
-        }
-    },
-    jueves: {
-        mañana: {
-            8: ["joaco m","javier r",null,null,null,null,null],
-            9: ["marina m","ale p","flor p","martina g","sabri v",null],
-            10: ["dani e","facu a","marian m",null,null,null],
-            11: [null,null,null,null,null,null]
-        },
-        tarde: {
-            16: ["dona r","jor p","mayra n","ziomara r","malvi r",null,null],
-            17: ["agos p","facu a","rocio g","liliana v","elba","guille sc","pato c"],
-            18: ["frances","belu a","irina r",null,null,null],
-            19: ["mariano f","flor m","lucas k","sofi f","eve v",null],
-        }
-    },
-    viernes: {
-        mañana: {
-            8: ["juan jose f","miriam p","daniela a","isabel c","romi m","belu s","hugo d"],
-            9: ["martina g","yaz w","lu w","beti f","nanci g","mauri l"],
-            10: ["ro b","dani r","adri f","flor b","ailen m",null],
-            11: [null,null,null,null,null,null]
-        },
-        tarde: {
-            16: ["jor p","marian g","mayra n","cande b","dona r","irina r",null],
-            17: ["ale g","bruno","liliana v","rocio g","damian o","irina r",null],
-            18: ["alicia n","eze s","maela g","vero t", null,null],
-            19: ["maia b","rama r","mica p","uli",null,null],
-        }
-    },
-    sábado: {
-        mañana: {
-            930: ["yaz w","fatima d","dani r","flor p","licha r",null],
-            1030: ["lu s","marian m","eve v","sofia f",null,null],
-            1130: ["flor m",null,null,null,null,null,null]
-        }
-    }
-};
+const socket = io('/')
 
-const Calendario = ({ theme, adminCalendar }) => {
+const Calendario = ({ theme }) => {
     
-    // Calendario que se guarda en el LOCALSTORAGE
-    const [calendar, setCalendar] = useState(() => {
-        const savedCalendar = localStorage.getItem("calendar");
-        return savedCalendar ? JSON.parse(savedCalendar) : initialCalendar;
-    });
+    // Calendario que se guarda en MONGODB
+    const [calendar, setCalendar] = useState('')
+    useEffect(() => {
+        const fetchCalendar = async () => {
+            try {
+                const response = await axios.get('/api/calendar');
+                setCalendar(response.data);
+            } catch (error) {
+                console.error('Error fetching calendar', error)
+            }
+        };
+        
+        fetchCalendar();
+
+        // Escuchar el evento de actualizacion del calendario desde el servidor
+        socket.on('updateCalendar', (updateCalendar) => {
+            setCalendar(updateCalendar);
+        });
+
+        return () => {
+            socket.off('updateCalendar');
+        }
+    }, [])
     
     //UseState para manejar las distintas cosas (nombre, dia, turno y hora)
     const [name, setName] = useState("");
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
-
-    // Funcion para resetear el calendario al que estaba en el comienzo
-    const handleResetCalendar = () => {
-        setCalendar(JSON.parse(localStorage.getItem("calendarAdmin", JSON.stringify(adminCalendar))));    
-    };
-
-    // Persistencia 
-    useEffect(() => {
-        localStorage.setItem("calendar", JSON.stringify(calendar));
-    }, [calendar]);
-
-    // Funcion para resetear el calendario todos los sabados a las 15hs
-    const resetSaturday = () => {
-        const ahora = moment();
-        const sabado = ahora.day() === 6;
-        const quinceHoras = ahora.hour() === 15 && ahora.minute() === 0;
-
-        if(sabado && quinceHoras) {
-            console.log('Ejecutando reseteo del Initial Calendar.')
-            handleResetCalendar()
-        }
-    }
-
-    // Ejecutar la funcion resetSaturday cada una hora para ver si es sabado.
-    useEffect(() => {
-        
-        //Timer para recargar la pagina cada 1 hora
-        const timer = setTimeout(() => {
-            window.location.reload()
-        }, 3600000)
-        // ejecutando la funcion que resetea el Initial Calendar
-        resetSaturday()
-
-        return() => clearTimeout(timer)
-    })
 
     const handleAddPerson = (day, shift, hour, name) => {
         setCalendar((prev) => {
@@ -181,6 +87,7 @@ const Calendario = ({ theme, adminCalendar }) => {
                 })
                 updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
                 setName(""); // Limpia el campo de entrada
+                axios.put('/api/calendar', { day, shift, hour, updatedHour: updated[day][shift][hour] })
                 return updated;
             } else {
                 const Toast = Swal.mixin({
@@ -204,27 +111,47 @@ const Calendario = ({ theme, adminCalendar }) => {
     };
 
     const handleRemovePerson = (day, shift, hour, index) => {
-            setCalendar((prev) => {
-            const updated = { ...prev };
-            updated[day][shift][hour][index] = null;
-            return updated;
-            });
-            const Toast = Swal.mixin({
+        setCalendar((prev) => {
+            const updated = { ...prev }
+            const updatedHour = [ ...updated[day][shift][hour] ];
+            updatedHour[index] = null;
+
+            // Actualizar el estado con la hora modificada
+            updated[day][shift][hour] = updatedHour;
+    
+            // Enviar solicitud PUT con datos correctos
+            axios.put('/api/calendar/remove', { 
+                day, 
+                shift, 
+                hour, 
+                index 
+            })
+
+            .then(() => {
+                const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
                     didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
                     }
                 });
                 Toast.fire({
                     icon: "error",
                     title: "Usuario eliminado"
                 });
-        };
+
+            })
+            .catch((err) => {
+                console.error("Error removing person:", err.response?.data || err.message);
+            });
+    
+            return updated;
+        });
+    };
 
     const handleMovePerson = (fromDay, fromShift, fromHour, index) => {
         const person = calendar[fromDay][fromShift][fromHour][index];
@@ -352,7 +279,7 @@ const Calendario = ({ theme, adminCalendar }) => {
                     <Select w='250px' onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay} border='1px solid #80c687'>
                     <option value="">Seleccionar Día</option>
                     {Object.keys(calendar).map((day) => (
-                        <option key={day} value={day}>{day}</option>
+                        <option key={day} value={day} > {day} </option>
                     ))}
                     </Select>
 
