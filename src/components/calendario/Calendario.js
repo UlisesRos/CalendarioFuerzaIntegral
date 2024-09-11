@@ -12,10 +12,25 @@ const Calendario = ({ theme }) => {
 
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
+    
+    // Ejecutar el render para que no tenga inactividad
     useEffect(() => {
         const fetchCalendar = async () => {
             try {
-                console.log(apiUrl)
+                const response = await axios.get(`${apiUrl}`)
+                console.log('Solicitud silenciosa exitosa!', response.data)
+
+            } catch (error) {
+                console.error('Error al ejecutar el render', error)
+            }
+        }
+
+        fetchCalendar()
+    }, [])
+
+    useEffect(() => {
+        const fetchCalendar = async () => {
+            try {
                 const response = await axios.get(`${apiUrl}/api/calendar`);
                 setCalendar(response.data);
             } catch (error) {
@@ -41,7 +56,7 @@ const Calendario = ({ theme }) => {
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
     
-    const handleAddPerson = (day, shift, hour, name) => {
+    const handleAddPerson = (day, shift, hour, name, mover) => {
         setCalendar((prev) => {
             // Crear una copia profunda del estado previo
             const updated = JSON.parse(JSON.stringify(prev));
@@ -51,10 +66,11 @@ const Calendario = ({ theme }) => {
             if(personaRepetida.filter(p => p === true).length > 0){
                 const Toast = Swal.mixin({
                     toast: true,
-                    position: "top-end",
+                    position: "bottom-start",
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
+                    color: 'black',
                     didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -66,31 +82,55 @@ const Calendario = ({ theme }) => {
                 });
                 return prev
             } else if (availableSlot !== -1) {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                day === 'sábado' ?
-                Toast.fire({
-                    icon: "success",
-                    title: `Turno confirmado: ${day}, ${hour} hs`
-                })
-                : 
-                Toast.fire({
-                    icon: "success",
-                    title: `Turno confirmado: ${day}, ${hour}:00 hs`
-                })
-                updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
-                setName(""); // Limpia el campo de entrada
-                axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
-                return updated;
+                if(mover){
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        color: 'black',
+                        didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: "success",
+                        title: 'Usuario movido a otro horario.'
+                    });
+                    updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
+                    setName(""); // Limpia el campo de entrada
+                    axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
+                    return updated;
+                } else {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        color: 'black',
+                        didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    day === 'sábado' ?
+                    Toast.fire({
+                        icon: "success",
+                        title: `Turno confirmado: ${day}, ${hour} hs`
+                    })
+                    : 
+                    Toast.fire({
+                        icon: "success",
+                        title: `Turno confirmado: ${day}, ${hour}:00 hs`
+                    })
+                    updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
+                    setName(""); // Limpia el campo de entrada
+                    axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
+                    return updated;
+                }
             } else {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -98,6 +138,7 @@ const Calendario = ({ theme }) => {
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
+                    color: 'black',
                     didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -112,7 +153,7 @@ const Calendario = ({ theme }) => {
         });
     };
 
-    const handleRemovePerson = (day, shift, hour, index) => {
+    const handleRemovePerson = (day, shift, hour, index, mover) => {
         setCalendar((prev) => {
             const updated = { ...prev }
             const updatedHour = [ ...updated[day][shift][hour] ];
@@ -130,21 +171,24 @@ const Calendario = ({ theme }) => {
             })
 
             .then(() => {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "error",
-                    title: "Usuario eliminado"
-                });
+                if(!mover){
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        color: 'black',
+                        didOpen: (toast) => {
+                            toast.onmouseenter = Swal.stopTimer;
+                            toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: "error",
+                        title: "Usuario eliminado"
+                    });
+                }
 
             })
             .catch((err) => {
@@ -157,6 +201,7 @@ const Calendario = ({ theme }) => {
 
     const handleMovePerson = (fromDay, fromShift, fromHour, index) => {
         const person = calendar[fromDay][fromShift][fromHour][index];
+        const mover = true
     
         // Pedir al usuario que ingrese el turno de destino (mañana o tarde)
         const toShift = prompt("Ingresa el turno de destino (mañana o tarde):").toLocaleLowerCase();
@@ -169,6 +214,7 @@ const Calendario = ({ theme }) => {
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                color: 'black',
                 didOpen: (toast) => {
                 toast.onmouseenter = Swal.stopTimer;
                 toast.onmouseleave = Swal.resumeTimer;
@@ -195,11 +241,11 @@ const Calendario = ({ theme }) => {
             // Remover la persona de su horario actual
             const personaRepetida = calendar[fromDay][toShift][toHourNumber].map(pers => pers === person.toLocaleLowerCase())
             if(!(personaRepetida.filter(p => p === true).length > 0)){
-                handleRemovePerson(fromDay, fromShift, fromHour, index);
+                handleRemovePerson(fromDay, fromShift, fromHour, index, mover);
             }
             if (emptyIndex !== -1) {
                 // Mover a la persona al nuevo horario
-                handleAddPerson(fromDay, toShift, toHourNumber, person);
+                handleAddPerson(fromDay, toShift, toHourNumber, person, mover);
             } else {
                 const Toast = Swal.mixin({
                     toast: true,
@@ -207,6 +253,7 @@ const Calendario = ({ theme }) => {
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
+                    color: 'black',
                     didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -226,6 +273,7 @@ const Calendario = ({ theme }) => {
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                color: 'black',
                 didOpen: (toast) => {
                 toast.onmouseenter = Swal.stopTimer;
                 toast.onmouseleave = Swal.resumeTimer;
@@ -343,6 +391,7 @@ const Calendario = ({ theme }) => {
                                     showConfirmButton: false,
                                     timer: 3000,
                                     timerProgressBar: true,
+                                    color: 'black',
                                     didOpen: (toast) => {
                                     toast.onmouseenter = Swal.stopTimer;
                                     toast.onmouseleave = Swal.resumeTimer;
@@ -388,7 +437,7 @@ const Calendario = ({ theme }) => {
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                             Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
                                 <Flex key={hour} flexDir='column' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
-                                    {selectedDay === 'sábado' ?
+                                    {selectedDay === 'sábado' ? 
                                     <Text textDecor='underline' fontWeight='bold' fontSize='2rem' margin='0 20px 0 20px'>{hour}</Text> :
                                     <Text textDecor='underline' fontWeight='bold' fontSize='1.6rem' margin='0 20px 0 20px'>{hour}:00</Text>
                                 }

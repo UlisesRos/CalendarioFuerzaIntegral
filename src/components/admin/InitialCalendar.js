@@ -9,10 +9,10 @@ import io from 'socket.io-client'
 import axios from 'axios'
 
 const socket = io('/')
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
     
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
@@ -55,6 +55,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                color: 'black',
                 didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -72,6 +73,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                color: 'black',
                 didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -98,6 +100,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
+                    color: 'black',
                     didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -115,6 +118,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
+                    color: 'black',
                     didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -141,6 +145,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
+                    color: 'black',
                     didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -179,6 +184,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
+                    color: 'black',
                     didOpen: (toast) => {
                         toast.onmouseenter = Swal.stopTimer;
                         toast.onmouseleave = Swal.resumeTimer;
@@ -212,6 +218,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                color: 'black',
                 didOpen: (toast) => {
                 toast.onmouseenter = Swal.stopTimer;
                 toast.onmouseleave = Swal.resumeTimer;
@@ -251,6 +258,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
+                    color: 'black',
                     didOpen: (toast) => {
                     toast.onmouseenter = Swal.stopTimer;
                     toast.onmouseleave = Swal.resumeTimer;
@@ -270,6 +278,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: true,
+                color: 'black',
                 didOpen: (toast) => {
                 toast.onmouseenter = Swal.stopTimer;
                 toast.onmouseleave = Swal.resumeTimer;
@@ -435,6 +444,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                                     showConfirmButton: false,
                                     timer: 3000,
                                     timerProgressBar: true,
+                                    color: 'black',
                                     didOpen: (toast) => {
                                     toast.onmouseenter = Swal.stopTimer;
                                     toast.onmouseleave = Swal.resumeTimer;
