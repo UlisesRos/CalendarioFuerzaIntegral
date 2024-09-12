@@ -66,7 +66,7 @@ const Calendario = ({ theme }) => {
             if(personaRepetida.filter(p => p === true).length > 0){
                 const Toast = Swal.mixin({
                     toast: true,
-                    position: "bottom-start",
+                    position: "top-end",
                     showConfirmButton: false,
                     timer: 3000,
                     timerProgressBar: true,
