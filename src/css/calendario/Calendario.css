@@ -1,0 +1,19 @@
+.selectUser{
+    text-transform: capitalize;
+    width: 20%;
+    font-size: 0.9rem;
+    text-align: center;
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .selectUser {
+        width: 50%;
+    }
+}
+
+@media (max-width: 576px) {
+    .selectUser {
+        width: 80%;
+    }
+}

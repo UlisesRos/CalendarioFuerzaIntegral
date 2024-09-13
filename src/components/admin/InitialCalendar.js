@@ -4,6 +4,7 @@ import '../../css/nav/Navbar.css'
 import logo from '../../img/logofuerza.png'
 import { useNavigate } from 'react-router-dom'
 import { Box, Button, Flex, FormLabel, Heading, Input, Select, Text, Image } from '@chakra-ui/react';
+import ReactSelect from 'react-select'
 import Swal from 'sweetalert2'
 import io from 'socket.io-client'
 import axios from 'axios'
@@ -38,7 +39,6 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
         }
     }, [])
     
-    console.log(calendar)
     //UseState para manejar las distintas cosas (nombre, dia, turno y hora)
     const [name, setName] = useState("");
     const [selectedDay, setSelectedDay] = useState("");
@@ -303,6 +303,28 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
         navigate('/')
     }
 
+    // Obtener todos los usuarios del calendario para el select
+    const usuariosCalendar = (calendar) => {
+        const userSet = new Set();
+
+        Object.values(calendar).forEach(day => {
+            Object.values(day).forEach(shift => {
+                Object.values(shift).forEach(hour => {
+                    hour.forEach(user => userSet.add(user))
+                })
+            })
+        });
+
+        return Array.from(userSet)
+    }
+
+    const user = usuariosCalendar(calendar)
+    const options = user.map((usuarios) => ({value: usuarios, label: usuarios}));
+
+    const handleSelectChange = (selectOption) => {
+        setName(selectOption ? selectOption.value : '')
+    }
+
     return (
         <Box>
             <Flex
@@ -344,6 +366,9 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
             <Box
                 margin='15px 0 0 0'
                 textAlign='center'
+                display='flex'
+                flexDir='column'
+                alignItems='center'
                 >
                 <Heading
                     fontFamily='"Poppins", sans-serif;'
@@ -363,8 +388,18 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                     value={name} 
                     onChange={(e) => setName(e.target.value)} 
                     fontSize='0.9rem'
-                    placeholder="Ingresa del usuario que quieres modificar  " 
+                    placeholder="Ingresa del usuario que quieres modificar"
+                    marginBottom='10px'
                 />
+                <ReactSelect
+                    className='selectUser'
+                    value={options.find(option => option.value === name)} 
+                    onChange={handleSelectChange} 
+                    placeholder="nombre del usuario"
+                    options={options}
+                    isSearchable
+                >
+                </ReactSelect>
             </Box>
             
             <Box

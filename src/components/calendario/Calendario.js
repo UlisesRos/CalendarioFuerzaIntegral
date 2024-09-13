@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../css/calendario/Calendario.css'
-import { Box, Button, Flex, FormLabel, Heading, Input, Select, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, FormLabel, Heading, Select, Text } from '@chakra-ui/react';
+import ReactSelect from 'react-select'
 import Swal from 'sweetalert2'
 import io from 'socket.io-client'
 import axios from 'axios'
@@ -287,27 +288,52 @@ const Calendario = ({ theme }) => {
             handleAddPerson(fromDay, fromShift, fromHour, person);
         }
     };
-    
+
+    // Obtener todos los usuarios del calendario para el select
+    const usuariosCalendar = (calendar) => {
+        const userSet = new Set();
+
+        Object.values(calendar).forEach(day => {
+            Object.values(day).forEach(shift => {
+                Object.values(shift).forEach(hour => {
+                    hour.forEach(user => userSet.add(user))
+                })
+            })
+        });
+
+        return Array.from(userSet)
+    }
+
+    const user = usuariosCalendar(calendar)
+    const options = user.map((usuarios) => ({value: usuarios, label: usuarios}));
+
+    const handleSelectChange = (selectOption) => {
+        setName(selectOption ? selectOption.value : '')
+    }
+
     return (
         <Box>
             <Box
+                display='flex'
+                flexDir='column'
+                alignItems='center'
                 margin='15px 0 0 0'
                 textAlign='center'
                 >
                 <FormLabel
                     textAlign='center'
                     >
-                    Nombre Habitual
+                    Elije tu nombre
                 </FormLabel>
-                <Input
-                    border='1px solid #80c687'
-                    w={["80%",'40%','30%']}
-                    type="text" 
-                    value={name} 
-                    onChange={(e) => setName(e.target.value)} 
-                    fontSize='0.9rem'
-                    placeholder="Ingresa el nombre con el que te registras siempre" 
-                />
+                <ReactSelect
+                    className='selectUser'
+                    value={options.find(option => option.value === name)} 
+                    onChange={handleSelectChange} 
+                    placeholder="nombre del usuario"
+                    options={options}
+                    isSearchable
+                >
+                </ReactSelect>
             </Box>
             
             <Box
