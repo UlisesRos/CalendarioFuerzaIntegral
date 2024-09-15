@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../css/calendario/Calendario.css'
-import { Box, Button, Flex, FormLabel, Heading, Select, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, FormLabel, Heading, Select, Text, Input } from '@chakra-ui/react';
 import ReactSelect from 'react-select'
 import Swal from 'sweetalert2'
 import io from 'socket.io-client'
@@ -101,7 +101,6 @@ const Calendario = ({ theme }) => {
                         title: 'Usuario movido a otro horario.'
                     });
                     updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
-                    setName(""); // Limpia el campo de entrada
                     axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
                     return updated;
                 } else {
@@ -128,7 +127,6 @@ const Calendario = ({ theme }) => {
                         title: `Turno confirmado: ${day}, ${hour}:00 hs`
                     })
                     updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
-                    setName(""); // Limpia el campo de entrada
                     axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
                     return updated;
                 }
@@ -334,6 +332,23 @@ const Calendario = ({ theme }) => {
                     isSearchable
                 >
                 </ReactSelect>
+                <FormLabel
+                    marginTop='15px'
+                    textAlign='center'
+                    >
+                    Si todavia no estas en el calendario, puedes agregarte aqui.
+                </FormLabel>
+                <Input
+                    textAlign='center'
+                    border='1px solid #80c687'
+                    w={["80%",'40%','20%']}
+                    type="text" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    fontSize='0.9rem'
+                    placeholder="Ingresa tu nombre"
+                    marginBottom='10px'
+                />
             </Box>
             
             <Box

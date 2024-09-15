@@ -135,7 +135,6 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                     title: `Turno confirmado: ${day}, ${hour}:00 hs`
                 })
                 updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
-                setName(""); // Limpia el campo de entrada
                 axios.put(`${apiUrl}/api/admincalendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
                 return updated;
             } else {
@@ -383,7 +382,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 </FormLabel>
                 <Input
                     border='1px solid #80c687'
-                    w={["80%",'40%','30%']}
+                    w={["80%",'40%','25%']}
                     type="text" 
                     value={name} 
                     onChange={(e) => setName(e.target.value)} 
