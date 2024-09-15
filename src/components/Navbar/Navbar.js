@@ -12,7 +12,7 @@ function Navbar({toggleTheme, theme}) {
             <Image src={logo} alt='logo de fuerza integral' w='13rem' h='7rem' marginLeft={['0','20px','20px']}/>
             <Box
                 as='a'
-                href='https://www.youtube.com/watch?v=aBglzLRz2Ys'
+                href='https://www.youtube.com/watch?v=WZNvY6FMGKE'
                 target='_blank'
                 marginBottom='12px'
                 >
