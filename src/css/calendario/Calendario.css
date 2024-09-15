@@ -4,6 +4,7 @@
     font-size: 0.9rem;
     text-align: center;
     border-radius: 10px;
+    color: black;
 }
 
 @media (max-width: 768px) {
