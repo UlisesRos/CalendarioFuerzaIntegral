@@ -19,7 +19,7 @@ function Modal() {
             w={['90%','50%', '40%']}
             h='auto'
             position='absolute'
-            margin={['180px 0 0 5%','180px 0 0 30%','180px 0 0 30%']} 
+            margin={['180px 0 0 5%','180px 0 0 30%','120px 0 0 30%']} 
             zIndex='100'
             padding='20px 0 20px 0'
             bg='#80c687'
