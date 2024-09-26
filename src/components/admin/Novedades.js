@@ -223,6 +223,7 @@ function Novedades({toggleTheme, theme}) {
                         color: theme === 'light' ? 'white' : 'black'
                     }}
                     onClick={handleReset}
+                    mb='15px'
                     >
                     Sin novedades
                 </Button>
