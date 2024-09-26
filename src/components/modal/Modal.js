@@ -1,15 +1,50 @@
-import { Box, Text, Heading, Flex, Button, Image } from "@chakra-ui/react"
-import { useState } from "react"
+import { Box, Text, Heading, Flex, Button, Image, Link } from "@chakra-ui/react"
+import { useState, useEffect } from "react"
+import axios from "axios"
 import TypingEffect from "./TypingEffect"
-import llavero from '../../img/llaverito.png'
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function Modal() {
-
-    const texto = 'NOVEDADES'
-
+    
     const [ visible, setVisible] = useState(true)
+    const [ modalContent, setModalContent ] = useState({
+        title: '',
+        subtitle: '',
+        link: '',
+        image: '',
+        description: ''
+    });
 
+    // Cargar los datos desde la base de Datos
+    useEffect(() => {
+        const fetchModalContent = async () => {
+            try {
+                const response = await axios.get(`${apiUrl}/api/get-modal-content`);
+                setModalContent(response.data) // Actualizamos el estado con la base de datos
+            } catch (error) {
+                console.error('Error al cargar el contenido del modal', error);
+            }
+        };
+
+        fetchModalContent()
+
+    }, [])
+
+    useEffect(() => {
+        const sinModal = () => {
+            if(modalContent.title === '' && modalContent.subtitle === '' & modalContent.link === '' && modalContent.image === '' && modalContent.description === ''){
+                setVisible(false)
+            } else {
+                setVisible(true)
+            }
+        }
+
+        sinModal()
+    }, [modalContent.title, modalContent.subtitle, modalContent.link, modalContent.image, modalContent.description])
+    
+    const texto = modalContent.title
+    
     const desaparecerModal = () => {
         setVisible(false)
     }
@@ -44,16 +79,22 @@ function Modal() {
                     fontWeight='semi-bold'
                     textAlign='center'
                     >
-                    ¡Nuevos llaveros de Fuerza Integral!
+                    {modalContent.subtitle}
                 </Text>
-                <Image src={llavero} alt="llavero de fuerza integral" overflow='inherit' />
+                <Image src={modalContent.image} alt='llavero de fuerza integral' overflow='inherit' display={modalContent.image === '' ? 'none' : 'block'} />
                 <Text
                     fontSize='1.1rem'
                     fontWeight='semi-bold'
                     textAlign='center'
                     >
-                    Pedile el tuyo al profe 😜
+                    {modalContent.description}
                 </Text>
+                <Link
+                    href={modalContent.link}
+                    target='_blank'
+                    >
+                    {modalContent.link}
+                </Link>
                 <Button
                     onClick={desaparecerModal}
                     backgroundColor='white'

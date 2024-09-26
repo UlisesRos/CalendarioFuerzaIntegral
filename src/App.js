@@ -1,5 +1,6 @@
 import Admin from "./components/admin/Admin";
 import InitialCalendar from "./components/admin/InitialCalendar";
+import Novedades from "./components/admin/Novedades";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import Rutas from "./components/Rutas/Rutas";
 import React, { useState, useEffect } from 'react'
@@ -43,6 +44,7 @@ function App() {
                 </ProtectedRoute>
             }
             />
+            <Route path="/novedades" element={<Novedades toggleTheme={toggleTheme} theme={theme}/>} />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         </Router>
