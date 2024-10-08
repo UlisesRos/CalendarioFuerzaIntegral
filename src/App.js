@@ -44,7 +44,12 @@ function App() {
                 </ProtectedRoute>
             }
             />
-            <Route path="/novedades" element={<Novedades toggleTheme={toggleTheme} theme={theme}/>} />
+            <Route path="/novedades" element={
+                <ProtectedRoute isAuthenticated={isAuthenticated} >
+                    <Novedades toggleTheme={toggleTheme} theme={theme} setIsAuthenticated={setIsAuthenticated} />
+                </ProtectedRoute>
+            }
+            />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         </Router>
