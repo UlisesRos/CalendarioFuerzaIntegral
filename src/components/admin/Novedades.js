@@ -79,7 +79,7 @@ function Novedades({toggleTheme, theme}) {
         };
 
         try {
-            await axios.post(`http://localhost:5000/api/save-modal-content`, modalData);
+            await axios.post(`${apiUrl}/api/save-modal-content`, modalData);
             const Toast = Swal.mixin({
                 toast: true,
                 position: "top-end",

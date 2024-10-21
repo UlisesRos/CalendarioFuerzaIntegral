@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/admin/ProtectedRoute";
 import Rutas from "./components/Rutas/Rutas";
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
+import BoxRutinas from "./components/rutinas/BoxRutinas";
 
 function App() {
 
@@ -50,6 +51,7 @@ function App() {
                 </ProtectedRoute>
             }
             />
+            <Route path="/rutinas" element={<BoxRutinas toggleTheme={toggleTheme} theme={theme} />} />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
         </Router>

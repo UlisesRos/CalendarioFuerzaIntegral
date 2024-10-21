@@ -309,6 +309,31 @@ const Calendario = ({ theme }) => {
         setName(selectOption ? selectOption.value : '')
     }
 
+    const handleEnter = (e) => {
+        if(e.key === 'Enter'){
+            if (selectedDay && selectedShift && selectedHour && name) {
+                handleAddPerson(selectedDay, selectedShift, selectedHour, name);
+                } else {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: "top-end",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        color: 'black',
+                        didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                        }
+                    });
+                    Toast.fire({
+                        icon: "info",
+                        title: "Selecciona un dia, un turno, una hora y proporciona tu nombre"
+                    });
+                }
+        }
+    }
+
     return (
         <Box>
             <Box
@@ -329,6 +354,7 @@ const Calendario = ({ theme }) => {
                     onChange={handleSelectChange} 
                     placeholder="nombre del usuario"
                     options={options}
+                    onKeyDown={handleEnter}
                     isSearchable
                 >
                 </ReactSelect>
@@ -348,6 +374,7 @@ const Calendario = ({ theme }) => {
                     fontSize='0.9rem'
                     placeholder="Ingresa tu nombre"
                     marginBottom='10px'
+                    onKeyDown={handleEnter}
                 />
             </Box>
             
@@ -394,7 +421,7 @@ const Calendario = ({ theme }) => {
                             }
 
                             {selectedShift && 
-                                <Select w='250px' onChange={(e) => setSelectedHour(e.target.value)} value={selectedHour} border='1px solid #80c687'>
+                                <Select w='250px' onChange={(e) => setSelectedHour(e.target.value)} value={selectedHour} border='1px solid #80c687' onKeyDown={handleEnter} >
                                     <option value="">Seleccionar Hora</option>
                                     {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                                         Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
