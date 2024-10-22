@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../css/calendario/Calendario.css'
 import '../../css/nav/Navbar.css'
-import logo from '../../img/logofuerza.png'
+import logo from '../../img/logoblack.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { Box, Button, Flex, FormLabel, Heading, Input, Select, Text, Image } from '@chakra-ui/react';
 import ReactSelect from 'react-select'
@@ -331,7 +331,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 alignItems='center'
                 flexWrap='wrap'
                 >
-                <Image src={logo} alt='logo de fuerza integral' w='13rem' h='7rem' marginLeft='20px'/>
+                <Image src={logo} alt='logo de fuerza integral' w='8rem' h='8rem' marginLeft={['0','20px','20px']} objectFit='cover' />
                 <Flex
                     marginRight={['0','20px','20px']}
                     justifyContent='center'
@@ -396,7 +396,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 <Heading
                     fontFamily='"Poppins", sans-serif;'
                     fontSize={['1.6rem','2rem','2.3rem']}
-                    >Hola Manu! Este es el sector del ADMIN
+                    >Hola Manu y Tomi! Este es el sector del ADMIN
                 </Heading>
                 <FormLabel
                     marginTop='15px'
@@ -540,9 +540,9 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                         justifyContent='center'
                         alignItems='center'
                         flexDir={['column','column','row']}
-                        columnGap='40px'
+                        columnGap='10px'
                         rowGap={['10px','10px','0']}
-                        w={['85%','85%','93%']}
+                        w={['85%','85%','95%']}
                         flexWrap={['wrap','wrap','nowrap']}
                         >
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 

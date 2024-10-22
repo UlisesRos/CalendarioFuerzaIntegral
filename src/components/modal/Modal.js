@@ -54,7 +54,10 @@ function Modal() {
             w={['90%','50%', '40%']}
             h='auto'
             position='absolute'
-            margin={['180px 0 0 5%','180px 0 0 30%','120px 0 0 30%']} 
+            //margin={['160px 0 0 5%','180px 0 0 30%','120px 0 0 30%']} 
+            top='50%'
+            left='50%'
+            transform='translate(-50%, -50%)'
             zIndex='100'
             padding='20px 0 20px 0'
             bg='#80c687'
@@ -70,7 +73,9 @@ function Modal() {
                 rowGap='7px'
                 >
                 <Heading
+                    textAlign='center'
                     fontWeight='bold'
+                    margin='0 30px 0 30px'
                     >
                     <TypingEffect text={texto} speed={120} />
                 </Heading>
@@ -78,18 +83,21 @@ function Modal() {
                     fontSize='1.3rem'
                     fontWeight='semi-bold'
                     textAlign='center'
+                    margin='0 30px 0 30px'
                     >
                     {modalContent.subtitle}
                 </Text>
-                <Image src={modalContent.image} alt='llavero de fuerza integral' overflow='inherit' display={modalContent.image === '' ? 'none' : 'block'} />
+                <Image margin='0 30px 0 30px' src={modalContent.image} alt='llavero de fuerza integral' overflow='inherit' display={modalContent.image === '' ? 'none' : 'block'} />
                 <Text
                     fontSize='1.1rem'
                     fontWeight='semi-bold'
                     textAlign='center'
+                    margin='0 30px 0 30px'
                     >
                     {modalContent.description}
                 </Text>
                 <Link
+                    margin='0 30px 0 30px'
                     href={modalContent.link}
                     target='_blank'
                     >

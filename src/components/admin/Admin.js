@@ -1,6 +1,6 @@
 import { Flex, Image, Box, Button, Text, Input } from '@chakra-ui/react'
 import { Link, useNavigate } from 'react-router-dom'
-import logo from '../../img/logofuerza.png'
+import logo from '../../img/logoblack.png'
 import { useState } from 'react'
 import Swal from 'sweetalert2'
 
@@ -49,7 +49,7 @@ function Admin({theme, setIsAuthenticated}) {
                 justify='space-between'
                 alignItems='center'
                 >
-                <Image src={logo} alt='logo de fuerza integral' w='13rem' h='7rem' marginLeft='20px'/>
+                <Image src={logo} alt='logo de fuerza integral' w='8rem' h='8rem' marginLeft={['0','20px','20px']} objectFit='cover' />
                 <Link
                     to='/'
                     >
