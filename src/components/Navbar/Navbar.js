@@ -9,12 +9,13 @@ function Navbar({toggleTheme, theme}) {
             alignItems='center'
             flexWrap='wrap'
             >
-            <Image src={logo2} alt='logo de fuerza integral' w='8rem' h='8rem' marginLeft={['0','20px','20px']} objectFit='cover' />
+            <Image src={logo2} alt='logo de fuerza integral' w='10rem' h='8rem' marginLeft={['0','20px','20px']} objectFit='cover' />
             <Box
                 as='a'
                 href='https://www.youtube.com/watch?v=WZNvY6FMGKE'
                 target='_blank'
                 marginBottom='12px'
+                marginTop='12px'
                 >
                 <Button
                     marginLeft={[0,'50px','70px']}
