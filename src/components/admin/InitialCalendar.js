@@ -44,6 +44,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
+    const [horariosOcupados, setHorariosOcupados] = useState([]);
 
     // Funcion para resetear el calendario al que estaba en el comienzo
     const handleResetCalendar = async () => {
@@ -302,6 +303,24 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
         navigate('/')
     }
 
+    //Funcion para guardar los dias y horarios ocupados
+    const getHorariosOcupados = (calendar, name) => {
+        const ocupado = [];
+
+        Object.keys(calendar).forEach(day => {
+            Object.keys(calendar[day]).forEach(shift => {
+                Object.keys(calendar[day][shift]).forEach(hour => {
+                    calendar[day][shift][hour].forEach((user, index) => {
+                        if(user === name.toLowerCase()){
+                            ocupado.push({day, shift, hour});
+                        };
+                    });
+                });
+            });
+        });
+        return ocupado
+    }
+
     // Obtener todos los usuarios del calendario para el select
     const usuariosCalendar = (calendar) => {
         const userSet = new Set();
@@ -321,7 +340,9 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
     const options = user.map((usuarios) => ({value: usuarios, label: usuarios}));
 
     const handleSelectChange = (selectOption) => {
-        setName(selectOption ? selectOption.value : '')
+        setName(selectOption ? selectOption.value : '');
+        const ocupado = getHorariosOcupados(calendar, selectOption.value);
+        setHorariosOcupados(ocupado);
     }
 
     return (
@@ -396,7 +417,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 <Heading
                     fontFamily='"Poppins", sans-serif;'
                     fontSize={['1.6rem','2rem','2.3rem']}
-                    >Hola Manu y Tomi! Este es el sector del ADMIN
+                    >Hola Manu y Juli! Este es el sector del ADMIN
                 </Heading>
                 <FormLabel
                     marginTop='15px'
@@ -424,6 +445,24 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                 >
                 </ReactSelect>
             </Box>
+
+            {name && horariosOcupados.length > 0 && (
+                <Box marginTop="20px" textAlign="center">
+                    <Heading fontFamily='"Poppins", sans-serif;' fontSize='1.4rem' mb='5px'>
+                        {name.toLocaleUpperCase()} ya esta inscripto en los siguientes horarios:
+                    </Heading>
+                    {horariosOcupados.map((slot, index) => (
+                        <Text key={index} fontSize='1rem' textTransform='capitalize' mt='3px'>
+                            {
+                                slot.day === 'sábado' ?
+                                `dia: ${slot.day} - turno: ${slot.shift} - hora: ${slot.hour}` 
+                                :
+                                `dia: ${slot.day} - turno: ${slot.shift} - hora: ${slot.hour}:00`
+                            }
+                        </Text>
+                    ))}
+                </Box>
+            )}
             
             <Box
                 margin='30px 0 30px 0px'
@@ -540,20 +579,20 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                         justifyContent='center'
                         alignItems='center'
                         flexDir={['column','column','row']}
-                        columnGap='10px'
-                        rowGap={['10px','10px','0']}
+                        columnGap='16px'
+                        rowGap={['10px','10px','10px']}
                         w={['85%','85%','95%']}
-                        flexWrap={['wrap','wrap','nowrap']}
+                        flexWrap={['wrap','wrap','wrap']}
                         >
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                             Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                <Flex key={hour} flexDir='column' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
+                                <Flex key={hour} flexDir='column' flex='0 0 calc(33.33% - 16px)' boxSizing='border-box' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
                                     {selectedDay === 'sábado' ?
                                     <Text textDecor='underline' fontWeight='bold' fontSize='2rem' margin='0 20px 0 20px'>{hour}</Text> :
                                     <Text textDecor='underline' fontWeight='bold' fontSize='1.6rem' margin='0 20px 0 20px'>{hour}:00</Text>
                                 }
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
-                                        <Box key={index} w='100%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
+                                        <Box key={index} w='85%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
                                             <Button
                                                 display={person ? 'flex' : 'none'}
                                                 backgroundColor={theme === 'light' ? 'white' : 'black'}
@@ -573,6 +612,7 @@ const InitialCalendar = ({ toggleTheme, theme, setIsAuthenticated }) => {
                                                     textTransform='capitalize'
                                                     textDecor={name.toLocaleLowerCase() === person ? 'underline' : 'none'}
                                                     textAlign='center'
+                                                    fontSize='0.9rem'
                                                     w='100%'
                                                     style={{fontWeight: 'bold', margin: '5px 0 10px 0'}} 
                                                     color={person ? 'auto' : 'green'}

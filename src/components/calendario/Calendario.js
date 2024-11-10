@@ -56,6 +56,7 @@ const Calendario = ({ theme }) => {
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
+    const [horariosOcupados, setHorariosOcupados] = useState([])
     
     const handleAddPerson = (day, shift, hour, name, mover) => {
         setCalendar((prev) => {
@@ -287,6 +288,23 @@ const Calendario = ({ theme }) => {
         }
     };
 
+    // Funcion para obtener los dias y horarios ocupados
+    const getHorariosOcupados = (calendar, name) => {
+        const ocupado = [];
+        Object.keys(calendar).forEach(day => {
+            Object.keys(calendar[day]).forEach(shift => {
+                Object.keys(calendar[day][shift]).forEach(hour => {
+                    calendar[day][shift][hour].forEach((user, index) => {
+                        if (user === name.toLowerCase()){
+                            ocupado.push({ day, shift, hour});
+                        };
+                    });
+                });
+            });
+        });
+        return ocupado
+    };
+
     // Obtener todos los usuarios del calendario para el select
     const usuariosCalendar = (calendar) => {
         const userSet = new Set();
@@ -305,8 +323,11 @@ const Calendario = ({ theme }) => {
     const user = usuariosCalendar(calendar)
     const options = user.map((usuarios) => ({value: usuarios, label: usuarios}));
 
+
     const handleSelectChange = (selectOption) => {
-        setName(selectOption ? selectOption.value : '')
+        setName(selectOption ? selectOption.value : '');
+        const ocupado = getHorariosOcupados(calendar, selectOption.value);
+        setHorariosOcupados(ocupado);
     }
 
     const handleEnter = (e) => {
@@ -333,6 +354,7 @@ const Calendario = ({ theme }) => {
                 }
         }
     }
+
 
     return (
         <Box>
@@ -377,6 +399,24 @@ const Calendario = ({ theme }) => {
                     onKeyDown={handleEnter}
                 />
             </Box>
+
+            {name && horariosOcupados.length > 0 && (
+                <Box marginTop="20px" textAlign="center">
+                    <Heading fontFamily='"Poppins", sans-serif;' fontSize='1.4rem'>
+                        Ya estás inscrito en los siguientes horarios:
+                    </Heading>
+                    {horariosOcupados.map((slot, index) => (
+                        <Text key={index} fontSize='1rem' textTransform='capitalize'>
+                            {
+                                slot.day === 'sábado' ?
+                                `dia: ${slot.day} - turno: ${slot.shift} - hora: ${slot.hour}` 
+                                :
+                                `dia: ${slot.day} - turno: ${slot.shift} - hora: ${slot.hour}:00`
+                            }
+                        </Text>
+                    ))}
+                </Box>
+            )}
             
             <Box
                 margin='30px 0 30px 0px'
@@ -497,14 +537,14 @@ const Calendario = ({ theme }) => {
                         justifyContent='center'
                         alignItems='center'
                         flexDir={['column','column','row']}
-                        columnGap='40px'
-                        rowGap={['10px','10px','0']}
-                        w={['80%','80%','90%']}
-                        flexWrap={['wrap','wrap','nowrap']}
+                        columnGap='16px'
+                        rowGap={['10px','10px','10px']}
+                        w={['80%','80%','95%']}
+                        flexWrap={['wrap','wrap','wrap']}
                         >
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                             Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                <Flex key={hour} flexDir='column' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
+                                <Flex key={hour} flexDir='column' flex='0 0 calc(33.33% - 16px)' boxSizing='border-box' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
                                     {selectedDay === 'sábado' ? 
                                     <Text textDecor='underline' fontWeight='bold' fontSize='2rem' margin='0 20px 0 20px'>{hour}</Text> :
                                     <Text textDecor='underline' fontWeight='bold' fontSize='1.6rem' margin='0 20px 0 20px'>{hour}:00</Text>

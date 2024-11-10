@@ -36,24 +36,24 @@ function App() {
 
     return (
         <Router>
-        <Routes>
-            <Route path="/" element={<Rutas toggleTheme={toggleTheme} theme={theme} />} />
-            <Route path="/admin" element={<Admin setIsAuthenticated={setIsAuthenticated} theme={theme}/>} />
-            <Route path='/initialcalendar' element={
-                <ProtectedRoute isAuthenticated={isAuthenticated}>
-                    <InitialCalendar setIsAuthenticated={setIsAuthenticated} toggleTheme={toggleTheme} theme={theme} />
-                </ProtectedRoute>
-            }
-            />
-            <Route path="/novedades" element={
-                <ProtectedRoute isAuthenticated={isAuthenticated} >
-                    <Novedades toggleTheme={toggleTheme} theme={theme} setIsAuthenticated={setIsAuthenticated} />
-                </ProtectedRoute>
-            }
-            />
-            <Route path="/rutinas" element={<BoxRutinas toggleTheme={toggleTheme} theme={theme} />} />
-            <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+            <Routes>
+                <Route path="/" element={<Rutas toggleTheme={toggleTheme} theme={theme} />} />
+                <Route path="/admin" element={<Admin setIsAuthenticated={setIsAuthenticated} theme={theme}/>} />
+                <Route path='/initialcalendar' element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated}>
+                        <InitialCalendar setIsAuthenticated={setIsAuthenticated} toggleTheme={toggleTheme} theme={theme} />
+                    </ProtectedRoute>
+                }
+                />
+                <Route path="/novedades" element={
+                    <ProtectedRoute isAuthenticated={isAuthenticated} >
+                        <Novedades toggleTheme={toggleTheme} theme={theme} setIsAuthenticated={setIsAuthenticated} />
+                    </ProtectedRoute>
+                }
+                />
+                <Route path="/rutinas" element={<BoxRutinas toggleTheme={toggleTheme} theme={theme} />} />
+                <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
         </Router>
     );
 }
