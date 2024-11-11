@@ -455,8 +455,8 @@ const Calendario = ({ theme }) => {
                             </Select> :
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
-                                <option value="mañana">Mañana (08:00 - 11:00)</option>
-                                <option value="tarde">Tarde (16:00 - 19:00)</option>
+                                <option value="mañana">Mañana (07:00 - 12:00)</option>
+                                <option value="tarde">Tarde (15:00 - 20:00)</option>
                             </Select>
                             }
 
