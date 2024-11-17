@@ -13,27 +13,13 @@ const Calendario = ({ theme }) => {
 
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
-    
-    // Ejecutar el render para que no tenga inactividad
-    useEffect(() => {
-        const fetchCalendar = async () => {
-            try {
-                const response = await axios.get(`${apiUrl}`)
-                console.log('Solicitud silenciosa exitosa!', response.data)
-
-            } catch (error) {
-                console.error('Error al ejecutar el render', error)
-            }
-        }
-
-        fetchCalendar()
-    }, [])
 
     useEffect(() => {
         const fetchCalendar = async () => {
             try {
                 const response = await axios.get(`${apiUrl}/api/calendar`);
                 setCalendar(response.data);
+                console.log(response.data)
             } catch (error) {
                 console.error('Error fetching calendar', error)
             }
@@ -452,6 +438,10 @@ const Calendario = ({ theme }) => {
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
                                 <option value="mañana">Mañana (09:30 - 11:30)</option>
+                            </Select> : selectedDay === 'lunes' ?
+                            <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
+                                <option value="">Seleccionar Turno</option>
+                                <option value="mañana">Mañana (07:00 - 14:00)</option>
                             </Select> :
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
