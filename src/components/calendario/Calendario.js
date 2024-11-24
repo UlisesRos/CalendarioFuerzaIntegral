@@ -438,11 +438,7 @@ const Calendario = ({ theme }) => {
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
                                 <option value="mañana">Mañana (09:30 - 11:30)</option>
-                            </Select> : selectedDay === 'lunes' ?
-                            <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
-                                <option value="">Seleccionar Turno</option>
-                                <option value="mañana">Mañana (07:00 - 14:00)</option>
-                            </Select> :
+                            </Select> : 
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
                                 <option value="mañana">Mañana (07:00 - 12:00)</option>
