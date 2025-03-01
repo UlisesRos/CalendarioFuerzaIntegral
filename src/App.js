@@ -40,7 +40,7 @@ function App() {
     const [theme, setTheme] = useState('dark')
     const [userData, setUserData] = useState(null)
 
-    useEffect(() => {
+    /*useEffect(() => {
         const fetchUserData = async() => {
             try {
                 const response = await axios.get(`${apiUrl}/api/auth/user`);
@@ -51,7 +51,7 @@ function App() {
         };
 
         fetchUserData();
-    }, []);
+    }, []);*/
     
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
