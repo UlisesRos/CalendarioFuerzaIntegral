@@ -4,6 +4,8 @@ const TypingEffect = ({ text, speed }) => {
     const [displayedText, setDisplayedText] = useState(''); // Texto que se mostrará
     const [index, setIndex] = useState(0); // Índice del carácter actual
 
+    console.log(text)
+
     useEffect(() => {
         if(text) {
             if (index < text.length) {

@@ -3,7 +3,7 @@ import { useState } from "react"
 import axios from "axios";
 import Swal from 'sweetalert2'
 
-function Novedades({toggleTheme, theme, apiUrl}) {
+function Novedades({theme, apiUrl}) {
 
     const [ title, setTitle ] = useState('')
     const [ subtitle, setSubTitle ] = useState('')

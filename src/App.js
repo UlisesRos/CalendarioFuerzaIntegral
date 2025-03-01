@@ -75,7 +75,7 @@ function App() {
         <Router>
             <Navbar toggleTheme={toggleTheme} theme={theme} userData={userData}/>
             <Routes>
-                <Route path="/" element={<Rutas toggleTheme={toggleTheme} theme={theme} />} />
+                <Route path="/" element={<Rutas apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
                 <Route 
                     path="/ingresousuario"
                     element={
