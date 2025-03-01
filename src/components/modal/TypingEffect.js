@@ -4,8 +4,10 @@ const TypingEffect = ({ text, speed }) => {
     const [displayedText, setDisplayedText] = useState(''); // Texto que se mostrará
     const [index, setIndex] = useState(0); // Índice del carácter actual
 
+    const texto = text || ''
+
     useEffect(() => {
-        if (index < text.length) {
+        if (index < texto.length) {
         // Crear un temporizador para añadir el siguiente carácter
         const timer = setTimeout(() => {
             setDisplayedText((prev) => prev + text.charAt(index));
