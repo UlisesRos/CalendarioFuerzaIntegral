@@ -305,7 +305,7 @@ function RegistroClientes({ theme, apiUrl }) {
                         <TableContainer 
                             mt='20px'
                             mb='20px'
-                            w='95%'
+                            w='99%'
                             >
                             <Table
                                 variant='simple'

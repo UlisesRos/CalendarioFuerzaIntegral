@@ -137,7 +137,7 @@ function App() {
                 <Route path="/rutinas" element={<BoxRutinas toggleTheme={toggleTheme} theme={theme} />} />
                 <Route path="/registro" element={
                     <ProtectedRouteCode>
-                        <Registro toggleTheme={toggleTheme} theme={theme} />
+                        <Registro apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
                     </ProtectedRouteCode>
                     } />
                 <Route path="/login" element={<Login apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
