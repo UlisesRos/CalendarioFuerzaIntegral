@@ -85,7 +85,7 @@ function Modal({apiUrl}) {
                     >
                     {modalContent.subtitle}
                 </Text>
-                <Image margin='0 30px 0 30px' src={modalContent.image} alt='llavero de fuerza integral' overflow='inherit' display={modalContent.image === '' ? 'none' : 'block'} />
+                <Image margin='0 30px 0 30px' src={modalContent.image} overflow='inherit' display={modalContent.image === '' ? 'none' : 'block'} />
                 <Text
                     fontSize='1.1rem'
                     fontWeight='semi-bold'
