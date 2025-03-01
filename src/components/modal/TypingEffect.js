@@ -7,6 +7,10 @@ const TypingEffect = ({ text, speed }) => {
     const texto = text || ''
 
     useEffect(() => {
+        if(texto === ''){
+            return
+        };
+
         if (index < texto.length) {
         // Crear un temporizador para añadir el siguiente carácter
         const timer = setTimeout(() => {
