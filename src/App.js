@@ -24,7 +24,7 @@ import ForgotPasswordForm from "./components/Login/ForgotPasswordForm";
 import ResetPasswordForm from "./components/Login/ResetPasswordForm";
 import HistorialMensual from "./components/admin/clients/HistorialMensual";
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const apiUrl = process.env.REACT_APP_API_URL;
 
 function App() {
 
@@ -40,7 +40,7 @@ function App() {
     const [theme, setTheme] = useState('dark')
     const [userData, setUserData] = useState(null)
 
-    /*useEffect(() => {
+    useEffect(() => {
         const fetchUserData = async() => {
             try {
                 const response = await axios.get(`${apiUrl}/api/auth/user`);
@@ -51,7 +51,7 @@ function App() {
         };
 
         fetchUserData();
-    }, []);*/
+    }, []);
     
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme');
