@@ -43,6 +43,10 @@ function App() {
     useEffect(() => {
         const fetchUserData = async() => {
             try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    return;
+                }
                 const response = await axios.get(`${apiUrl}/api/auth/user`);
                 setUserData(response.data)
             } catch (error) {
