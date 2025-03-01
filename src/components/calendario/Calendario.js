@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import '../../css/calendario/Calendario.css'
-import { Box, Button, Flex, FormLabel, Heading, Select, Text, Input } from '@chakra-ui/react';
-import ReactSelect from 'react-select'
+import { Box, Button, Flex, Heading, Select, Text } from '@chakra-ui/react';
 import Swal from 'sweetalert2'
 import io from 'socket.io-client'
 import axios from 'axios'
+import ModalTurnos from './modalTurnos'
 
 const socket = io('/')
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-const Calendario = ({ theme }) => {
+const Calendario = ({ theme, userData, apiUrl }) => {
+
+    const usuario = `${userData.username} ${userData.userlastname}`
 
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
@@ -19,7 +20,6 @@ const Calendario = ({ theme }) => {
             try {
                 const response = await axios.get(`${apiUrl}/api/calendar`);
                 setCalendar(response.data);
-                console.log(response.data)
             } catch (error) {
                 console.error('Error fetching calendar', error)
             }
@@ -38,18 +38,18 @@ const Calendario = ({ theme }) => {
     }, [])
 
     //UseState para manejar las distintas cosas (nombre, dia, turno y hora)
-    const [name, setName] = useState("");
+
     const [selectedDay, setSelectedDay] = useState("");
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
-    const [horariosOcupados, setHorariosOcupados] = useState([])
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
-    const handleAddPerson = (day, shift, hour, name, mover) => {
+    const handleAddPerson = (day, shift, hour, mover) => {
         setCalendar((prev) => {
             // Crear una copia profunda del estado previo
             const updated = JSON.parse(JSON.stringify(prev));
             const availableSlot = updated[day][shift][hour].indexOf(null);
-            const personaRepetida = updated[day][shift][hour].map(pers => pers === name.toLocaleLowerCase())
+            const personaRepetida = updated[day][shift][hour].map(pers => pers === usuario.toLocaleLowerCase())
 
             if(personaRepetida.filter(p => p === true).length > 0){
                 const Toast = Swal.mixin({
@@ -66,7 +66,7 @@ const Calendario = ({ theme }) => {
                 });
                 Toast.fire({
                     icon: "warning",
-                    title: `Hola ${name}, ya estas registrado en este horario. Elije otro.`
+                    title: `Hola ${usuario}, ya estas registrado en este horario. Elije otro.`
                 });
                 return prev
             } else if (availableSlot !== -1) {
@@ -87,7 +87,7 @@ const Calendario = ({ theme }) => {
                         icon: "success",
                         title: 'Usuario movido a otro horario.'
                     });
-                    updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
+                    updated[day][shift][hour][availableSlot] = usuario.toLocaleLowerCase();
                     axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
                     return updated;
                 } else {
@@ -113,7 +113,7 @@ const Calendario = ({ theme }) => {
                         icon: "success",
                         title: `Turno confirmado: ${day}, ${hour}:00 hs`
                     })
-                    updated[day][shift][hour][availableSlot] = name.toLocaleLowerCase();
+                    updated[day][shift][hour][availableSlot] = usuario.toLocaleLowerCase();
                     axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
                     return updated;
                 }
@@ -274,52 +274,10 @@ const Calendario = ({ theme }) => {
         }
     };
 
-    // Funcion para obtener los dias y horarios ocupados
-    const getHorariosOcupados = (calendar, name) => {
-        const ocupado = [];
-        Object.keys(calendar).forEach(day => {
-            Object.keys(calendar[day]).forEach(shift => {
-                Object.keys(calendar[day][shift]).forEach(hour => {
-                    calendar[day][shift][hour].forEach((user, index) => {
-                        if (user === name.toLowerCase()){
-                            ocupado.push({ day, shift, hour});
-                        };
-                    });
-                });
-            });
-        });
-        return ocupado
-    };
-
-    // Obtener todos los usuarios del calendario para el select
-    const usuariosCalendar = (calendar) => {
-        const userSet = new Set();
-
-        Object.values(calendar).forEach(day => {
-            Object.values(day).forEach(shift => {
-                Object.values(shift).forEach(hour => {
-                    hour.forEach(user => userSet.add(user))
-                })
-            })
-        });
-
-        return Array.from(userSet)
-    }
-
-    const user = usuariosCalendar(calendar)
-    const options = user.map((usuarios) => ({value: usuarios, label: usuarios}));
-
-
-    const handleSelectChange = (selectOption) => {
-        setName(selectOption ? selectOption.value : '');
-        const ocupado = getHorariosOcupados(calendar, selectOption.value);
-        setHorariosOcupados(ocupado);
-    }
-
     const handleEnter = (e) => {
         if(e.key === 'Enter'){
-            if (selectedDay && selectedShift && selectedHour && name) {
-                handleAddPerson(selectedDay, selectedShift, selectedHour, name);
+            if (selectedDay && selectedShift && selectedHour && usuario) {
+                handleAddPerson(selectedDay, selectedShift, selectedHour, usuario);
                 } else {
                     const Toast = Swal.mixin({
                         toast: true,
@@ -339,11 +297,35 @@ const Calendario = ({ theme }) => {
                     });
                 }
         }
-    }
+    };
 
+    // Obtener los dias y horarios que el usuario ya esta inscripto
+    const getUserSchedule = () => {
+        if (!calendar || !usuario) return [];
+    
+        const userSchedule = [];
+    
+        Object.keys(calendar).forEach((day) => {
+            Object.keys(calendar[day]).forEach((shift) => {
+                Object.keys(calendar[day][shift]).forEach((hour) => {
+                    const isUserRegistered = calendar[day][shift][hour].includes(usuario.toLocaleLowerCase());
+                    if (isUserRegistered) {
+                        userSchedule.push({
+                            day,
+                            shift,
+                            hour
+                        });
+                    }
+                });
+            });
+        });
+    
+        return userSchedule;
+    };
+    
 
     return (
-        <Box>
+        <Box className='animate__animated animate__backInUp'>
             <Box
                 display='flex'
                 flexDir='column'
@@ -351,63 +333,41 @@ const Calendario = ({ theme }) => {
                 margin='15px 0 0 0'
                 textAlign='center'
                 >
-                <FormLabel
+                <Heading
+                    fontFamily='"Poppins", sans-serif;'
                     textAlign='center'
-                    >
-                    Elije tu nombre
-                </FormLabel>
-                <ReactSelect
-                    className='selectUser'
-                    value={options.find(option => option.value === name)} 
-                    onChange={handleSelectChange} 
-                    placeholder="nombre del usuario"
-                    options={options}
-                    onKeyDown={handleEnter}
-                    isSearchable
-                >
-                </ReactSelect>
-                <FormLabel
-                    marginTop='15px'
-                    textAlign='center'
-                    >
-                    Si todavia no estas en el calendario, puedes agregarte aqui.
-                </FormLabel>
-                <Input
-                    textAlign='center'
-                    border='1px solid #80c687'
-                    w={["80%",'40%','20%']}
-                    type="text" 
-                    value={name} 
-                    onChange={(e) => setName(e.target.value)} 
-                    fontSize='0.9rem'
+                    w={["80%",'40%','50%']}
                     placeholder="Ingresa tu nombre"
-                    marginBottom='10px'
                     onKeyDown={handleEnter}
-                />
+                    textTransform='capitalize'
+                >
+                    Hola, {usuario}!
+                </Heading>
             </Box>
-
-            {name && horariosOcupados.length > 0 && (
-                <Box marginTop="20px" textAlign="center">
-                    <Heading fontFamily='"Poppins", sans-serif;' fontSize='1.4rem'>
-                        Ya estás inscrito en los siguientes horarios:
-                    </Heading>
-                    {horariosOcupados.map((slot, index) => (
-                        <Text key={index} fontSize='1rem' textTransform='capitalize'>
-                            {
-                                slot.day === 'sábado' ?
-                                `dia: ${slot.day} - turno: ${slot.shift} - hora: ${slot.hour}` 
-                                :
-                                `dia: ${slot.day} - turno: ${slot.shift} - hora: ${slot.hour}:00`
-                            }
-                        </Text>
-                    ))}
-                </Box>
-            )}
             
             <Box
                 margin='30px 0 30px 0px'
                 textAlign='center'
                 >
+                <Box
+                    mb='20px'
+                    >
+                    <Button 
+                        onClick={() => setIsModalOpen(true)} 
+                        backgroundColor={theme === 'light' ? 'white' : 'black'}
+                        color={theme === 'light' ? 'black' : 'white'}
+                        border='1px solid #80c687'
+                        boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                        transition='all 0.3s ease'
+                        _hover={{
+                            boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
+                            transform: 'translateY(-2px)',
+                            backgroundColor:'#80c687',
+                            color: theme === 'light' ? 'white' : 'black'
+                        }}>Ver Turnos Asignados</Button>
+                    <ModalTurnos isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} getUserSchedule={getUserSchedule} />
+                </Box>
+
                 <Heading
                     fontFamily='"Poppins", sans-serif;'
                     fontSize={['1.6rem','2rem','2.3rem']}
@@ -438,11 +398,11 @@ const Calendario = ({ theme }) => {
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
                                 <option value="mañana">Mañana (09:30 - 11:30)</option>
-                            </Select> : 
+                            </Select> :
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
                                 <option value="mañana">Mañana (07:00 - 12:00)</option>
-                                <option value="tarde">Tarde (15:00 - 20:00)</option>
+                                <option value="tarde">Tarde (13:00 - 20:00)</option>
                             </Select>
                             }
 
@@ -452,7 +412,7 @@ const Calendario = ({ theme }) => {
                                     {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                                         Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
                                             selectedDay === 'sábado' ? 
-                                            <option key={hour} value={hour}>{hour}</option> :
+                                            <option key={hour} value={hour}>{hour.length === 3 ? hour[0] + ':' + hour.slice(1) : (hour).slice(0,2) + ':' + (hour).slice(2)}</option> :
                                             <option key={hour} value={hour}>{hour}:00</option>
                                         ))
                                         : <option value="">No hay horas disponibles</option>
@@ -462,12 +422,11 @@ const Calendario = ({ theme }) => {
                         </Box>
                     }
                     
-
                     <Button
                         backgroundColor={theme === 'light' ? 'white' : 'black'}
                         color={theme === 'light' ? 'black' : 'white'}
                         border='1px solid #80c687'
-                        box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                        boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                         transition='all 0.3s ease'
                         _hover={{
                             boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
@@ -476,8 +435,8 @@ const Calendario = ({ theme }) => {
                             color: theme === 'light' ? 'white' : 'black'
                         }}
                         onClick={() => {
-                            if (selectedDay && selectedShift && selectedHour && name) {
-                            handleAddPerson(selectedDay, selectedShift, selectedHour, name);
+                            if (selectedDay && selectedShift && selectedHour && usuario) {
+                            handleAddPerson(selectedDay, selectedShift, selectedHour, usuario);
                             } else {
                                 const Toast = Swal.mixin({
                                     toast: true,
@@ -497,7 +456,7 @@ const Calendario = ({ theme }) => {
                                 });
                             }
                         }}
-                        disabled={!name || !selectedDay || !selectedShift || !selectedHour}
+                        disabled={!usuario || !selectedDay || !selectedShift || !selectedHour}
                     >
                     Inscribirme
                     </Button>
@@ -515,10 +474,10 @@ const Calendario = ({ theme }) => {
                     <Text
                         fontWeight='bold'
                         fontSize={['1.5rem','2rem','2rem']}
-                        textDecor='underline'
                         textTransform='capitalize'
                         textAlign='center'
-                        >{selectedDay} - Turno {selectedShift === 'mañana' ? 'Mañana' : 'Tarde'}</Text>
+                        className='animate__animated animate__fadeInLeftBig'
+                        >{selectedDay} <br/> Turno {selectedShift === 'mañana' ? 'Mañana' : 'Tarde'}</Text>
                     <Flex
                         justifyContent='center'
                         alignItems='center'
@@ -530,18 +489,18 @@ const Calendario = ({ theme }) => {
                         >
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                             Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                <Flex key={hour} flexDir='column' flex='0 0 calc(33.33% - 16px)' boxSizing='border-box' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
+                                <Flex className='animate__animated animate__backInUp' key={hour} flexDir='column' flex='0 0 calc(33.33% - 16px)' boxSizing='border-box' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
                                     {selectedDay === 'sábado' ? 
-                                    <Text textDecor='underline' fontWeight='bold' fontSize='2rem' margin='0 20px 0 20px'>{hour}</Text> :
+                                    <Text textDecor='underline' fontWeight='bold' fontSize='2rem' margin='0 20px 0 20px'>{hour.length === 3 ? hour[0] + ':' + hour.slice(1) : (hour).slice(0,2) + ':' + (hour).slice(2)}</Text> :
                                     <Text textDecor='underline' fontWeight='bold' fontSize='1.6rem' margin='0 20px 0 20px'>{hour}:00</Text>
                                 }
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
                                         <Box key={index} w='100%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
                                             <Button
-                                                display={name.toLocaleLowerCase() === person ? 'flex' : 'none'}
+                                                display={usuario.toLocaleLowerCase() === person ? 'flex' : 'none'}
                                                 backgroundColor={theme === 'light' ? 'white' : 'black'}
                                                 color='black'
-                                                box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                                                boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                                                 transition='all 0.3s ease'
                                                 border='1px solid #80c687'
                                                 _hover={{
@@ -554,18 +513,24 @@ const Calendario = ({ theme }) => {
                                                 </Button>
                                                 <Text
                                                     textTransform='capitalize'
-                                                    textDecor={name.toLocaleLowerCase() === person ? 'underline' : 'none'}
+                                                    textDecor={usuario.toLocaleLowerCase() === person ? 'underline' : 'none'}
                                                     textAlign='center'
                                                     w='100%'
-                                                    style={{fontWeight: 'bold', margin: '5px 0 10px 0'}} 
+                                                    style={{
+                                                        fontWeight: 'bold',
+                                                        margin: '5px 0 10px 0',
+                                                        textShadow: usuario.toLocaleLowerCase() === person ? '0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00' : 'none' // Sombra verde tipo reflector solo para el usuario actual
+                                                    }}
                                                     color={person ? 'auto' : 'green'}
-                                                    >{person || "Disponible"}</Text>
+                                                    >
+                                                    {person || "Disponible"}
+                                                </Text>
                                             <Button
-                                                display={name.toLocaleLowerCase() === person ? 'flex' : 'none'}
+                                                display={usuario.toLocaleLowerCase() === person ? 'flex' : 'none'}
                                                 backgroundColor={theme === 'light' ? 'white' : 'black'}
                                                 color={theme === 'light' ? 'black' : 'white'}
                                                 border='1px solid #80c687'
-                                                box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                                                boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                                                 transition='all 0.3s ease'
                                                 _hover={{
                                                     boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',

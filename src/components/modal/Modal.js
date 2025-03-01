@@ -3,9 +3,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import TypingEffect from "./TypingEffect"
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
-function Modal() {
+function Modal({apiUrl}) {
     
     const [ visible, setVisible] = useState(true)
     const [ modalContent, setModalContent ] = useState({

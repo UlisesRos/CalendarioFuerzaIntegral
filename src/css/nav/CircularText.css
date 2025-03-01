@@ -1,0 +1,49 @@
+.circular-text {
+    margin: 0 0;
+    border-radius: 50%;
+    width: 160px;
+    height: 160px;
+    font-weight: bold;
+    color: black;
+    font-weight: 900;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 20px;
+  }
+  
+  .circular-text span {
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 24px;
+    transition: all 0.5s cubic-bezier(0, 0, 0, 1);
+  }
+
+  .circular-text2 {
+    margin: 0 0;
+    border-radius: 50%;
+    width: 160px;
+    height: 160px;
+    font-weight: bold;
+    color: white;
+    font-weight: 900;
+    text-align: center;
+    cursor: pointer;
+    margin-left: 20px;
+  }
+  
+  .circular-text2 span {
+    position: absolute;
+    display: inline-block;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 24px;
+    transition: all 0.5s cubic-bezier(0, 0, 0, 1);
+  }
+
+  

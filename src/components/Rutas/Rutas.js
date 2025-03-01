@@ -1,20 +1,16 @@
 import { Flex } from '@chakra-ui/react'
-import Calendario from '../calendario/Calendario'
-import Navbar from '../Navbar/Navbar'
 import '../../css/nav/Navbar.css'
-import Footer from '../footer/Footer'
 import Modal from '../modal/Modal'
+import Home from '../home/Home'
 
-function Rutas({toggleTheme, theme, adminCalendar}) {
+function Rutas({toggleTheme, theme}) {
 
     return (
         <Flex
             flexDir='column'
             >
             <Modal theme={theme} />
-            <Navbar toggleTheme={toggleTheme} theme={theme} />
-            <Calendario theme={theme} adminCalendar={adminCalendar}/>
-            <Footer />
+            <Home />
         </Flex>
     )
 }

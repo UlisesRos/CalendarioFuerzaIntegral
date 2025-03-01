@@ -1,118 +1,124 @@
 import React from 'react'
 import { Box, Image, Link, Text, Flex } from '@chakra-ui/react'
 import avatar from '../../img/avatar.svg'
-import facebook from '../../img/facebook.png'
-import youtube from '../../img/youtub.png'
-import '../../css/footer/RedesSociales.css'
+import youtube from '../../img/yout.png'
+import '../../css/footer/redes.css'
 
 function Footer() {
     return (
         <Box
-            display='flex'
-            flexDir='column'
-            textAlign='center'
-            marginBottom='10px'
+            mt='100px'
+            id='footer'
             >
             <Box
                 display='flex'
-                columnGap='20px'
-                margin='40px 0 20px 0'
-                justifyContent='center'
-                >
-                    <Link
-                        href='https://www.instagram.com/fuerza.integral/'
-                        target='_blank'
-                        >
-                        <button class="button" >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            height="24"
-                            width="24"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            class="w-6 h-6 text-gray-800 dark:text-white"
-                        >
-                            <path
-                            clip-rule="evenodd"
-                            d="M3 8a5 5 0 0 1 5-5h8a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8Zm5-3a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3H8Zm7.597 2.214a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2h-.01a1 1 0 0 1-1-1ZM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm-5 3a5 5 0 1 1 10 0 5 5 0 0 1-10 0Z"
-                            fill-rule="evenodd"
-                            fill="currentColor"
-                            ></path>
-                        </svg>
-                        </button>
-                    </Link>
-                    <Link
-                        href="https://api.whatsapp.com/send?phone=3416948109&text=Hola! Te hablo porque vi tu pagina web!. Gracias!&nbspme&nbsppueden&nbspayudar?"
-                        target='_blank'
-                        >
-                        <button class="button" id='b1'>
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            height="24"
-                            width="24"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            class="w-6 h-6 text-gray-800 dark:text-white"
-                        >
-                            <path
-                            clip-rule="evenodd"
-                            d="M12 4a8 8 0 0 0-6.895 12.06l.569.718-.697 2.359 2.32-.648.379.243A8 8 0 1 0 12 4ZM2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10a9.96 9.96 0 0 1-5.016-1.347l-4.948 1.382 1.426-4.829-.006-.007-.033-.055A9.958 9.958 0 0 1 2 12Z"
-                            fill-rule="evenodd"
-                            fill="currentColor"
-                            ></path>
-                            <path
-                            d="M16.735 13.492c-.038-.018-1.497-.736-1.756-.83a1.008 1.008 0 0 0-.34-.075c-.196 0-.362.098-.49.291-.146.217-.587.732-.723.886-.018.02-.042.045-.057.045-.013 0-.239-.093-.307-.123-1.564-.68-2.751-2.313-2.914-2.589-.023-.04-.024-.057-.024-.057.005-.021.058-.074.085-.101.08-.079.166-.182.249-.283l.117-.14c.121-.14.175-.25.237-.375l.033-.066a.68.68 0 0 0-.02-.64c-.034-.069-.65-1.555-.715-1.711-.158-.377-.366-.552-.655-.552-.027 0 0 0-.112.005-.137.005-.883.104-1.213.311-.35.22-.94.924-.94 2.16 0 1.112.705 2.162 1.008 2.561l.041.06c1.161 1.695 2.608 2.951 4.074 3.537 1.412.564 2.081.63 2.461.63.16 0 .288-.013.4-.024l.072-.007c.488-.043 1.56-.599 1.804-1.276.192-.534.243-1.117.115-1.329-.088-.144-.239-.216-.43-.308Z"
-                            fill="currentColor"
-                            ></path>
-                        </svg>
-                        </button>
-                    </Link>
-                    <Link
-                        href='https://www.facebook.com/profile.php?id=100081675554626'
-                        target='_blank'
-                        >
-                        <button class="button" id='b2'>
-                        <Image src={facebook} h='25px' w='25px' />
-                        </button>    
-                    </Link>
-                    <Link
-                        href='https://www.youtube.com/channel/UCx50jLX2u6ODD9jOLcfqw9w'
-                        target='_blank'
-                        >
-                        <button class="button" id='b3'>
-                        <Image src={youtube} h='25px' w='25px' />
-                        </button>
-                    </Link>
-            </Box>
-            <Box
-                display='flex'
-                flexDir='column'
                 alignItems='center'
+                justifyContent='space-around'
+                flexDir={['column','row','row']}
+                textAlign='center'
+                marginBottom='10px'
                 >
-                <Text>
-                    Hecho por
-                </Text>
-                <Link
-                    href='https://ulisesros-desarrolloweb.vercel.app/'
-                    target='_blank'
-                    w='120px'
-                    textAlign='center'
-                    _hover={{
-                        transform: 'scale(1.2)',
-                        textDecor: 'underline'
-                    }}
+                <Box>
+                    <div class="main">
+                        <div class="up">
+                            <Link
+                                href="https://api.whatsapp.com/send?phone=3416948109&text=Hola! Te hablo porque vi tu pagina web!. Gracias!&nbspme&nbsppueden&nbspayudar?"
+                                target='_blank'
+                                >
+                                <button class="card1">
+                                <svg
+                                    class="whatsapp"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    height="30"
+                                    width="30"
+                                >
+                                    <path
+                                    d="M19.001 4.908A9.817 9.817 0 0 0 11.992 2C6.534 2 2.085 6.448 2.08 11.908c0 1.748.458 3.45 1.321 4.956L2 22l5.255-1.377a9.916 9.916 0 0 0 4.737 1.206h.005c5.46 0 9.908-4.448 9.913-9.913A9.872 9.872 0 0 0 19 4.908h.001ZM11.992 20.15A8.216 8.216 0 0 1 7.797 19l-.3-.18-3.117.818.833-3.041-.196-.314a8.2 8.2 0 0 1-1.258-4.381c0-4.533 3.696-8.23 8.239-8.23a8.2 8.2 0 0 1 5.825 2.413 8.196 8.196 0 0 1 2.41 5.825c-.006 4.55-3.702 8.24-8.24 8.24Zm4.52-6.167c-.247-.124-1.463-.723-1.692-.808-.228-.08-.394-.123-.556.124-.166.246-.641.808-.784.969-.143.166-.29.185-.537.062-.247-.125-1.045-.385-1.99-1.23-.738-.657-1.232-1.47-1.38-1.716-.142-.247-.013-.38.11-.504.11-.11.247-.29.37-.432.126-.143.167-.248.248-.413.082-.167.043-.31-.018-.433-.063-.124-.557-1.345-.765-1.838-.2-.486-.404-.419-.557-.425-.142-.009-.309-.009-.475-.009a.911.911 0 0 0-.661.31c-.228.247-.864.845-.864 2.067 0 1.22.888 2.395 1.013 2.56.122.167 1.742 2.666 4.229 3.74.587.257 1.05.408 1.41.523.595.19 1.13.162 1.558.1.475-.072 1.464-.6 1.673-1.178.205-.58.205-1.075.142-1.18-.061-.104-.227-.165-.475-.29Z"
+                                    ></path>
+                                </svg>
+                                </button>
+                            </Link>
+                            <Link
+                                href='https://www.facebook.com/profile.php?id=100081675554626'
+                                target='_blank'
+                                >
+                                <button class="card2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" height="24" class="facebook" width="24">
+                                        <path d="M9.19795 21.5H13.198V13.4901H16.8021L17.198 9.50977H13.198V7.5C13.198 6.94772 13.6457 6.5 14.198 6.5H17.198V2.5H14.198C11.4365 2.5 9.19795 4.73858 9.19795 7.5V9.50977H7.19795L6.80206 13.4901H9.19795V21.5Z"></path>
+                                    </svg>
+                                </button>
+                            </Link>
+                        </div>
+                        <div class="down">
+                            <Link
+                                href='https://www.instagram.com/fuerza.baseintegral/'
+                                target='_blank'
+                                >
+                                <button class="card3">
+                                <svg
+                                className="instagram"
+                                fillRule="nonzero"
+                                height="30px"
+                                width="30px"
+                                viewBox="0 0 256 256"
+                                >
+                                <g style={{ mixBlendMode: 'normal' }} textAnchor="none" fontSize="none" fontWeight="none" fontFamily="none" strokeDashoffset="0" strokeDasharray="" strokeMiterlimit="10" strokeLinejoin="miter" strokeLinecap="butt" strokeWidth="1" stroke="none" fillRule="nonzero">
+                                    <g transform="scale(8,8)">
+                                    <path d="M11.46875,5c-3.55078,0 -6.46875,2.91406 -6.46875,6.46875v9.0625c0,3.55078 2.91406,6.46875 6.46875,6.46875h9.0625c3.55078,0 6.46875,-2.91406 6.46875,-6.46875v-9.0625c0,-3.55078 -2.91406,-6.46875 -6.46875,-6.46875zM11.46875,7h9.0625c2.47266,0 4.46875,1.99609 4.46875,4.46875v9.0625c0,2.47266 -1.99609,4.46875 -4.46875,4.46875h-9.0625c-2.47266,0 -4.46875,-1.99609 -4.46875,-4.46875v-9.0625c0,-2.47266 1.99609,-4.46875 4.46875,-4.46875zM21.90625,9.1875c-0.50391,0 -0.90625,0.40234 -0.90625,0.90625c0,0.50391 0.40234,0.90625 0.90625,0.90625c0.50391,0 0.90625,-0.40234 0.90625,-0.90625c0,-0.50391 -0.40234,-0.90625 -0.90625,-0.90625zM16,10c-3.30078,0 -6,2.69922 -6,6c0,3.30078 2.69922,6 6,6c3.30078,0 6,-2.69922 6,-6c0,-3.30078 -2.69922,-6 -6,-6zM16,12c2.22266,0 4,1.77734 4,4c0,2.22266 -1.77734,4 -4,4c-2.22266,0 -4,-1.77734 -4,-4c0,-2.22266 1.77734,-4 4,-4z"></path>
+                                    </g>
+                                </g>
+                                </svg>
+                                </button>
+                            </Link>
+                            <Link
+                                href='https://www.youtube.com/channel/UCx50jLX2u6ODD9jOLcfqw9w'
+                                target='_blank'
+                                >
+                                <button class="card4">
+                                    <Image className='youtube' src={youtube} h='25px' w='25px' />
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
+                </Box>
+                <Box
+                    display='flex'
+                    flexDir='column'
+                    alignItems='center'
+                    mt={['25px','0','0']}
+                    w={['80%','50%','50%']}
                     >
-                    <Flex
-                        alignItems='center'
-                        justifyContent='center'
-                        columnGap='4px'
+                    <Text
+                        textAlign={['center','end','end']}
+                        fontSize='sm'
                         >
-                        <Image src={avatar} h='30px' w='30px'/>
-                        <Text>Ulises Ros</Text>
-                    </Flex>
-                </Link>
+                        Fuerza Integral es un gimnasio creado con pasión y dedicación por dos jóvenes emprendedores de la ciudad de Rosario. Con un enfoque integral hacia el bienestar físico y mental, ofrecemos un espacio moderno y equipado para que puedas alcanzar tus metas fitness en un ambiente motivador y cercano. Te invitamos a conocer nuestras instalaciones y sumarte a una comunidad que promueve la salud, la disciplina y el crecimiento personal. <strong>¡Visítanos y descubre todo lo que Fuerza Integral tiene para ofrecerte!</strong> <br/>Para más información, contáctanos a través de nuestras redes sociales. ¡Te esperamos!
+                    </Text>  
+                </Box>
+            </Box>
+            <Box>
+            <Link
+                href='https://ulisesros-desarrolloweb.vercel.app/'
+                target='_blank'
+                w='120px'
+                textAlign='center'
+                _hover={{
+                    transform: 'scale(1.2)',
+                    textDecor: 'underline'
+                }}
+                >
+                <Flex
+                    mt='25px'
+                    mb='20px'
+                    alignItems='center'
+                    justifyContent='center'
+                    columnGap='4px'
+                    >
+                    <Image src={avatar} h='30px' w='30px'/>
+                    <Text>Ulises Ros</Text>
+                </Flex>
+            </Link>
             </Box>
         </Box>
     )
