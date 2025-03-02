@@ -14,41 +14,91 @@ function Transferencia({theme, userData}) {
             align='center'
             justify='center'
             h='70vh'
+            mt='50px'
             >
             <Box
                 w={['90%', '80%', '50%']}
                 >
-
                 <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(0, 229, 255, 0.2)">
                     <Flex
                         flexDir='column'
                         align='center'
                         justify='center'
                         color='#80c687'
-                        rowGap='10px'
-                        padding='20px'
+                        rowGap='10px'   
                         >
                         <Heading
                             fontFamily='poppins'
                             fontSize='3xl'
+                            textAlign='center'
                             >
                                 Datos para Transferir
                         </Heading>
-                        <Text>
-                            <strong>Alias:</strong> fzabaseintegral
-                        </Text>
-                        <Text>  
-                            <strong>Nombre de la Cuenta:</strong> Manuel Mariano Martino
-                        </Text>
-                        <Text>  
-                            <strong>N° Cuenta:</strong> 0000003100035185326089
-                        </Text>
-                        <Text>
-                            <strong>Importe a pagar:</strong> {precioMostrar}
-                        </Text>
-                        <Text>
-                            <strong>Dias de entrenamiento:</strong> {userData.diasentrenamiento}
-                        </Text>
+                        <Flex
+                            flexDir='column'
+                            align='center'
+                            >
+                            <Text
+                                fontWeight='bold'
+                                >
+                                Alias
+                            </Text>
+                            <Text>
+                                fzabaseintegral    
+                            </Text> 
+                        </Flex>
+                        <Flex
+                            flexDir='column'
+                            align='center'
+                            >
+                            <Text
+                                fontWeight='bold'
+                                >
+                                Nombre de la Cuenta
+                            </Text>
+                            <Text>
+                                Manuel Mariano Martino 
+                            </Text> 
+                        </Flex> 
+                        <Flex
+                            flexDir='column'
+                            align='center'
+                            >
+                            <Text
+                                fontWeight='bold'
+                                >
+                                N° Cuenta
+                            </Text>
+                            <Text>
+                                0000003100035185326089
+                            </Text> 
+                        </Flex>
+                        <Flex
+                            flexDir='column'
+                            align='center'
+                            >
+                            <Text
+                                fontWeight='bold'
+                                >
+                                Importe a Pagar
+                            </Text>
+                            <Text>
+                                {precioMostrar}
+                            </Text> 
+                        </Flex>
+                        <Flex
+                            flexDir='column'
+                            align='center'
+                            >
+                            <Text
+                                fontWeight='bold'
+                                >
+                                Dias de entrenamiento
+                            </Text>
+                            <Text>
+                                {userData.diasentrenamiento}
+                            </Text> 
+                        </Flex>
                         <Flex
                             flexDir='column'
                             align='center'
@@ -56,7 +106,7 @@ function Transferencia({theme, userData}) {
                             rowGap='2px'
                             border='1px solid #80c687'
                             borderRadius='10px' 
-                            p='10px'
+                            p='10px'    
                             >                            
                             <Text
                                 color='red'

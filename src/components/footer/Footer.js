@@ -7,7 +7,7 @@ import '../../css/footer/redes.css'
 function Footer() {
     return (
         <Box
-            mt='100px'
+            mt={['60px','70px','90px']}
             id='footer'
             >
             <Box

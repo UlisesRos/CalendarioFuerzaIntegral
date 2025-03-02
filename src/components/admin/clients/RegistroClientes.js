@@ -284,6 +284,7 @@ function RegistroClientes({ theme, apiUrl }) {
                             <Box
                                 display='flex'  
                                 columnGap='8px'
+                                p='5px'
                                 alignItems='center'
                                 justifyContent='center'
                                 fontSize='1.2rem'

@@ -1,12 +1,11 @@
-import { Button, Flex, FormControl, FormLabel, Stack, useToast, Input, Box, Select } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import { Button, Flex, FormControl, FormLabel, Stack, useToast, Input, Box, Select, Spinner } from '@chakra-ui/react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Registro({ theme, apiUrl }) {
-
     // Manejo del formulario
-    const [ formData, setFormData ] = useState({
+    const [formData, setFormData] = useState({
         username: '',
         userlastname: '',
         useremail: '',
@@ -18,9 +17,11 @@ function Registro({ theme, apiUrl }) {
         descuento: ''
     });
 
+    const [loading, setLoading] = useState(false); // Estado para controlar el loading
+
     // Notificaciones
     const toast = useToast();
-    const navegate = useNavigate()
+    const navigate = useNavigate();
 
     // Traer los datos del input
     const handleChange = (e) => {
@@ -28,30 +29,28 @@ function Registro({ theme, apiUrl }) {
         setFormData({
             ...formData,
             [name]: value
-        })
-    }
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true); // Activar el estado de loading
 
         try {
             const response = await axios.post(`${apiUrl}/api/auth/register`, formData);
 
-            if(response.status === 201) {
+            if (response.status === 201) {
                 toast({
                     title: 'Registro Exitoso',
-                    description: 'Ahora puedes iniciar sesion',
+                    description: 'Ahora puedes iniciar sesión',
                     status: 'success',
                     duration: 5000,
                     isClosable: true
                 });
-                navegate('/login')
+                navigate('/login');
             }
-
-
         } catch (error) {
-            
-            if(error.response) {
+            if (error.response) {
                 // Respuestas de error del Back
                 toast({
                     title: 'Error al registrarse',
@@ -60,9 +59,9 @@ function Registro({ theme, apiUrl }) {
                     duration: 5000,
                     isClosable: true
                 });
-            } else if(error.request) {
+            } else if (error.request) {
                 toast({
-                    title: 'Error en la conexion',
+                    title: 'Error en la conexión',
                     description: 'No se pudo conectar al servidor',
                     status: 'error',
                     duration: 5000,
@@ -77,17 +76,19 @@ function Registro({ theme, apiUrl }) {
                     isClosable: true,
                 });
             }
+        } finally {
+            setLoading(false); // Desactivar el estado de loading
         }
-    }
-    
+    };
+
     return (
         <Flex
             alignItems='center'
             justifyContent='center'
             m='30px 0 20px 0'
-            >
+        >
             <Box
-                w={['90%','70%','60%']}
+                w={['90%', '70%', '60%']}
                 h='auto'
                 p='50px'
                 borderRadius='20px'
@@ -96,183 +97,149 @@ function Registro({ theme, apiUrl }) {
                 _hover={{
                     boxShadow: "0px 15px 20px rgba(0, 0, 0, 0.3), 0px 10px 15px rgba(0, 0, 0, 0.2)"
                 }}
-                >
+            >
                 <form onSubmit={handleSubmit}>
                     <Stack spacing={4}>
                         <FormControl
                             id='username'
                             isRequired
-                            >
-                            <FormLabel
-                                
-                                >
-                                Nombre
-                            </FormLabel>
+                        >
+                            <FormLabel>Nombre</FormLabel>
                             <Input
                                 value={(formData.username).toLowerCase()}
                                 onChange={handleChange}
                                 type='text'
                                 name='username'
                                 placeholder='Ingresa tu Nombre'
-                                border='1px solid #80c687' 
-                                />
+                                border='1px solid #80c687'
+                            />
                         </FormControl>
 
                         <FormControl
                             id='userlastname'
                             isRequired
-                            >
-                            <FormLabel
-                                
-                                >
-                                Apellido
-                            </FormLabel>
+                        >
+                            <FormLabel>Apellido</FormLabel>
                             <Input
                                 value={formData.userlastname.toLowerCase()}
                                 onChange={handleChange}
                                 type='text'
                                 name='userlastname'
                                 placeholder='Ingresa tu Apellido'
-                                border='1px solid #80c687' 
-                                />
+                                border='1px solid #80c687'
+                            />
                         </FormControl>
 
                         <FormControl
                             id='useremail'
                             isRequired
-                            >
-                            <FormLabel
-                                
-                                >
-                                Email
-                            </FormLabel>
+                        >
+                            <FormLabel>Email</FormLabel>
                             <Input
                                 value={formData.useremail.toLowerCase()}
                                 onChange={handleChange}
                                 type='email'
                                 name='useremail'
                                 placeholder='Ingresa tu Email'
-                                border='1px solid #80c687' 
-                                />
+                                border='1px solid #80c687'
+                            />
                         </FormControl>
 
                         <FormControl
                             id='documento'
                             isRequired
-                            >
-                            <FormLabel
-                                >
-                                Documento
-                            </FormLabel>
+                        >
+                            <FormLabel>Documento</FormLabel>
                             <Input
                                 value={formData.documento}
                                 onChange={handleChange}
                                 type='number'
                                 name='documento'
                                 placeholder='Ingresa tu Documento'
-                                border='1px solid #80c687' 
-                                />
+                                border='1px solid #80c687'
+                            />
                         </FormControl>
 
                         <FormControl
                             id='usertelefono'
                             isRequired
-                            >
-                            <FormLabel
-                                
-                                >
-                                Celular
-                            </FormLabel>
+                        >
+                            <FormLabel>Celular</FormLabel>
                             <Input
                                 value={formData.usertelefono}
                                 onChange={handleChange}
                                 type='number'
                                 name='usertelefono'
                                 placeholder='341xxxxxxx'
-                                border='1px solid #80c687' 
-                                />
+                                border='1px solid #80c687'
+                            />
                         </FormControl>
 
                         <FormControl
                             id='diasentrenamiento'
                             isRequired
-                            >
-                            <FormLabel
-                                
-                                >
-                                Cantidad de Dias a Entrenar
-                            </FormLabel>
+                        >
+                            <FormLabel>Cantidad de Días a Entrenar</FormLabel>
                             <Select
                                 value={formData.diasentrenamiento}
                                 onChange={handleChange}
                                 name='diasentrenamiento'
-                                placeholder='Selecciona la cantidad de dias'
-                                border='1px solid #80c687' 
-                                >
-                                    <option value='2'>2 dias</option>
-                                    <option value='3'>3 dias</option>
-                                    <option value='4'>4 dias</option>
-                                    <option value='5'>5 dias</option>
-                                </Select>
+                                placeholder='Selecciona la cantidad de días'
+                                border='1px solid #80c687'
+                            >
+                                <option value='2'>2 días</option>
+                                <option value='3'>3 días</option>
+                                <option value='4'>4 días</option>
+                                <option value='5'>5 días</option>
+                            </Select>
                         </FormControl>
 
                         <FormControl
                             id='descuento'
-                            >
-                            <FormLabel
-                                
-                                >
-                                Descuento
-                            </FormLabel>
+                        >
+                            <FormLabel>Descuento</FormLabel>
                             <Select
                                 value={formData.descuento}
                                 onChange={handleChange}
                                 name='descuento'
                                 placeholder='Selecciona si posees un descuento'
-                                border='1px solid #80c687' 
-                                >
-                                    <option value='jubilado'>Jubilado</option>
-                                    <option value='estudiante'>Estudiante</option>
-                                    <option value='familia'>Grupo familiar (+2)</option>
-                                    <option value='deportista'>Deportista</option>
-                                </Select>
+                                border='1px solid #80c687'
+                            >
+                                <option value='jubilado'>Jubilado</option>
+                                <option value='estudiante'>Estudiante</option>
+                                <option value='familia'>Grupo familiar (+2)</option>
+                                <option value='deportista'>Deportista</option>
+                            </Select>
                         </FormControl>
 
                         <FormControl
                             id='userpassword'
                             isRequired
-                            >
-                            <FormLabel
-                                
-                                >
-                                Contraseña
-                            </FormLabel>
+                        >
+                            <FormLabel>Contraseña</FormLabel>
                             <Input
                                 value={formData.userpassword}
                                 onChange={handleChange}
                                 type='password'
                                 name='userpassword'
                                 placeholder='Ingresa tu Contraseña'
-                                border='1px solid #80c687' 
-                                />
+                                border='1px solid #80c687'
+                            />
                         </FormControl>
+
                         <FormControl
                             id='userpasswordc'
                             isRequired
-                            >
-                            <FormLabel
-                                
-                                >
-                                Nuevamente tu Contraseña
-                            </FormLabel>
+                        >
+                            <FormLabel>Nuevamente tu Contraseña</FormLabel>
                             <Input
                                 value={formData.userpasswordc}
                                 onChange={handleChange}
                                 type='password'
                                 name='userpasswordc'
                                 placeholder='Vuelve a ingresar tu Contraseña'
-                                border='1px solid #80c687' 
-                                />
+                                border='1px solid #80c687'
+                            />
                         </FormControl>
 
                         <Button
@@ -281,23 +248,25 @@ function Registro({ theme, apiUrl }) {
                             backgroundColor={theme === 'light' ? 'white' : 'black'}
                             color={theme === 'light' ? 'black' : 'white'}
                             border='1px solid #80c687'
-                            box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
+                            boxShadow='0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
                             transition='all 0.3s ease'
                             _hover={{
                                 boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
                                 transform: 'translateY(-2px)',
-                                backgroundColor:'#80c687',
+                                backgroundColor: '#80c687',
                                 color: theme === 'light' ? 'white' : 'black'
                             }}
                             w='80%'
-                            >
-                            Registrarse
+                            isLoading={loading}
+                            spinner={<Spinner size='sm' />} 
+                        >
+                            {loading ? '' : 'Registrarse'}
                         </Button>
                     </Stack>
                 </form>
             </Box>
         </Flex>
-    )
+    );
 }
 
-export default Registro
+export default Registro;

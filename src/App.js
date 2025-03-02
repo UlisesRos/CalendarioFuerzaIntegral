@@ -36,7 +36,7 @@ function App() {
         return config;
     });
 
-    const [theme, setTheme] = useState('dark')
+    const [theme, setTheme] = useState('ligth')
     const [userData, setUserData] = useState(null)
 
     useEffect(() => {
