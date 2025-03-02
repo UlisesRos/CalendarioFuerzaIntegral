@@ -65,7 +65,7 @@ function App() {
     }, [])
 
     const toggleTheme = () => {
-        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
     };
