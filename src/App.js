@@ -5,7 +5,6 @@ import Novedades from "./components/admin/Novedades";
 import Rutas from "./components/Rutas/Rutas";
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
-import BoxRutinas from "./components/rutinas/BoxRutinas";
 import Calendario from "./components/calendario/Calendario";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/footer/Footer";
@@ -36,7 +35,7 @@ function App() {
         return config;
     });
 
-    const [theme, setTheme] = useState('ligth')
+    const [theme, setTheme] = useState('light')
     const [userData, setUserData] = useState(null)
 
     useEffect(() => {
@@ -57,7 +56,7 @@ function App() {
     }, []);
     
     useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
+        const savedTheme = 'light';
         if (savedTheme) {
             setTheme(savedTheme);
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -138,7 +137,6 @@ function App() {
                     </AdminRoute>
                 }
                 />
-                <Route path="/rutinas" element={<BoxRutinas toggleTheme={toggleTheme} theme={theme} />} />
                 <Route path="/registro" element={
                     <ProtectedRouteCode>
                         <Registro apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
