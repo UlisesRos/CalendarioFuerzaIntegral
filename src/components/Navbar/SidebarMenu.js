@@ -12,7 +12,9 @@ import {
   Image,
   useToast,
   VStack,
-  Text
+  Text,
+  Flex,
+  Spinner
 } from '@chakra-ui/react';
 import { jwtDecode } from 'jwt-decode';
 import { Link, useNavigate } from 'react-router-dom';
@@ -84,18 +86,7 @@ function SidebarMenu({ theme, userData }) {
 
   return (
     <Box>
-      <Button
-        onClick={onOpen}
-        backgroundColor={theme === 'light' ? 'white' : '#1A202C'}
-        _hover={{
-          backgroundColor: theme === 'light' ? 'white' : '#1A202C',
-          transform: 'scale(1.1)',
-        }}
-        h="auto"
-        w="auto"
-      >
-        <Image src={menu} alt="Menu desplegable" w="50px" h="50px" m="3px" />
-      </Button>
+      <Image _hover={{cursor: 'pointer', transform: 'scale(1.1)'}} onClick={onOpen} src={menu} alt="Menu desplegable" w="50px" h="50px" m="3px" />
 
       <Drawer isOpen={isOpen} onClose={onClose} placement="right" size="sm">
         <DrawerOverlay />
@@ -104,7 +95,21 @@ function SidebarMenu({ theme, userData }) {
           <DrawerHeader>Menú de Navegación</DrawerHeader>
 
           <DrawerBody>
-            {isAuthenticated ? (
+            {isAuthenticated ? 
+              !userData ? (
+                      <Flex
+                          w='100%'
+                          h='70vh'
+                          align='center'
+                          justify='center'
+                          flexDir='column'
+                          rowGap='10px'
+                          >
+                          Cargando...
+                          <Spinner size='lg' color='green' />
+                      </Flex>        
+              ) :
+              (
               userData ? (
                 userData.role === 'admin' ? (
                   <VStack align="start" spacing={4}>

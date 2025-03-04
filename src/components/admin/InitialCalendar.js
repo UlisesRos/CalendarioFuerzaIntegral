@@ -8,7 +8,7 @@ import axios from 'axios'
 import ModalOcupados from './modalOcupados';
 import 'animate.css'
 
-const InitialCalendar = ({ theme, administrador, apiUrl }) => {
+const InitialCalendar = ({ theme, apiUrl }) => {
     
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')

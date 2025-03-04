@@ -2,9 +2,25 @@ import React from 'react'
 import usuarios from '../../img/usuarios.png'
 import HistorialPagosUs from './HistorialPagosUs'
 import 'animate.css'
-import { Box, Flex, Card, CardHeader, CardBody, Heading, Text, Image } from '@chakra-ui/react'
+import { Box, Flex, Card, CardHeader, CardBody, Heading, Text, Image, Spinner } from '@chakra-ui/react'
 
 function Perfil({ userData, theme }) {
+
+    if(!userData){
+        return(
+            <Flex
+                w='100%'
+                h='70vh'
+                align='center'
+                justify='center'
+                flexDir='column'
+                rowGap='10px'
+                >
+                Cargando...
+                <Spinner size='lg' color='green' />
+            </Flex>
+        )
+    }
 
     return (
         <Flex

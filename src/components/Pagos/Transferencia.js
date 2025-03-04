@@ -1,13 +1,30 @@
-import { Button, Flex, Heading, Link, Text, Box } from '@chakra-ui/react'
+import { Button, Flex, Heading, Link, Text, Box, Spinner } from '@chakra-ui/react'
 import SpotlightCard from './SpotlightCard';
 import {PRECIOS, DESCUENTO} from '../../config/precios'
 
 function Transferencia({theme, userData}) {
 
+    if(!userData) {
+        return (
+            <Flex
+                w='100%'
+                h='70vh'
+                align='center'
+                justify='center'
+                flexDir='column'
+                rowGap='10px'
+                >
+                Cargando...
+                <Spinner size='lg' color='green' />
+            </Flex>
+        )
+    }
+
      // PRECIOS ACTUALIZADOS
         const precioBase = PRECIOS[userData.diasentrenamiento] || 0;
         const precioFinal = userData.descuento ? precioBase - precioBase * DESCUENTO : precioBase;
         const precioMostrar = precioBase ? `$ ${precioFinal.toLocaleString('es-ES')}` : "$ -";
+
 
     return (
         <Flex

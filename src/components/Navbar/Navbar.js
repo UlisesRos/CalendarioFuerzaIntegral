@@ -6,6 +6,7 @@ import CircularText from './CircularText';
 
 function Navbar({toggleTheme, theme, userData}) {
     //<Image src={logo2} alt='logo de fuerza integral' w='10rem' h='8rem' marginLeft={['0','20px','20px']} objectFit='cover' />
+    
     return (
         <Flex
             flexDir={['column','row','row']}
@@ -13,6 +14,7 @@ function Navbar({toggleTheme, theme, userData}) {
             alignItems='center'
             flexWrap='wrap'
             rowGap='15px'
+            mb='40px'
             >
             <CircularText
                 theme={theme}

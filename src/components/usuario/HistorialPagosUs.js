@@ -1,5 +1,5 @@
 import { 
-    Box, Modal, ModalOverlay, ModalCloseButton, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Text, Stack, useDisclosure, Select 
+    Flex, Spinner, Box, Modal, ModalOverlay, ModalCloseButton, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Text, Stack, useDisclosure, Select 
 } from "@chakra-ui/react";
 import { useState } from "react";
 
@@ -7,6 +7,22 @@ const HistorialPagos = ({ userData, theme }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [mesSeleccionado, setMesSeleccionado] = useState("");
     const [anioSeleccionado, setAnioSeleccionado] = useState("");
+
+    if(!userData) {
+        return(
+            <Flex
+                w='100%'
+                h='70vh'
+                align='center'
+                justify='center'
+                flexDir='column'
+                rowGap='10px'
+                >
+                Cargando...
+                <Spinner size='lg' color='green' />
+            </Flex>
+        )
+    }
 
     const formatFecha = (fechaISO) => {
         const fecha = new Date(fechaISO);

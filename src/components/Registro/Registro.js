@@ -106,7 +106,7 @@ function Registro({ theme, apiUrl }) {
                         >
                             <FormLabel>Nombre</FormLabel>
                             <Input
-                                value={(formData.username).toLowerCase()}
+                                value={(formData.username)}
                                 onChange={handleChange}
                                 type='text'
                                 name='username'
@@ -121,7 +121,7 @@ function Registro({ theme, apiUrl }) {
                         >
                             <FormLabel>Apellido</FormLabel>
                             <Input
-                                value={formData.userlastname.toLowerCase()}
+                                value={formData.userlastname}
                                 onChange={handleChange}
                                 type='text'
                                 name='userlastname'
@@ -136,7 +136,7 @@ function Registro({ theme, apiUrl }) {
                         >
                             <FormLabel>Email</FormLabel>
                             <Input
-                                value={formData.useremail.toLowerCase()}
+                                value={formData.useremail}
                                 onChange={handleChange}
                                 type='email'
                                 name='useremail'

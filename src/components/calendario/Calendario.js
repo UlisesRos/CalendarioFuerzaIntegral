@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../css/calendario/Calendario.css'
-import { Box, Button, Flex, Heading, Select, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Select, Spinner, Text } from '@chakra-ui/react';
 import Swal from 'sweetalert2'
 import io from 'socket.io-client'
 import axios from 'axios'
@@ -9,8 +9,6 @@ import ModalTurnos from './modalTurnos'
 const socket = io('/')
 
 const Calendario = ({ theme, userData, apiUrl }) => {
-
-    const usuario = `${userData.username} ${userData.userlastname}`
 
     // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
@@ -43,6 +41,24 @@ const Calendario = ({ theme, userData, apiUrl }) => {
     const [selectedShift, setSelectedShift] = useState("");
     const [selectedHour, setSelectedHour] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    if(!userData) {
+        return (
+            <Flex
+                w='100%'
+                h='70vh'
+                align='center'
+                justify='center'
+                flexDir='column'
+                rowGap='10px'
+                >
+                Cargando...
+                <Spinner size='lg' color='green' />
+            </Flex>
+        )
+    }
+
+    const usuario = `${userData?.username || ''} ${userData?.userlastname || ''}`
     
     const handleAddPerson = (day, shift, hour, mover) => {
         setCalendar((prev) => {
