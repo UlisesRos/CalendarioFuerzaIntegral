@@ -19,9 +19,22 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
     const [diasEntrenamiento, setDiasEntrenamiento] = useState(0);
     const [username, setUsername] = useState('');
     const [userlastname, setUserlastname] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const toast = useToast();
 
     const verificarCliente = async () => {
+        if (!documento.trim()) {
+            toast({
+                title: "Error",
+                description: "Por favor, ingresa un número de documento.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+            });
+            return;
+        }
+
+        setIsLoading(true);
         try {
             const response = await axios.post(`${apiUrl}/api/ingresousuario`, { documento });
 
@@ -52,17 +65,20 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
                 setDocumento("");
             }
         } catch (error) {
-            setMensaje(error.response.data.msg);
-            setUsername(error.response.data.username);
-            setUserlastname(error.response.data.userlastname);
+            const errorMessage = error.response?.data?.msg || "Ocurrió un error al verificar el cliente.";
+            setMensaje(errorMessage);
+            setUsername(error.response?.data?.username || '');
+            setUserlastname(error.response?.data?.userlastname || '');
 
             toast({
                 title: "Verificación Fallida",
-                description: error.response.data.msg,
+                description: errorMessage,
                 status: "error",
                 duration: 5000,
                 isClosable: true,
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -105,6 +121,8 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
                         backgroundColor: '#80c687',
                         color: theme === 'light' ? 'white' : 'black'
                     }}
+                    isLoading={isLoading}
+                    loadingText="Verificando..."
                 >
                     Verificar
                 </Button>
@@ -125,7 +143,7 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
                     </Text>
                 )}
 
-                {diasRestantes > 0 && (
+                {diasRestantes > 0 && diasEntrenamiento > 0 && (
                     <Box mt={4} p={4} borderWidth={1} borderRadius="md" backgroundColor={theme === 'light' ? "gray.100" : 'black'} >
                         <Text fontSize="lg" fontWeight="bold">Días Restantes:</Text>
                         <Text fontSize="lg">{diasRestantes}</Text>
