@@ -23,8 +23,16 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
     const toast = useToast();
 
     const verificarCliente = async () => {
+        // Resetear estados antes de la verificación
+        setMensaje("");
+        setDiasRestantes(0);
+        setDiasEntrenamiento(0);
+        setUsername("");
+        setUserlastname("");
+
         if (!documento.trim()) {
             toast({
+                id: "documento-vacio", // Evita duplicados
                 title: "Error",
                 description: "Por favor, ingresa un número de documento.",
                 status: "error",
@@ -41,6 +49,7 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
             if (response.data.yaIngresadoHoy) {
                 setMensaje("Ya has ingresado hoy.");
                 toast({
+                    id: "ya-ingresado", // Evita duplicados
                     title: "Error",
                     description: "Ya has ingresado hoy.",
                     status: "error",
@@ -55,6 +64,7 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
                 setUserlastname(response.data.userlastname);
 
                 toast({
+                    id: "verificacion-exitosa", // Evita duplicados
                     title: "Verificación exitosa",
                     description: 'Puedes ingresar al gimnasio',
                     status: "success",
@@ -67,10 +77,11 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
         } catch (error) {
             const errorMessage = error.response?.data?.msg || "Ocurrió un error al verificar el cliente.";
             setMensaje(errorMessage);
-            setUsername(error.response?.data?.username || '');
-            setUserlastname(error.response?.data?.userlastname || '');
+            setUsername('');
+            setUserlastname('');
 
             toast({
+                id: "verificacion-fallida", // Evita duplicados
                 title: "Verificación Fallida",
                 description: errorMessage,
                 status: "error",
@@ -86,7 +97,7 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
         if (event.key === 'Enter') {
             verificarCliente();
         }
-    }
+    };
 
     return (
         <Box p={5} boxShadow="md" borderRadius="md" maxWidth="500px" margin="auto">
@@ -138,13 +149,13 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
                 </Heading>
 
                 {mensaje && (
-                    <Text color={mensaje !== 'Verificación exitosa' ? 'red' : 'green'} textAlign="center">
+                    <Text key="mensaje" color={mensaje !== 'Verificación exitosa' ? 'red' : 'green'} textAlign="center">
                         {mensaje}
                     </Text>
                 )}
 
                 {diasRestantes > 0 && diasEntrenamiento > 0 && (
-                    <Box mt={4} p={4} borderWidth={1} borderRadius="md" backgroundColor={theme === 'light' ? "gray.100" : 'black'} >
+                    <Box key="dias-info" mt={4} p={4} borderWidth={1} borderRadius="md" backgroundColor={theme === 'light' ? "gray.100" : 'black'} >
                         <Text fontSize="lg" fontWeight="bold">Días Restantes:</Text>
                         <Text fontSize="lg">{diasRestantes}</Text>
 
@@ -152,7 +163,6 @@ const IngresoUsuario = ({ theme, apiUrl }) => {
                         <Text>{diasEntrenamiento}</Text>
                     </Box>
                 )}
-
             </VStack>
         </Box>
     );
