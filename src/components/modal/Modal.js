@@ -53,7 +53,7 @@ function Modal({apiUrl}) {
             h='auto'
             position='absolute'
             //margin={['160px 0 0 5%','180px 0 0 30%','120px 0 0 30%']} 
-            top='50%'
+            top={['15%','20%','25%']}
             left='50%'
             transform='translate(-50%, -50%)'
             zIndex='100'
