@@ -11,13 +11,18 @@ import {
     Input,
     useDisclosure,
     Text,
+    InputGroup,
+    InputRightElement,
+    IconButton
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 const ProtectedRegisterButton = ({ theme, onClose1 }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [code, setCode] = useState("");
     const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     const correctCode = process.env.REACT_APP_PROTECTED_CODE
@@ -48,6 +53,10 @@ const ProtectedRegisterButton = ({ theme, onClose1 }) => {
         }
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
         <>
         <Button
@@ -74,18 +83,29 @@ const ProtectedRegisterButton = ({ theme, onClose1 }) => {
             <ModalCloseButton />
             <ModalBody>
                 <Text mb={2}>Ingresa el código para acceder al registro:</Text>
-                <Input
-                onKeyDown={handleKeyPress}
-                placeholder="Código"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                type="password"
-                />
-                {error && (
-                <Text color="red.500" fontSize="sm" mt={2}>
-                    {error}
-                </Text>
-                )}
+                <InputGroup>
+                    <Input
+                        onKeyDown={handleKeyPress}
+                        placeholder="Código"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        type={showPassword ? "text" : "password"}
+                        />
+                        <InputRightElement>
+                            <IconButton
+                                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                onClick={togglePasswordVisibility}
+                                variant="ghost"
+                                size="sm"
+                            />
+                        </InputRightElement>
+                    </InputGroup>  
+                    {error && (
+                    <Text color="red.500" fontSize="sm" mt={2}>
+                        {error}
+                    </Text>
+                    )}
             </ModalBody>
             <ModalFooter>
                 <Button

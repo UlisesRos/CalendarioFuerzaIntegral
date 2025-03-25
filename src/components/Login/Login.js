@@ -1,7 +1,8 @@
-import { Button, Text, Flex, FormControl, FormLabel, Stack, useToast, Input, Box, Spinner } from '@chakra-ui/react';
+import { Button, Text, Flex, FormControl, FormLabel, Stack, useToast, Input, Box, Spinner, InputGroup, InputRightElement, IconButton } from '@chakra-ui/react';
 import axios from 'axios';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 
 function Login({ theme, apiUrl }) {
     const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ function Login({ theme, apiUrl }) {
         userpassword: ''
     });
     const [loading, setLoading] = useState(false); // Estado para controlar el loading
+    const [ showPassword, setShowPassword ] = useState(false);
     const toast = useToast();
     const navigate = useNavigate();
 
@@ -55,6 +57,10 @@ function Login({ theme, apiUrl }) {
         }
     };
 
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
         <Flex
             alignItems='center'
@@ -94,14 +100,25 @@ function Login({ theme, apiUrl }) {
                             isRequired
                         >
                             <FormLabel>Contraseña</FormLabel>
-                            <Input
-                                value={formData.userpassword}
-                                onChange={handleChange}
-                                type='password'
-                                name='userpassword'
-                                placeholder='Ingresa tu contraseña'
-                                border='1px solid #80c687'
-                            />
+                            <InputGroup>
+                                <Input
+                                    value={formData.userpassword}
+                                    onChange={handleChange}
+                                    type={showPassword ? 'text' : 'password'}
+                                    name='userpassword'
+                                    placeholder='Ingresa tu contraseña'
+                                    border='1px solid #80c687'
+                                />
+                                <InputRightElement>
+                                    <IconButton
+                                        aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                        icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                                        onClick={togglePasswordVisibility}
+                                        variant="ghost"
+                                        size="sm"
+                                    />
+                                </InputRightElement>
+                            </InputGroup>
                         </FormControl>
 
                         <Link to={'/forgotpasswordform'}>
