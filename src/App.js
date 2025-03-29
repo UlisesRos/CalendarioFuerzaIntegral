@@ -1,20 +1,19 @@
 import ProtectedRouteToken from "./components/ProtectedRoute/ProtectedRouteToken";
-import ProtectedRouteCode from './components/ProtectedRoute/ProtectedRouteCode'
+import ProtectedRouteCode from './components/ProtectedRoute/ProtectedRouteCode';
 import InitialCalendar from "./components/admin/InitialCalendar";
 import Novedades from "./components/admin/Novedades";
 import Rutas from "./components/Rutas/Rutas";
-import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Calendario from "./components/calendario/Calendario";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/footer/Footer";
 import Registro from "./components/Registro/Registro";
 import Login from "./components/Login/Login";
-import axios from 'axios'
+import axios from 'axios';
 import AdminRoute from "./components/admin/AdminRoute";
 import SeccionAdmin from "./components/admin/SeccionAdmin";
 import RegistroClientes from "./components/admin/clients/RegistroClientes";
-import Pagos from "./components/Pagos/Pagos";
 import Transferencia from "./components/Pagos/Transferencia";
 import PaymentSuccess from "./components/pages/PaymentSuccess";
 import IngresoUsuario from "./components/ingreso/IngresoUsuario";
@@ -26,50 +25,85 @@ import HistorialMensual from "./components/admin/clients/HistorialMensual";
 const apiUrl = process.env.REACT_APP_API_URL;
 
 function App() {
-
     const [theme, setTheme] = useState('light');
     const [userData, setUserData] = useState(null);
-    const [appStatus, setAppStatus] = useState('loading'); // 'loading', 'ready', 'error'
+    const [appStatus, setAppStatus] = useState('loading');
     const [errorMessage, setErrorMessage] = useState('');
 
-    // Configuración de axios
+    // Configuración de interceptores de axios
     axios.interceptors.request.use((config) => {
         const token = localStorage.getItem('token');
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;
+    }, (error) => {
+        return Promise.reject(error);
     });
+
+    axios.interceptors.response.use(
+        (response) => response,
+        (error) => {
+            if (error.response?.status === 401) {
+                // Manejo centralizado de errores 401
+                localStorage.removeItem('token');
+                setUserData(null);
+                
+                // Solo muestra error si no está en la página de login
+                if (!window.location.pathname.includes('/login')) {
+                    setErrorMessage('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                    setAppStatus('error');
+                }
+            }
+            return Promise.reject(error);
+        }
+    );
 
     useEffect(() => {
         const initializeApp = async () => {
             try {
-                // 1. Verificar conexión a internet
+                setAppStatus('loading');
+                
+                // Verificar conexión a internet
                 if (!navigator.onLine) {
-                    throw new Error('No hay conexión a internet');
+                    throw new Error('No hay conexión a internet. Por favor verifica tu conexión.');
                 }
 
-                // 2. Cargar datos del usuario si hay token
-                const token = localStorage.getItem('token');
-                if (token) {
-                    const response = await axios.get(`${apiUrl}/api/auth/user`);
-                    setUserData(response.data);
-                }
-
-                // 3. Configurar tema
-                const savedTheme = 'light'; // Puedes cambiarlo por tu lógica de temas
+                // Configurar tema
+                const savedTheme = 'light';
                 setTheme(savedTheme);
                 document.documentElement.setAttribute('data-theme', savedTheme);
+
+                // Cargar datos del usuario si hay token
+                const token = localStorage.getItem('token');
+                if (token) {
+                    try {
+                        const response = await axios.get(`${apiUrl}/api/auth/user`);
+                        setUserData(response.data);
+                    } catch (error) {
+                        if (error.response?.status === 401) {
+                            // Token inválido - limpiamos y continuamos como usuario no autenticado
+                            localStorage.removeItem('token');
+                            setUserData(null);
+                        } else {
+                            throw error;
+                        }
+                    }
+                }
 
                 setAppStatus('ready');
             } catch (error) {
                 console.error('Error inicializando la app:', error);
-                setErrorMessage(error.message || 'Error al cargar la aplicación');
+                setErrorMessage(
+                    error.response?.data?.message || 
+                    error.message || 
+                    'Error al cargar la aplicación. Por favor intenta nuevamente.'
+                );
                 setAppStatus('error');
             }
         };
 
-        // Retraso mínimo para evitar parpadeo en carga rápida
+        // Pequeño retraso para mejor experiencia de usuario
         const timer = setTimeout(() => {
             initializeApp();
         }, 300);
@@ -81,6 +115,19 @@ function App() {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
+    };
+
+    const handleLoginSuccess = (token, user) => {
+        localStorage.setItem('token', token);
+        setUserData(user);
+        setErrorMessage('');
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setUserData(null);
+        // No usar window.location.reload() para mantener el estado del tema
+        setAppStatus('ready');
     };
 
     const handleRetry = () => {
@@ -122,7 +169,7 @@ function App() {
                     textAlign: 'center',
                     maxWidth: '300px'
                 }}>
-                    Cargando tu experiencia de gimnasio...
+                    Cargando Gimnasio App...
                 </p>
                 <style>{`
                     @keyframes spin {
@@ -193,89 +240,124 @@ function App() {
                 >
                     Reintentar
                 </button>
+                {errorMessage.includes('expirado') && (
+                    <button
+                        onClick={() => window.location.href = '/login'}
+                        style={{
+                            padding: '12px 24px',
+                            backgroundColor: 'transparent',
+                            color: theme === 'light' ? '#3f51b5' : '#4fc3f7',
+                            border: `1px solid ${theme === 'light' ? '#3f51b5' : '#4fc3f7'}`,
+                            borderRadius: '4px',
+                            fontSize: '16px',
+                            cursor: 'pointer',
+                            marginTop: '15px',
+                            transition: 'all 0.3s'
+                        }}
+                    >
+                        Ir a Iniciar Sesión
+                    </button>
+                )}
             </div>
         );
     }
 
+    // Aplicación principal
     return (
-        <div style={{ minWidth: '320px', overflowX: 'hidden' }}>
+        <div style={{ 
+            minWidth: '320px', 
+            overflowX: 'hidden',
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: theme === 'light' ? '#ffffff' : '#121212'
+        }}>
             <Router>
-                <Navbar toggleTheme={toggleTheme} theme={theme} userData={userData}/>
-                <Routes>
-                    <Route path="/" element={<Rutas apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
-                    <Route 
-                        path="/ingresousuario"
-                        element={
+                <Navbar 
+                    toggleTheme={toggleTheme} 
+                    theme={theme} 
+                    userData={userData}
+                    onLogout={handleLogout}
+                />
+                <main style={{ flex: 1 }}>
+                    <Routes>
+                        <Route path="/" element={<Rutas apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
+                        <Route 
+                            path="/ingresousuario"
+                            element={
+                                <AdminRoute>
+                                    <IngresoUsuario apiUrl={apiUrl} theme={theme}/>
+                                </AdminRoute>
+                            }
+                        />
+                        <Route path='/historialmensual' element={
                             <AdminRoute>
-                                <IngresoUsuario apiUrl={apiUrl} theme={theme}/>
+                                <HistorialMensual apiUrl={apiUrl} theme={theme}/>
                             </AdminRoute>
-                        }
-                    />
-                    <Route path='/historialmensual' element={
-                        <AdminRoute>
-                            <HistorialMensual apiUrl={apiUrl} theme={theme}/>
-                        </AdminRoute>
-                    }
-                    />
-                    <Route path="/calendario" element={
-                        <ProtectedRouteToken>
-                            <Calendario apiUrl={apiUrl} theme={theme} userData={userData} />
-                        </ProtectedRouteToken>
-                    }
-                    />
-                    <Route path="/pagos" element={
-                        <ProtectedRouteToken>
-                            <Transferencia apiUrl={apiUrl} theme={theme} userData={userData} />
-                        </ProtectedRouteToken>
-                    }
-                    />
-                    <Route path="/payment_success" element={
-                        <ProtectedRouteToken>
-                            <PaymentSuccess apiUrl={apiUrl} userData={userData} />
-                        </ProtectedRouteToken>
-                    }
-                    />
-                    <Route path="/perfil" element={
-                        <ProtectedRouteToken>
-                            <Perfil userData={userData} theme={theme} />
-                        </ProtectedRouteToken>
-                    }
-                    />
-                    <Route path='/seccionadmin' element={
-                        <AdminRoute>
-                            <SeccionAdmin toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
-                        </AdminRoute>
-                    }
-                    />
-                    <Route path="/novedades" element={
-                        <AdminRoute >
-                            <Novedades apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
-                        </AdminRoute>
-                    }
-                    />
-                    <Route path="/initialcalendar" element={
-                        <AdminRoute>
-                            <InitialCalendar apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
-                        </AdminRoute>
-                    }
-                    />
-                    <Route path="/registroclientes" element={
-                        <AdminRoute >
-                            <RegistroClientes apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
-                        </AdminRoute>
-                    }
-                    />
-                    <Route path="/registro" element={
-                        <ProtectedRouteCode>
-                            <Registro apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
-                        </ProtectedRouteCode>
-                        } />
-                    <Route path="/login" element={<Login apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
-                    <Route path="/forgotpasswordform" element={<ForgotPasswordForm apiUrl={apiUrl} theme={theme} />} />
-                    <Route path="/resetpasswordform" element={<ResetPasswordForm apiUrl={apiUrl} theme={theme} />} />
-                    <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-                <Footer />
+                        }/>
+                        <Route path="/calendario" element={
+                            <ProtectedRouteToken>
+                                <Calendario apiUrl={apiUrl} theme={theme} userData={userData} />
+                            </ProtectedRouteToken>
+                        }/>
+                        <Route path="/pagos" element={
+                            <ProtectedRouteToken>
+                                <Transferencia apiUrl={apiUrl} theme={theme} userData={userData} />
+                            </ProtectedRouteToken>
+                        }/>
+                        <Route path="/payment_success" element={
+                            <ProtectedRouteToken>
+                                <PaymentSuccess apiUrl={apiUrl} userData={userData} />
+                            </ProtectedRouteToken>
+                        }/>
+                        <Route path="/perfil" element={
+                            <ProtectedRouteToken>
+                                <Perfil userData={userData} theme={theme} onLogout={handleLogout} />
+                            </ProtectedRouteToken>
+                        }/>
+                        <Route path='/seccionadmin' element={
+                            <AdminRoute>
+                                <SeccionAdmin toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
+                            </AdminRoute>
+                        }/>
+                        <Route path="/novedades" element={
+                            <AdminRoute>
+                                <Novedades apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
+                            </AdminRoute>
+                        }/>
+                        <Route path="/initialcalendar" element={
+                            <AdminRoute>
+                                <InitialCalendar apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
+                            </AdminRoute>
+                        }/>
+                        <Route path="/registroclientes" element={
+                            <AdminRoute>
+                                <RegistroClientes apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
+                            </AdminRoute>
+                        }/>
+                        <Route path="/registro" element={
+                            <ProtectedRouteCode>
+                                <Registro apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
+                            </ProtectedRouteCode>
+                        }/>
+                        <Route path="/login" element={
+                            <Login 
+                                apiUrl={apiUrl} 
+                                toggleTheme={toggleTheme} 
+                                theme={theme} 
+                                onLoginSuccess={handleLoginSuccess}
+                            />
+                        }/>
+                        <Route path="/forgotpasswordform" element={
+                            <ForgotPasswordForm apiUrl={apiUrl} theme={theme} />
+                        }/>
+                        <Route path="/resetpasswordform" element={
+                            <ResetPasswordForm apiUrl={apiUrl} theme={theme} />
+                        }/>
+                        <Route path="*" element={<Navigate to="/" />} />
+                    </Routes>
+                </main>
+                <Footer theme={theme} />
             </Router>
         </div>
     );
