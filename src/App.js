@@ -27,6 +27,12 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 function App() {
 
+    const [theme, setTheme] = useState('light');
+    const [userData, setUserData] = useState(null);
+    const [appStatus, setAppStatus] = useState('loading'); // 'loading', 'ready', 'error'
+    const [errorMessage, setErrorMessage] = useState('');
+
+    // Configuración de axios
     axios.interceptors.request.use((config) => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -35,120 +41,243 @@ function App() {
         return config;
     });
 
-    const [theme, setTheme] = useState('light')
-    const [userData, setUserData] = useState(null)
-
     useEffect(() => {
-        const fetchUserData = async() => {
+        const initializeApp = async () => {
             try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    return;
+                // 1. Verificar conexión a internet
+                if (!navigator.onLine) {
+                    throw new Error('No hay conexión a internet');
                 }
-                const response = await axios.get(`${apiUrl}/api/auth/user`);
-                setUserData(response.data)
+
+                // 2. Cargar datos del usuario si hay token
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const response = await axios.get(`${apiUrl}/api/auth/user`);
+                    setUserData(response.data);
+                }
+
+                // 3. Configurar tema
+                const savedTheme = 'light'; // Puedes cambiarlo por tu lógica de temas
+                setTheme(savedTheme);
+                document.documentElement.setAttribute('data-theme', savedTheme);
+
+                setAppStatus('ready');
             } catch (error) {
-                console.error('Error al obtener los datos del usuario', error)
+                console.error('Error inicializando la app:', error);
+                setErrorMessage(error.message || 'Error al cargar la aplicación');
+                setAppStatus('error');
             }
         };
 
-        fetchUserData();
+        // Retraso mínimo para evitar parpadeo en carga rápida
+        const timer = setTimeout(() => {
+            initializeApp();
+        }, 300);
+
+        return () => clearTimeout(timer);
     }, []);
-    
-    useEffect(() => {
-        const savedTheme = 'light';
-        if (savedTheme) {
-            setTheme(savedTheme);
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        }
-    }, [])
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
     };
-    
+
+    const handleRetry = () => {
+        setAppStatus('loading');
+        setErrorMessage('');
+        window.location.reload();
+    };
+
+    // Pantalla de carga
+    if (appStatus === 'loading') {
+        return (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: theme === 'light' ? '#f5f5f5' : '#121212',
+                zIndex: 1000,
+                padding: '20px',
+                boxSizing: 'border-box'
+            }}>
+                <div style={{
+                    width: '50px',
+                    height: '50px',
+                    border: `5px solid ${theme === 'light' ? '#e0e0e0' : '#333'}`,
+                    borderTopColor: theme === 'light' ? '#3f51b5' : '#4fc3f7',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite',
+                    marginBottom: '20px'
+                }} />
+                <p style={{ 
+                    color: theme === 'light' ? '#333' : '#fff',
+                    fontSize: '18px',
+                    textAlign: 'center',
+                    maxWidth: '300px'
+                }}>
+                    Cargando tu experiencia de gimnasio...
+                </p>
+                <style>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </div>
+        );
+    }
+
+    // Pantalla de error
+    if (appStatus === 'error') {
+        return (
+            <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: theme === 'light' ? '#f5f5f5' : '#121212',
+                zIndex: 1000,
+                padding: '20px',
+                boxSizing: 'border-box'
+            }}>
+                <div style={{ 
+                    color: theme === 'light' ? '#d32f2f' : '#f44336',
+                    fontSize: '24px',
+                    marginBottom: '20px'
+                }}>
+                    ⚠️
+                </div>
+                <h2 style={{ 
+                    color: theme === 'light' ? '#333' : '#fff',
+                    fontSize: '20px',
+                    textAlign: 'center',
+                    marginBottom: '10px'
+                }}>
+                    Ocurrió un problema
+                </h2>
+                <p style={{ 
+                    color: theme === 'light' ? '#666' : '#ccc',
+                    fontSize: '16px',
+                    textAlign: 'center',
+                    marginBottom: '30px',
+                    maxWidth: '300px'
+                }}>
+                    {errorMessage}
+                </p>
+                <button
+                    onClick={handleRetry}
+                    style={{
+                        padding: '12px 24px',
+                        backgroundColor: theme === 'light' ? '#3f51b5' : '#4fc3f7',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '16px',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.3s'
+                    }}
+                    onMouseOver={(e) => e.target.style.backgroundColor = theme === 'light' ? '#303f9f' : '#3dbbdc'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = theme === 'light' ? '#3f51b5' : '#4fc3f7'}
+                >
+                    Reintentar
+                </button>
+            </div>
+        );
+    }
 
     return (
-        <Router>
-            <Navbar toggleTheme={toggleTheme} theme={theme} userData={userData}/>
-            <Routes>
-                <Route path="/" element={<Rutas apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
-                <Route 
-                    path="/ingresousuario"
-                    element={
+        <div style={{ minWidth: '320px', overflowX: 'hidden' }}>
+            <Router>
+                <Navbar toggleTheme={toggleTheme} theme={theme} userData={userData}/>
+                <Routes>
+                    <Route path="/" element={<Rutas apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
+                    <Route 
+                        path="/ingresousuario"
+                        element={
+                            <AdminRoute>
+                                <IngresoUsuario apiUrl={apiUrl} theme={theme}/>
+                            </AdminRoute>
+                        }
+                    />
+                    <Route path='/historialmensual' element={
                         <AdminRoute>
-                            <IngresoUsuario apiUrl={apiUrl} theme={theme}/>
+                            <HistorialMensual apiUrl={apiUrl} theme={theme}/>
                         </AdminRoute>
                     }
-                />
-                <Route path='/historialmensual' element={
-                    <AdminRoute>
-                        <HistorialMensual apiUrl={apiUrl} theme={theme}/>
-                    </AdminRoute>
-                }
-                />
-                <Route path="/calendario" element={
-                    <ProtectedRouteToken>
-                        <Calendario apiUrl={apiUrl} theme={theme} userData={userData} />
-                    </ProtectedRouteToken>
-                }
-                />
-                <Route path="/pagos" element={
-                    <ProtectedRouteToken>
-                        <Transferencia apiUrl={apiUrl} theme={theme} userData={userData} />
-                    </ProtectedRouteToken>
-                }
-                />
-                <Route path="/payment_success" element={
-                    <ProtectedRouteToken>
-                        <PaymentSuccess apiUrl={apiUrl} userData={userData} />
-                    </ProtectedRouteToken>
-                }
-                />
-                <Route path="/perfil" element={
-                    <ProtectedRouteToken>
-                        <Perfil userData={userData} theme={theme} />
-                    </ProtectedRouteToken>
-                }
-                />
-                <Route path='/seccionadmin' element={
-                    <AdminRoute>
-                        <SeccionAdmin toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
-                    </AdminRoute>
-                }
-                />
-                <Route path="/novedades" element={
-                    <AdminRoute >
-                        <Novedades apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
-                    </AdminRoute>
-                }
-                />
-                <Route path="/initialcalendar" element={
-                    <AdminRoute>
-                        <InitialCalendar apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
-                    </AdminRoute>
-                }
-                />
-                <Route path="/registroclientes" element={
-                    <AdminRoute >
-                        <RegistroClientes apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
-                    </AdminRoute>
-                }
-                />
-                <Route path="/registro" element={
-                    <ProtectedRouteCode>
-                        <Registro apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
-                    </ProtectedRouteCode>
-                    } />
-                <Route path="/login" element={<Login apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
-                <Route path="/forgotpasswordform" element={<ForgotPasswordForm apiUrl={apiUrl} theme={theme} />} />
-                <Route path="/resetpasswordform" element={<ResetPasswordForm apiUrl={apiUrl} theme={theme} />} />
-                <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-            <Footer />
-        </Router>
+                    />
+                    <Route path="/calendario" element={
+                        <ProtectedRouteToken>
+                            <Calendario apiUrl={apiUrl} theme={theme} userData={userData} />
+                        </ProtectedRouteToken>
+                    }
+                    />
+                    <Route path="/pagos" element={
+                        <ProtectedRouteToken>
+                            <Transferencia apiUrl={apiUrl} theme={theme} userData={userData} />
+                        </ProtectedRouteToken>
+                    }
+                    />
+                    <Route path="/payment_success" element={
+                        <ProtectedRouteToken>
+                            <PaymentSuccess apiUrl={apiUrl} userData={userData} />
+                        </ProtectedRouteToken>
+                    }
+                    />
+                    <Route path="/perfil" element={
+                        <ProtectedRouteToken>
+                            <Perfil userData={userData} theme={theme} />
+                        </ProtectedRouteToken>
+                    }
+                    />
+                    <Route path='/seccionadmin' element={
+                        <AdminRoute>
+                            <SeccionAdmin toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
+                        </AdminRoute>
+                    }
+                    />
+                    <Route path="/novedades" element={
+                        <AdminRoute >
+                            <Novedades apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
+                        </AdminRoute>
+                    }
+                    />
+                    <Route path="/initialcalendar" element={
+                        <AdminRoute>
+                            <InitialCalendar apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
+                        </AdminRoute>
+                    }
+                    />
+                    <Route path="/registroclientes" element={
+                        <AdminRoute >
+                            <RegistroClientes apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
+                        </AdminRoute>
+                    }
+                    />
+                    <Route path="/registro" element={
+                        <ProtectedRouteCode>
+                            <Registro apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
+                        </ProtectedRouteCode>
+                        } />
+                    <Route path="/login" element={<Login apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
+                    <Route path="/forgotpasswordform" element={<ForgotPasswordForm apiUrl={apiUrl} theme={theme} />} />
+                    <Route path="/resetpasswordform" element={<ResetPasswordForm apiUrl={apiUrl} theme={theme} />} />
+                    <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
+                <Footer />
+            </Router>
+        </div>
     );
 }
 
