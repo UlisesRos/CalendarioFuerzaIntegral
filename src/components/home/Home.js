@@ -25,7 +25,7 @@ function Home() {
                 duration: 1200,
                 delay: anime.stagger(200)
             })
-        }, 0)
+        }, 100)
     }, [])
 
     const cardVisible = (cardId) => setActiveCard(cardId)
