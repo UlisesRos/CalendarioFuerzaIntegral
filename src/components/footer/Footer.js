@@ -93,7 +93,7 @@ function Footer() {
                         textAlign={['center','end','end']}
                         fontSize='sm'
                         >
-                        Fuerza Base Integral es un gimnasio creado con pasión y dedicación por dos jóvenes emprendedores de la ciudad de Rosario. Con un enfoque integral hacia el bienestar físico y mental, ofrecemos un espacio moderno y equipado para que puedas alcanzar tus metas fitness en un ambiente motivador y cercano. Te invitamos a conocer nuestras instalaciones y sumarte a una comunidad que promueve la salud, la disciplina y el crecimiento personal. <strong>¡Visítanos y descubre todo lo que Fuerza Integral tiene para ofrecerte!</strong> <br/>Para más información, contáctanos a través de nuestras redes sociales. ¡Te esperamos!
+                        Fuerza Base Integral es un gimnasio creado con pasión y dedicación por dos jóvenes emprendedores de la ciudad de Rosario. Con un enfoque integral hacia el bienestar físico y mental, ofrecemos un espacio moderno y equipado para que puedas alcanzar tus metas fitness en un ambiente motivador y cercano. Te invitamos a conocer nuestras instalaciones y sumarte a una comunidad que promueve la salud, la disciplina y el crecimiento personal. <strong>¡Visítanos y descubre todo lo que Fuerza Base Integral tiene para ofrecerte!</strong> <br/>Para más información, contáctanos a través de nuestras redes sociales. ¡Te esperamos!
                     </Text>  
                 </Box>
             </Box>
