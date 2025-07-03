@@ -1,4 +1,3 @@
-import React from 'react'
 import { Box, Image, Link, Text, Flex } from '@chakra-ui/react'
 import avatar from '../../img/avatar.svg'
 import youtube from '../../img/yout.png'

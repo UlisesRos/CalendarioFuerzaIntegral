@@ -21,6 +21,9 @@ import Perfil from "./components/usuario/Perfil";
 import ForgotPasswordForm from "./components/Login/ForgotPasswordForm";
 import ResetPasswordForm from "./components/Login/ResetPasswordForm";
 import HistorialMensual from "./components/admin/clients/HistorialMensual";
+import Nutricion from "./components/nutricion/NutricionCalendar";
+import HomeNutricion from './components/nutricion/HomeNutricion';
+import AdminTurnosHistorial from "./components/nutricion/AdminTurnosHistorial";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -295,6 +298,11 @@ function App() {
                                 <HistorialMensual apiUrl={apiUrl} theme={theme}/>
                             </AdminRoute>
                         }/>
+                        <Route path="/admin/historial" element={
+                            <AdminRoute>
+                                <AdminTurnosHistorial apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
+                            </AdminRoute>
+                        }/>
                         <Route path="/calendario" element={
                             <ProtectedRouteToken>
                                 <Calendario apiUrl={apiUrl} theme={theme} userData={userData} />
@@ -313,6 +321,16 @@ function App() {
                         <Route path="/perfil" element={
                             <ProtectedRouteToken>
                                 <Perfil userData={userData} theme={theme} onLogout={handleLogout} />
+                            </ProtectedRouteToken>
+                        }/>
+                        <Route path="/nutricion" element={
+                            <ProtectedRouteToken>
+                                <Nutricion apiUrl={apiUrl} theme={theme} userData={userData} />
+                            </ProtectedRouteToken>
+                        }/>
+                        <Route path="/homenutricion" element={
+                            <ProtectedRouteToken>
+                                <HomeNutricion apiUrl={apiUrl} theme={theme} userData={userData} />
                             </ProtectedRouteToken>
                         }/>
                         <Route path='/seccionadmin' element={

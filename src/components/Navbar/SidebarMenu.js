@@ -119,6 +119,9 @@ function SidebarMenu({ theme, userData }) {
                     <Link to="/calendario" onClick={onClose}>
                       Calendario
                     </Link>
+                    <Link to='/homenutricion' onClick={onClose}>
+                      Nutrición
+                    </Link>
                     <Link to="/seccionadmin" onClick={onClose}>
                       Admin
                     </Link>
@@ -136,6 +139,9 @@ function SidebarMenu({ theme, userData }) {
                     </Link>
                     <Link to="/perfil" onClick={onClose}>
                       Perfil
+                    </Link>
+                    <Link to='/homenutricion' onClick={onClose}>
+                      Nutrición
                     </Link>
                     <Text as='button' onClick={scrollToFooter} variant="link" color={theme === 'light' ? '#1A202C' : '#EEEFF1'} >
                       Contactanos
