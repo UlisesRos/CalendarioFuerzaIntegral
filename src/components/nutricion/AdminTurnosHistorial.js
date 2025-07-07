@@ -75,7 +75,7 @@ const AdminTurnosHistorial = ({ apiUrl }) => {
                 mb='15px'
                 >
                 <Button
-                    onClick={() => navigate('/nutricion')}
+                    onClick={() => navigate('/homenutricion')}
                     colorScheme='green'
                     >
                     Volver
