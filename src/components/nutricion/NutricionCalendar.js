@@ -114,6 +114,7 @@ const NutricionCalendar = ({ userData, apiUrl }) => {
           status: 'info',
           duration: 3000,
         });
+
         setTurnos(turnos.filter((t) => t.fecha !== fecha || t.hora !== hora));
       })
       .catch(() => {
@@ -187,6 +188,8 @@ const NutricionCalendar = ({ userData, apiUrl }) => {
             ? 'Florencia Bertaña'
             : null;
 
+        if (profeFiltro && profeFiltro !== nutricionista) return null;
+
         return (
           <Box key={fechaStr} mb={6}>
             <Text fontWeight="bold" mb={1}>
@@ -206,7 +209,7 @@ const NutricionCalendar = ({ userData, apiUrl }) => {
                   label = (
                     <Box>
                       <Text fontSize="sm" fontWeight="bold">{hora}</Text>
-                      {userData.role === 'admin' ? (
+                      {userData.role === 'admin' || (userData.role === 'user' && userData.username + " " + userData.userlastname === nombreUsuario) ? (
                         <Text fontSize="xs" color="white">🔒 {nombreUsuario}</Text>
                       ) : (
                         <Text fontSize="xs" color="white" fontWeight="bold">🔒 Reservado</Text>
@@ -219,7 +222,7 @@ const NutricionCalendar = ({ userData, apiUrl }) => {
 
                 const handleClick = () => {
                   if (reservado) {
-                    if (userData.role === 'admin') {
+                    if (userData.role === 'admin' || (userData.role === 'user' && userData.username + " " + userData.userlastname === nombreUsuario)) {
                       const confirmar = window.confirm(
                         `¿Cancelar reserva de ${nombreUsuario} el ${hora}?`
                       );

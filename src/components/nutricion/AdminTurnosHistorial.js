@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
-  Box, Text, Button, Grid, useToast, Heading,
-  Flex
+    Box, Text, Button, useToast, Heading,
+    Flex
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { format, isBefore, startOfMonth, subMonths } from 'date-fns';
@@ -42,15 +42,24 @@ const AdminTurnosHistorial = ({ apiUrl }) => {
     }, []);
 
     const cancelarTurno = (fecha, hora) => {
-        axios
-        .delete(`${apiUrl}/api/nutricion/cancelar`, { data: { fecha, hora } })
-        .then(() => {
-            toast({ title: 'Turno cancelado', status: 'info', duration: 3000 });
-            setTurnos(turnos.filter(t => t.fecha !== fecha || t.hora !== hora));
-        })
-        .catch(() => {
-            toast({ title: 'Error al cancelar turno', status: 'error', duration: 3000 });
-        });
+        const confirmar = window.confirm(
+            '¿Deseas cancelar este turno?'
+        )
+
+        if(confirmar){
+            axios
+                .delete(`${apiUrl}/api/nutricion/cancelar`, { data: { fecha, hora } })
+                .then(() => {
+                    toast({ title: 'Turno cancelado', status: 'info', duration: 3000 });
+                    setTurnos(turnos.filter(t => t.fecha !== fecha || t.hora !== hora));
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 300);
+                })
+                .catch(() => {
+                    toast({ title: 'Error al cancelar turno', status: 'error', duration: 3000 });
+                });
+        }
     };
 
     // Aplicar filtro
