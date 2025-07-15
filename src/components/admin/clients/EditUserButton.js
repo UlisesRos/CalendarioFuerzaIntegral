@@ -26,8 +26,10 @@ function EditUserButton({ user, onUserUpdated, theme, apiUrl }) {
         userlastname: user.userlastname,
         usertelefono: user.usertelefono,
         diasentrenamiento: user.diasentrenamiento,
+        descuento: user.descuento,
         fechaPago: user.fechaPago
     });
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -128,6 +130,21 @@ function EditUserButton({ user, onUserUpdated, theme, apiUrl }) {
                                 <option value='3'>3 dias</option>
                                 <option value='4'>4 dias</option>
                                 <option value='5'>5 dias</option>
+                            </Select>
+                        </FormControl>
+                        
+                        <FormControl mb={4}>
+                            <FormLabel>Descuento</FormLabel>
+                            <Select
+                                name='descuento'
+                                value={formData.descuento}
+                                onChange={handleInputChange}
+                                >   
+                                <option value="">Sin descuento</option>
+                                <option value='jubilado'>Jubilado</option>
+                                <option value='estudiante'>Estudiante</option>
+                                <option value='familia'>Grupo familiar (+2)</option>
+                                <option value='deportista'>Deportista</option>
                             </Select>
                         </FormControl>
 

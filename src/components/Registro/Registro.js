@@ -198,18 +198,18 @@ function Registro({ theme, apiUrl }) {
                             id='descuento'
                         >
                             <FormLabel>Descuento</FormLabel>
-                            <Select
-                                value={formData.descuento}
-                                onChange={handleChange}
-                                name='descuento'
-                                placeholder='Selecciona si posees un descuento'
-                                border='1px solid #80c687'
-                            >
-                                <option value='jubilado'>Jubilado</option>
-                                <option value='estudiante'>Estudiante</option>
-                                <option value='familia'>Grupo familiar (+2)</option>
-                                <option value='deportista'>Deportista</option>
-                            </Select>
+                                <Select
+                                    value={formData.descuento}
+                                    onChange={handleChange}
+                                    name='descuento'
+                                    placeholder='Selecciona si posees un descuento'
+                                    border='1px solid #80c687'
+                                >
+                                    <option value='jubilado'>Jubilado</option>
+                                    <option value='estudiante'>Estudiante</option>
+                                    <option value='familia'>Grupo familiar (+2)</option>
+                                    <option value='deportista'>Deportista</option>
+                                </Select>
                         </FormControl>
 
                         <FormControl
