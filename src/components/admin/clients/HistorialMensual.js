@@ -2,17 +2,18 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'animate.css';
 import {
-  Box,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Heading,
-  useToast,
-  TableContainer,
-  Button
+    Box,
+    Table,
+    Thead,
+    Tbody,
+    Tr,
+    Th,
+    Td,
+    Heading,
+    useToast,
+    TableContainer,
+    Button,
+    Text
 } from '@chakra-ui/react';
 
 // Componente para mostrar clientes con "ver más / ver menos"
@@ -25,11 +26,12 @@ const ClientesConToggle = ({ clientes }) => {
 
     return (
         <Td textTransform="capitalize">
+            <Text paddingBottom='10px'>{clientes.length} ❌</Text>
             {clientesAMostrar.map((cliente, index) => (
                 <div key={index}>
-                <ul>
-                    <li>{cliente.nombre} {cliente.apellido}</li>
-                </ul>
+                    <ul>
+                        <li>{cliente.nombre} {cliente.apellido}</li>
+                    </ul>
                 </div>
             ))}
             {clientes.length > MAX_MOSTRAR && (
@@ -40,7 +42,7 @@ const ClientesConToggle = ({ clientes }) => {
                 mt={1}
                 onClick={toggleMostrar}
                 >
-                {mostrarTodos ? 'Ver menos' : 'Ver más'}
+                    {mostrarTodos ? 'Ver menos' : 'Ver más'}
                 </Button>
             )}
         </Td>
