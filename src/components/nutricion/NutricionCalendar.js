@@ -163,7 +163,7 @@ const NutricionCalendar = ({ userData, apiUrl }) => {
           onClick={irSemanaAnterior}
           aria-label="Semana anterior"
         />
-        <Text fontSize={['18px', '2xl']} fontWeight="bold">
+        <Text fontSize={['18px', '2xl']} fontWeight="bold" textAlign='center'>
           Semana del {format(semanaInicio, "d 'de' MMMM yyyy", { locale: es })}
         </Text>
         <IconButton
@@ -210,7 +210,7 @@ const NutricionCalendar = ({ userData, apiUrl }) => {
                     <Box>
                       <Text fontSize="sm" fontWeight="bold">{hora}</Text>
                       {userData.role === 'admin' || (userData.role === 'user' && userData.username + " " + userData.userlastname === nombreUsuario) ? (
-                        <Text fontSize="xs" color="white">🔒 {nombreUsuario}</Text>
+                        <Text fontSize="xs" color="white" whiteSpace='nowrap' overflow='hidden' textOverflow='ellipsis' maxW={['100px', '150px', '150px']}>🔒 {nombreUsuario}</Text>
                       ) : (
                         <Text fontSize="xs" color="white" fontWeight="bold">🔒 Reservado</Text>
                       )}

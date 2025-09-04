@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
     Box, Text, Button, useToast, Heading,
-    Flex
+    Flex, Stack
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { format, isBefore, startOfMonth, subMonths } from 'date-fns';
@@ -18,22 +18,21 @@ const AdminTurnosHistorial = ({ apiUrl }) => {
         axios.get(`${apiUrl}/api/nutricion`)
         .then((res) => {
             const todosLosTurnos = res.data;
-
             const fechaInicioMesAnterior = startOfMonth(subMonths(new Date(), 1));
 
             const turnosFiltrados = todosLosTurnos.filter((t) => {
-            const turnoFecha = new Date(t.fecha);
-            return turnoFecha >= fechaInicioMesAnterior;
+                const turnoFecha = new Date(t.fecha);
+                return turnoFecha >= fechaInicioMesAnterior;
             });
 
             const turnosParaEliminar = todosLosTurnos.filter((t) => {
-            const turnoFecha = new Date(t.fecha);
-            return isBefore(turnoFecha, fechaInicioMesAnterior);
+                const turnoFecha = new Date(t.fecha);
+                return isBefore(turnoFecha, fechaInicioMesAnterior);
             });
 
             if (turnosParaEliminar.length > 0) {
-            axios.post(`${apiUrl}/api/nutricion/limpiar`, { turnos: turnosParaEliminar })
-                .then(() => console.log('Turnos antiguos eliminados'));
+                axios.post(`${apiUrl}/api/nutricion/limpiar`, { turnos: turnosParaEliminar })
+                    .then(() => console.log('Turnos antiguos eliminados'));
             }
 
             setTurnos(turnosFiltrados);
@@ -42,9 +41,7 @@ const AdminTurnosHistorial = ({ apiUrl }) => {
     }, []);
 
     const cancelarTurno = (fecha, hora) => {
-        const confirmar = window.confirm(
-            '¿Deseas cancelar este turno?'
-        )
+        const confirmar = window.confirm('¿Deseas cancelar este turno?')
 
         if(confirmar){
             axios
@@ -52,9 +49,6 @@ const AdminTurnosHistorial = ({ apiUrl }) => {
                 .then(() => {
                     toast({ title: 'Turno cancelado', status: 'info', duration: 3000 });
                     setTurnos(turnos.filter(t => t.fecha !== fecha || t.hora !== hora));
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 300);
                 })
                 .catch(() => {
                     toast({ title: 'Error al cancelar turno', status: 'error', duration: 3000 });
@@ -62,27 +56,25 @@ const AdminTurnosHistorial = ({ apiUrl }) => {
         }
     };
 
-    // Aplicar filtro
     const turnosMostrados = filtroProfe
         ? turnos.filter(t => t.profe === filtroProfe)
         : turnos;
 
     return (
-        <Box p={6}>
-            <Heading textAlign='center' size="lg" mb={4} fontFamily='poppins'>Historial de Turnos</Heading>
-            <Flex
-                justify='center'
-                mb='15px'
-                >
-                <Button
-                    onClick={() => navigate('/homenutricion')}
-                    colorScheme='green'
-                    >
+        <Box p={[4, 6, 8]}>
+            <Heading textAlign='center' size={['md', 'lg']} mb={6} fontFamily='poppins'>
+                Historial de Turnos
+            </Heading>
+
+            {/* Botón volver */}
+            <Flex justify='center' mb={6}>
+                <Button onClick={() => navigate('/homenutricion')} colorScheme='green'>
                     Volver
                 </Button>
             </Flex>
-            {/* Filtro por profe */}
-            <Flex justify="center" gap={4} mb={6} flexWrap="wrap">
+
+            {/* Filtros */}
+            <Flex justify="center" gap={3} mb={8} flexWrap="wrap">
                 <Button onClick={() => setFiltroProfe(null)} colorScheme={!filtroProfe ? 'green' : 'gray'}>
                     Todas
                 </Button>
@@ -94,33 +86,40 @@ const AdminTurnosHistorial = ({ apiUrl }) => {
                 </Button>
             </Flex>
 
-            <Flex
-                flexDirection={['column', 'column', 'row']}
-                flexWrap='wrap'
-                columnGap='20px'
-                justifyContent='center'
-                alignContent='center'
-            >
+            {/* Lista de turnos responsiva */}
+            <Stack spacing={6}>
                 {turnosMostrados.map((turno, index) => (
-                <Flex key={index} mb={4} p={4} borderWidth="1px" flexDirection='row' borderRadius="md" w={['100%', '70%', '45%']} columnGap='30px' justifyContent='center'>
-                    <Box textTransform='capitalize'>
-                        <Text><strong>Fecha:</strong> {format(new Date(turno.fecha), "EEEE d 'de' MMMM yyyy", { locale: es })}</Text>
-                        <Text><strong>Hora:</strong> {turno.hora}</Text>
-                        <Text><strong>Nutricionista:</strong> {turno.profe}</Text>
-                    </Box>
-                    <Box>
-                        <Text textTransform='capitalize'><strong>Usuario:</strong> {turno.usuario?.nombre}</Text>
-                        <Text><strong>Email:</strong> {turno.usuario?.email}</Text>
-                        <Text><strong>Celular:</strong> {turno.usuario?.celular}</Text>
-                        <Button mt={2} size="sm" colorScheme="red" onClick={() => cancelarTurno(turno.fecha, turno.hora)}>
-                            Cancelar turno
-                        </Button>
-                    </Box>
-                </Flex>
+                    <Flex
+                        key={index}
+                        p={4}
+                        borderWidth="1px"
+                        borderRadius="md"
+                        direction={['column', 'column', 'row']}
+                        justify="space-between"
+                        gap={4}
+                        w="100%"
+                        maxW="800px"
+                        mx="auto"
+                    >
+                        <Box textTransform='capitalize' flex="1">
+                            <Text><strong>Fecha:</strong> {format(new Date(turno.fecha), "EEEE d 'de' MMMM yyyy", { locale: es })}</Text>
+                            <Text><strong>Hora:</strong> {turno.hora}</Text>
+                            <Text><strong>Nutricionista:</strong> {turno.profe}</Text>
+                        </Box>
+                        <Box flex="1">
+                            <Text textTransform='capitalize'><strong>Usuario:</strong> {turno.usuario?.nombre}</Text>
+                            <Text><strong>Email:</strong> {turno.usuario?.email}</Text>
+                            <Text><strong>Celular:</strong> {turno.usuario?.celular}</Text>
+                            <Button mt={2} size="sm" colorScheme="red" onClick={() => cancelarTurno(turno.fecha, turno.hora)} w={['100%', 'auto']}>
+                                Cancelar turno
+                            </Button>
+                        </Box>
+                    </Flex>
                 ))}
-            </Flex>
+            </Stack>
         </Box>
     );
 };
 
 export default AdminTurnosHistorial;
+
