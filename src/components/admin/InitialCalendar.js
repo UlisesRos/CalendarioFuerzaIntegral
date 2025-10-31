@@ -128,12 +128,6 @@ const InitialCalendar = ({ theme, apiUrl }) => {
                     toast.onmouseleave = Swal.resumeTimer;
                     }
                 });
-                day === 'sábado' ?
-                Toast.fire({
-                    icon: "success",
-                    title: `Turno confirmado: ${day}, ${hour} hs`
-                })
-                : 
                 Toast.fire({
                     icon: "success",
                     title: `Turno confirmado: ${day}, ${hour}:00 hs`
@@ -402,7 +396,7 @@ const InitialCalendar = ({ theme, apiUrl }) => {
                             {selectedDay === 'sábado' ? 
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
-                                <option value="mañana">Mañana (09:30 - 11:30)</option>
+                                <option value="mañana">Mañana (09:00 - 12:00)</option>
                             </Select> :
                             <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
                                 <option value="">Seleccionar Turno</option>
@@ -416,8 +410,6 @@ const InitialCalendar = ({ theme, apiUrl }) => {
                                     <option value="">Seleccionar Hora</option>
                                     {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                                         Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                            selectedDay === 'sábado' ? 
-                                            <option key={hour} value={hour}>{hour.length === 3 ? hour[0] + ':' + hour.slice(1) : (hour).slice(0,2) + ':' + (hour).slice(2)}</option> :
                                             <option key={hour} value={hour}>{hour}:00</option>
                                         ))
                                         : <option value="">No hay horas disponibles</option>
@@ -496,10 +488,7 @@ const InitialCalendar = ({ theme, apiUrl }) => {
                         {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
                             Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
                                 <Flex className='animate__animated animate__backInUp' key={hour} flexDir='column' flex='0 0 calc(33.33% - 16px)' boxSizing='border-box' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
-                                    {selectedDay === 'sábado' ?
-                                    <Text textDecor='underline' fontWeight='bold' fontSize='2rem' margin='0 20px 0 20px'>{hour.length === 3 ? hour[0] + ':' + hour.slice(1) : (hour).slice(0,2) + ':' + (hour).slice(2)}</Text> :
                                     <Text textDecor='underline' fontWeight='bold' fontSize='1.6rem' margin='0 20px 0 20px'>{hour}:00</Text>
-                                }
                                     {calendar[selectedDay][selectedShift][hour].map((person, index) => (
                                         <Box key={index} w='85%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
                                             <Button

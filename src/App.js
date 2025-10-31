@@ -26,6 +26,7 @@ import HomeNutricion from './components/nutricion/HomeNutricion';
 import AdminTurnosHistorial from "./components/nutricion/AdminTurnosHistorial";
 
 const apiUrl = process.env.REACT_APP_API_URL;
+// const apiUrl = 'http://localhost:5000'; // URL base de la API
 
 function App() {
     const [theme, setTheme] = useState('light');

@@ -40,9 +40,7 @@ const ModalOcupados = ({isOpen, onClose, horariosOcupados }) => {
                                     >
                                     <strong>Turno: </strong>{schedule.shift}
                                 </Text>
-                                {
-                                    schedule.day === 'sábado' ? <Text textTransform='capitalize'><strong>Hora: </strong>{schedule.hour.length === 3 ? schedule.hour[0] + ':' + (schedule.hour).slice(1) : (schedule.hour).slice(0,2) + ':' + (schedule.hour).slice(2)}</Text> : <Text textTransform='capitalize'><strong>Hora: </strong>{schedule.hour}:00</Text>
-                                }
+                                    <Text textTransform='capitalize'><strong>Hora: </strong>{schedule.hour}:00</Text>
                             </Flex>
                         ))
                     ) : (
