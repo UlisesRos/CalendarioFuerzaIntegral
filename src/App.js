@@ -14,7 +14,7 @@ import axios from 'axios';
 import AdminRoute from "./components/admin/AdminRoute";
 import SeccionAdmin from "./components/admin/SeccionAdmin";
 import RegistroClientes from "./components/admin/clients/RegistroClientes";
-import Transferencia from "./components/Pagos/Transferencia";
+import OpcionesPago from "./components/Pagos/OpcionesPago";
 import PaymentSuccess from "./components/pages/PaymentSuccess";
 import IngresoUsuario from "./components/ingreso/IngresoUsuario";
 import Perfil from "./components/usuario/Perfil";
@@ -311,7 +311,7 @@ function App() {
                         }/>
                         <Route path="/pagos" element={
                             <ProtectedRouteToken>
-                                <Transferencia apiUrl={apiUrl} theme={theme} userData={userData} />
+                                <OpcionesPago apiUrl={apiUrl} theme={theme} userData={userData} />
                             </ProtectedRouteToken>
                         }/>
                         <Route path="/payment_success" element={

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, Box, Text, Heading, Image } from '@chakra-ui/react';
+import { Button, Box, Text, Heading, Image, Flex, VStack } from '@chakra-ui/react';
 import pago from '../../img/metodo-de-pago.png';
 import {PRECIOS, DESCUENTO} from '../../config/precios'
 import 'animate.css'
@@ -11,7 +11,7 @@ function Pagos({ theme, userData, apiUrl }) {
     // PRECIOS ACTUALIZADOS
     const precioBase = PRECIOS[userData.diasentrenamiento] || 0;
     const precioFinal = userData.descuento ? precioBase - precioBase * DESCUENTO : precioBase;
-    const precioMostrar = precioBase ? `$ ${precioFinal}` : "$ -";
+    const precioMostrar = precioBase ? `$ ${precioFinal.toLocaleString('es-ES')}` : "$ -";
 
     // Efecto para verificar si userData está disponible antes de renderizar
     useEffect(() => {
@@ -57,50 +57,99 @@ function Pagos({ theme, userData, apiUrl }) {
     }
 
     return (
-        <Box display="flex" flexDirection="column" alignItems="center" p={5} rowGap="20px" className='animate__animated animate__backInUp'>
-            <Image src={pago} alt="Método de pago" />
-            <Heading fontFamily='"Poppins", sans-serif;' textTransform="capitalize">
-                ¡ Hola, {userData.username} !
+        <Flex 
+            display="flex" 
+            flexDirection="column" 
+            alignItems="center" 
+            p={[4, 5, 6]} 
+            rowGap={['16px', '20px', '24px']}
+            className='animate__animated animate__backInUp'
+            w='100%'
+        >
+            <Image 
+                src={pago} 
+                alt="Método de pago" 
+                maxW={['150px', '180px', '200px']}
+                w='100%'
+                h='auto'
+                objectFit='contain'
+            />
+            
+            <Heading 
+                fontFamily='"Poppins", sans-serif;' 
+                textTransform="capitalize"
+                fontSize={['lg', 'xl', '2xl']}
+                textAlign='center'
+                mt={[2, 3, 4]}
+            >
+                ¡Hola, {userData.username}!
             </Heading>
-            <Text>
+            
+            <Text fontSize={['sm', 'md', 'md']} textAlign='center' maxW='100%'>
                 En este sector vas a poder realizar el pago de tu cuota mensual por los {userData.diasentrenamiento} días de entrenamiento.
             </Text>
-            {
-                userData.descuento && (
+
+            {userData.descuento && (
+                <Box
+                    p={[2, 3, 3]}
+                    bg='green.50'
+                    borderRadius='md'
+                    borderLeft='4px'
+                    borderColor='#006400'
+                    w='100%'
+                    maxW='100%'
+                >
                     <Text
                         color='#006400'
                         fontWeight='bold'
-                        >
-                        Tenes un 10% de descuento por ser {userData.descuento}
+                        fontSize={['sm', 'md', 'md']}
+                        textAlign='center'
+                    >
+                        ✨ Tienes un 10% de descuento por ser {userData.descuento}
                     </Text>
-                )
-            }
-            <Text fontWeight="bold">
-                Importe a pagar: 
-                {
-                    precioMostrar
-                }
-            </Text>
+                </Box>
+            )}
+
+            <VStack spacing={2} w='100%' align='center'>
+                <Text fontSize={['sm', 'md', 'md']} fontWeight='bold'>
+                    Importe a pagar:
+                </Text>
+                <Text 
+                    fontSize={['2xl', '3xl', '3xl']} 
+                    fontWeight='bold'
+                    color='#80c687'
+                >
+                    {precioMostrar}
+                </Text>
+            </VStack>
+
             <Button
-                size="lg"
+                size={['md', 'lg', 'lg']}
                 onClick={handlePayment}
                 isLoading={loading}
                 loadingText="Procesando..."
                 backgroundColor={theme === 'light' ? 'white' : 'black'}
                 color={theme === 'light' ? 'black' : 'white'}
-                border="1px solid #80c687"
+                border="2px solid #80c687"
                 boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
                 transition="all 0.3s ease"
+                w={['100%', 'auto', 'auto']}
+                maxW='100%'
+                px={[6, 8, 10]}
+                fontSize={['md', 'lg', 'lg']}
                 _hover={{
                     boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
                     transform: 'translateY(-2px)',
                     backgroundColor: '#80c687',
                     color: theme === 'light' ? 'white' : 'black'
                 }}
+                _active={{
+                    transform: 'translateY(0px)'
+                }}
             >
                 Ir a Pagar
             </Button>
-        </Box>
+        </Flex>
     );
 }
 
