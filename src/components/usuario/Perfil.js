@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import usuarios from '../../img/usuarios.png'
 import HistorialPagosUs from './HistorialPagosUs'
 import 'animate.css'
@@ -6,14 +6,12 @@ import { Box, Flex, Card, CardHeader, CardBody, Heading, Text, Image, Spinner, B
 import { CheckCircleIcon, CloseIcon, TimeIcon } from '@chakra-ui/icons'
 
 function Perfil({ userData, theme }) {
-    const [refreshUserData, setRefreshUserData] = useState(false);
 
     // Efecto para refrescar datos cuando el usuario paga (simular polling)
     useEffect(() => {
         // Si userData cambió y pago es true, marcar como actualizado
         if (userData?.pago) {
             console.log('✅ Estado de pago actualizado:', userData.pago);
-            setRefreshUserData(true);
         }
     }, [userData?.pago, userData?.fechaPago]);
 
