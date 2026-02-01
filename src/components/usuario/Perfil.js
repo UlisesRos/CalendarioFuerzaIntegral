@@ -6,7 +6,6 @@ import { Box, Flex, Card, CardHeader, CardBody, Heading, Text, Image, Spinner, B
 import { CheckCircleIcon, CloseIcon, TimeIcon } from '@chakra-ui/icons'
 
 function Perfil({ userData, theme }) {
-
     // Efecto para refrescar datos cuando el usuario paga (simular polling)
     useEffect(() => {
         // Si userData cambió y pago es true, marcar como actualizado
