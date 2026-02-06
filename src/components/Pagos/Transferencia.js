@@ -70,7 +70,7 @@ function Transferencia({theme, userData}) {
                                     borderRadius='md'
                                     border='1px solid #80c687'
                                 >
-                                    <Text fontSize={['sm', 'md', 'md']} fontWeight='bold' color='#80c687'>
+                                    <Text fontSize={['sm', 'md', 'md']} fontWeight='bold' color='black'>
                                         fzabaseintegral    
                                     </Text>
                                 </Box>
@@ -90,7 +90,7 @@ function Transferencia({theme, userData}) {
                                     borderRadius='md'
                                     border='1px solid #80c687'
                                 >
-                                    <Text fontSize={['sm', 'md', 'md']} color='#80c687'>
+                                    <Text fontSize={['sm', 'md', 'md']} color='black'>
                                         Manuel Mariano Martino 
                                     </Text>
                                 </Box>
@@ -110,7 +110,7 @@ function Transferencia({theme, userData}) {
                                     borderRadius='md'
                                     border='1px solid #80c687'
                                 >
-                                    <Text fontSize={['sm', 'md', 'md']} color='#80c687' fontFamily='monospace'>
+                                    <Text fontSize={['sm', 'md', 'md']} color='black' fontFamily='monospace'>
                                         0000003100035185326089
                                     </Text>
                                 </Box>
