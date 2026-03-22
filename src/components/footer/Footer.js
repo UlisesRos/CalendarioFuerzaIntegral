@@ -3,7 +3,7 @@ import avatar from '../../img/avatar.svg'
 import youtube from '../../img/yout.png'
 import '../../css/footer/redes.css'
 
-function Footer() {
+function Footer({theme}) {
     return (
         <Box
             mt={['60px','70px','90px']}
@@ -18,7 +18,7 @@ function Footer() {
                 marginBottom='10px'
                 >
                 <Box>
-                    <div class="main">
+                    <div className={`main ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
                         <div class="up">
                             <Link
                                 href="https://api.whatsapp.com/send?phone=3416948109&text=Hola! Te hablo porque vi tu pagina web!. Gracias!&nbspme&nbsppueden&nbspayudar?"
@@ -90,9 +90,10 @@ function Footer() {
                     >
                     <Text
                         textAlign={['center','end','end']}
-                        fontSize='sm'
+                        fontSize={['xs', 'sm', 'sm']}
+                        color={theme === 'light' ? 'gray.600' : 'gray.400'}
                         >
-                        Fuerza Base Integral es un gimnasio creado con pasión y dedicación por dos jóvenes emprendedores de la ciudad de Rosario. Con un enfoque integral hacia el bienestar físico y mental, ofrecemos un espacio moderno y equipado para que puedas alcanzar tus metas fitness en un ambiente motivador y cercano. Te invitamos a conocer nuestras instalaciones y sumarte a una comunidad que promueve la salud, la disciplina y el crecimiento personal. <strong>¡Visítanos y descubre todo lo que Fuerza Base Integral tiene para ofrecerte!</strong> <br/>Para más información, contáctanos a través de nuestras redes sociales. ¡Te esperamos!
+                        <strong>¡Transforma tu cuerpo y mente en Fuerza Base Integral!</strong><br /><br/>Ofrecemos un espacio moderno y especializado para que alcances tus metas fitness.<br/> Súmate a nuestra comunidad de salud, disciplina y superación grupal e individual.<br/><br/>¡Contáctanos en nuestras redes y descubre tu mejor versión!
                     </Text>  
                 </Box>
             </Box>

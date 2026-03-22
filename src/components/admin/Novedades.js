@@ -1,186 +1,343 @@
-import { Box, Button, Heading, Input, Textarea } from "@chakra-ui/react"
+import { Box, Flex, Heading, Text } from "@chakra-ui/react"
 import { useState } from "react"
-import axios from "axios";
+import axios from "axios"
 import Swal from 'sweetalert2'
 
-function Novedades({theme, apiUrl}) {
+// ─── Estilos ──────────────────────────────────────────────────────────────────
+const novedadesStyles = `
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .nov-header  { animation: fadeSlideUp 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+    .nov-panel   { animation: fadeSlideUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
 
-    const [ title, setTitle ] = useState('')
-    const [ subtitle, setSubTitle ] = useState('')
-    const [ description, setDescription ] = useState('')
-    const [ image, setImage] = useState('')
-    const [ link, setLink ] = useState('')
+    .nov-input, .nov-textarea {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        border-radius: 10px;
+        padding: 10px 14px;
+        border: 1px solid rgba(104,211,145,0.35);
+        outline: none;
+        width: 100%;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        box-sizing: border-box;
+    }
+    .nov-input:focus, .nov-textarea:focus {
+        border-color: #68D391;
+        box-shadow: 0 0 0 1px #68D391;
+    }
+    .nov-input::placeholder, .nov-textarea::placeholder {
+        color: rgba(160,174,192,0.7);
+        font-size: 0.82rem;
+    }
+    .nov-textarea {
+        resize: vertical;
+        min-height: 110px;
+        line-height: 1.6;
+    }
+
+    .nov-save-btn {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 11px 28px;
+        border: 1px solid #68D391;
+        color: #1a202c;
+        background: #68D391;
+        transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+        width: 100%;
+    }
+    .nov-save-btn:hover {
+        background: #4FBF72;
+        border-color: #4FBF72;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(104,211,145,0.35);
+    }
+
+    .nov-reset-btn {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 10px 24px;
+        border: 1px solid rgba(252,129,129,0.4);
+        color: #FC8181;
+        background: rgba(252,129,129,0.06);
+        transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+        width: 100%;
+    }
+    .nov-reset-btn:hover {
+        background: rgba(252,129,129,0.12);
+        border-color: #FC8181;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .nov-char-count {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.68rem;
+        color: rgba(160,174,192,0.6);
+        text-align: right;
+        margin-top: 4px;
+    }
+`
+
+const toast = (icon, title) => Swal.mixin({
+    toast: true, position: 'top-end', showConfirmButton: false,
+    timer: 3000, timerProgressBar: true, color: 'black',
+    didOpen: (t) => { t.onmouseenter = Swal.stopTimer; t.onmouseleave = Swal.resumeTimer }
+}).fire({ icon, title })
+
+function Novedades({ theme, apiUrl }) {
+    const [title, setTitle] = useState('')
+    const [description, setDescription] = useState('')
+
+    const isDark = theme === 'dark'
+    const panelBg = isDark ? 'rgba(255,255,255,0.03)' : 'white'
+    const borderC = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(104,211,145,0.2)'
+    const textMain = isDark ? 'rgba(255,255,255,0.9)' : '#2D3748'
+    const textMuted = isDark ? 'rgba(255,255,255,0.45)' : '#A0AEC0'
+    const inputBg = isDark ? 'rgba(255,255,255,0.04)' : 'white'
+    const inputColor = isDark ? 'rgba(255,255,255,0.85)' : '#2D3748'
 
     const handleSave = async () => {
-        const modalData = {
-            title,
-            subtitle,
-            link,
-            image,
-            description,
-        };
-
+        if (!title.trim()) {
+            toast('warning', 'El título es obligatorio')
+            return
+        }
         try {
-            await axios.post(`${apiUrl}/api/save-modal-content`, modalData);
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                color: 'black',
-                didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "success",
-                title: 'Modal de novedades creado con exito!'
-            });
+            await axios.post(`${apiUrl}/api/save-modal-content`, {
+                title, subtitle: '', link: '', image: '', description
+            })
+            toast('success', '¡Novedad publicada correctamente!')
+            setTitle('')
+            setDescription('')
         } catch (error) {
             console.error('Error al guardar los datos del modal', error)
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                color: 'black',
-                didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "error",
-                title: `Error al guardar los datos del modal`
-            });
+            toast('error', 'Error al guardar la novedad')
         }
-
-        setTitle('')
-        setSubTitle('')
-        setLink('')
-        setImage('')
-        setDescription('')
     }
 
     const handleReset = async () => {
-        const modalData = {
-            title: '',
-            subtitle: '',
-            link: '',
-            image: '',
-            description: '',
-        };
-
         try {
-            await axios.post(`${apiUrl}/api/save-modal-content`, modalData);
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                color: 'black',
-                didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "warning",
-                title: `El modal de novedades ha sido quitado!`
-            });
+            await axios.post(`${apiUrl}/api/save-modal-content`, {
+                title: '', subtitle: '', link: '', image: '', description: ''
+            })
+            toast('warning', 'El aviso de novedades fue quitado')
         } catch (error) {
             console.error('Error al guardar los datos del modal', error)
         }
     }
 
     return (
-        <Box>
-            <Box
-                display='flex'
-                flexDir='column'
-                alignItems='center'
-                rowGap='20px'
-                >
+        <Box
+            display="flex"
+            flexDir="column"
+            alignItems="center"
+            w="100%"
+            px={['16px', '24px', '40px']}
+            py={['32px', '52px']}
+        >
+            <style>{novedadesStyles}</style>
+
+            {/* ── Header ── */}
+            <Box className="nov-header" w="100%" maxW="600px" mb={['24px', '36px']}>
+                <Flex alignItems="center" gap="10px" mb="10px">
+                    <Box w="24px" h="2px" bg="green.400" borderRadius="full" />
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.7rem"
+                        letterSpacing="0.25em"
+                        textTransform="uppercase"
+                        color="gray.500"
+                    >
+                        Panel de administración
+                    </Text>
+                </Flex>
                 <Heading
-                    mt='20px'
-                    fontFamily='poppins'
-                    textAlign='center'
-                    >
-                    Ingresa las nuevas novedades
+                    fontFamily='"Playfair Display", serif'
+                    fontSize={['1.8rem', '2.4rem']}
+                    fontWeight="900"
+                    letterSpacing="-0.02em"
+                    color={isDark ? 'white' : 'gray.900'}
+                    lineHeight="1.1"
+                >
+                    Novedades
                 </Heading>
-                <Input
-                    value={title}
-                    placeholder="Introduce el titulo"
-                    onChange={(e) => setTitle(e.target.value)}   
-                    w={['80%', '60%', '60%']}
-                    border='1px solid #80c687'
-                    isRequired
-                    />
-                <Input
-                    value={subtitle}
-                    placeholder="Introduce el sub titulo"
-                    onChange={(e) => setSubTitle(e.target.value)}
-                    w={['80%', '60%', '60%']}
-                    border='1px solid #80c687'
-                    />
-                <Input
-                    value={link}
-                    placeholder="Introduce el link de la web"
-                    onChange={(e) => setLink(e.target.value)}
-                    w={['80%', '60%', '60%']}
-                    border='1px solid #80c687'
-                    />
-                <Input
-                    value={image}
-                    placeholder="Introduce el link de la imagen"
-                    onChange={(e) => setImage(e.target.value)}
-                    w={['80%', '60%', '60%']}
-                    border='1px solid #80c687'
-                    />
-                <Textarea
-                    value={description}
-                    placeholder="Introduce la descripcion"
-                    onChange={(e) => setDescription(e.target.value)}
-                    w={['80%', '60%', '60%']}
-                    border='1px solid #80c687'
-                    />
-                <Button
-                    backgroundColor={theme === 'light' ? 'white' : 'black'}
-                    color={theme === 'light' ? 'black' : 'white'}
-                    border='1px solid #80c687'
-                    box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                    transition='all 0.3s ease'
-                    _hover={{
-                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                        transform: 'translateY(-2px)',
-                        backgroundColor:'#80c687',
-                        color: theme === 'light' ? 'white' : 'black'
-                    }}
-                    onClick={handleSave}
+                <Text
+                    mt="8px"
+                    fontFamily='"Poppins", sans-serif'
+                    fontSize="0.85rem"
+                    color={textMuted}
+                    lineHeight="1.6"
+                >
+                    Lo que publiques aparecerá como aviso flotante para todos los usuarios al ingresar.
+                </Text>
+            </Box>
+
+            {/* ── Formulario ── */}
+            <Box
+                className="nov-panel"
+                w="100%"
+                maxW="600px"
+                bg={panelBg}
+                border="1px solid"
+                borderColor={borderC}
+                borderRadius="16px"
+                p={['20px', '28px', '32px']}
+                mb="20px"
+            >
+                <Flex alignItems="center" gap="10px" mb="20px">
+                    <Box w="20px" h="2px" bg="green.400" borderRadius="full" />
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.7rem"
+                        letterSpacing="0.2em"
+                        textTransform="uppercase"
+                        color={textMuted}
                     >
-                    Guardar Novedades
-                </Button>
-                <Button
-                    backgroundColor={theme === 'light' ? 'white' : 'black'}
-                    color={theme === 'light' ? 'black' : 'white'}
-                    border='1px solid #80c687'
-                    box-shadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                    transition='all 0.3s ease'
-                    _hover={{
-                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                        transform: 'translateY(-2px)',
-                        backgroundColor:'#80c687',
-                        color: theme === 'light' ? 'white' : 'black'
-                    }}
-                    onClick={handleReset}
-                    mb='15px'
+                        Nueva novedad
+                    </Text>
+                </Flex>
+
+                <Box display="flex" flexDir="column" gap="16px">
+                    {/* Título */}
+                    <Box>
+                        <Text
+                            fontFamily='"Poppins", sans-serif'
+                            fontSize="0.75rem"
+                            fontWeight="600"
+                            letterSpacing="0.08em"
+                            textTransform="uppercase"
+                            color={textMuted}
+                            mb="6px"
+                        >
+                            Título *
+                        </Text>
+                        <input
+                            className="nov-input"
+                            value={title}
+                            placeholder="Ej: ¡Nueva clase de funcional!"
+                            onChange={(e) => setTitle(e.target.value)}
+                            maxLength={80}
+                            style={{ background: inputBg, color: inputColor }}
+                        />
+                        <div className="nov-char-count">{title.length}/80</div>
+                    </Box>
+
+                    {/* Descripción */}
+                    <Box>
+                        <Text
+                            fontFamily='"Poppins", sans-serif'
+                            fontSize="0.75rem"
+                            fontWeight="600"
+                            letterSpacing="0.08em"
+                            textTransform="uppercase"
+                            color={textMuted}
+                            mb="6px"
+                        >
+                            Descripción
+                        </Text>
+                        <textarea
+                            className="nov-textarea"
+                            value={description}
+                            placeholder="Contá los detalles de la novedad..."
+                            onChange={(e) => setDescription(e.target.value)}
+                            maxLength={300}
+                            style={{ background: inputBg, color: inputColor }}
+                        />
+                        <div className="nov-char-count">{description.length}/300</div>
+                    </Box>
+
+                    {/* Preview */}
+                    {title && (
+                        <Box
+                            p="14px 16px"
+                            bg={isDark ? 'rgba(104,211,145,0.06)' : 'rgba(104,211,145,0.05)'}
+                            border="1px solid rgba(104,211,145,0.2)"
+                            borderRadius="10px"
+                        >
+                            <Flex alignItems="center" gap="8px" mb="6px">
+                                <Box w="6px" h="6px" borderRadius="full" bg="green.400" />
+                                <Text
+                                    fontFamily='"Poppins", sans-serif'
+                                    fontSize="0.65rem"
+                                    letterSpacing="0.15em"
+                                    textTransform="uppercase"
+                                    color="green.400"
+                                >
+                                    Preview del aviso
+                                </Text>
+                            </Flex>
+                            <Text
+                                fontFamily='"Playfair Display", serif'
+                                fontSize="0.95rem"
+                                fontWeight="700"
+                                color={textMain}
+                                mb="2px"
+                            >
+                                {title}
+                            </Text>
+                            {description && (
+                                <Text
+                                    fontFamily='"Poppins", sans-serif'
+                                    fontSize="0.78rem"
+                                    color={textMuted}
+                                    lineHeight="1.5"
+                                >
+                                    {description}
+                                </Text>
+                            )}
+                        </Box>
+                    )}
+
+                    <button className="nov-save-btn" onClick={handleSave}>
+                        Publicar novedad
+                    </button>
+                </Box>
+            </Box>
+
+            {/* ── Zona de peligro ── */}
+            <Box
+                w="100%"
+                maxW="600px"
+                bg="rgba(252,129,129,0.04)"
+                border="1px solid rgba(252,129,129,0.2)"
+                borderRadius="16px"
+                p={['18px', '24px']}
+            >
+                <Flex alignItems="center" gap="10px" mb="10px">
+                    <Box w="20px" h="2px" bg="#FC8181" borderRadius="full" />
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.7rem"
+                        letterSpacing="0.2em"
+                        textTransform="uppercase"
+                        color="#FC8181"
                     >
+                        Quitar aviso
+                    </Text>
+                </Flex>
+                <Text
+                    fontFamily='"Poppins", sans-serif'
+                    fontSize="0.82rem"
+                    color={textMuted}
+                    lineHeight="1.65"
+                    mb="16px"
+                >
+                    Si no hay novedades activas, el aviso no aparecerá para los usuarios.
+                </Text>
+                <button className="nov-reset-btn" onClick={handleReset}>
                     Sin novedades
-                </Button>
+                </button>
             </Box>
         </Box>
     )

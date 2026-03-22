@@ -1,582 +1,774 @@
 import React, { useState, useEffect } from 'react';
-import '../../css/calendario/Calendario.css'
-import '../../css/nav/Navbar.css'
-import { Box, Button, Flex, FormLabel, Heading, Select, Text } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import ReactSelect from 'react-select'
 import Swal from 'sweetalert2'
 import axios from 'axios'
 import ModalOcupados from './modalOcupados';
-import 'animate.css'
 
+// ─── Estilos globales ─────────────────────────────────────────────────────────
+const initialCalStyles = `
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes hourCardIn {
+        from { opacity: 0; transform: translateY(16px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0)   scale(1); }
+    }
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-20px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .ic-header   { animation: fadeSlideUp 0.6s cubic-bezier(0.22,1,0.36,1) both; }
+    .ic-controls { animation: fadeSlideUp 0.6s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
+    .ic-day-title{ animation: slideInLeft 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+    .ic-hour-card{ animation: hourCardIn 0.45s cubic-bezier(0.22,1,0.36,1) both; }
+
+    .ic-select {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+        border-radius: 10px;
+        padding: 8px 14px;
+        border: 1px solid rgba(104,211,145,0.35);
+        outline: none;
+        cursor: pointer;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2368D391' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+        min-width: 200px;
+        flex: 1;
+    }
+    .ic-select:focus {
+        border-color: #68D391;
+        box-shadow: 0 0 0 1px #68D391;
+    }
+
+    .ic-primary-btn {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 10px 22px;
+        border: 1px solid rgba(104,211,145,0.45);
+        color: #68D391;
+        background: rgba(104,211,145,0.08);
+        transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+        white-space: nowrap;
+    }
+    .ic-primary-btn:hover:not(:disabled) {
+        background: rgba(104,211,145,0.18);
+        border-color: #68D391;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .ic-primary-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .ic-inscribir-btn {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 11px 28px;
+        border: 1px solid #68D391;
+        color: #1a202c;
+        background: #68D391;
+        transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+        white-space: nowrap;
+    }
+    .ic-inscribir-btn:hover:not(:disabled) {
+        background: #4FBF72;
+        border-color: #4FBF72;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(104,211,145,0.35);
+    }
+    .ic-inscribir-btn:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+    }
+
+    .ic-reset-btn {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 10px 24px;
+        border: 1px solid rgba(252,129,129,0.4);
+        color: #FC8181;
+        background: rgba(252,129,129,0.06);
+        transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    .ic-reset-btn:hover {
+        background: rgba(252,129,129,0.12);
+        border-color: #FC8181;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .ic-remove-btn {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 8px;
+        padding: 5px 10px;
+        border: 1px solid rgba(252,129,129,0.4);
+        color: #FC8181;
+        background: transparent;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+    .ic-remove-btn:hover {
+        background: rgba(252,129,129,0.1);
+        border-color: #FC8181;
+        transform: scale(1.05);
+    }
+
+    .ic-move-btn {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 8px;
+        padding: 5px 12px;
+        border: 1px solid rgba(104,211,145,0.4);
+        color: #68D391;
+        background: transparent;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+    .ic-move-btn:hover {
+        background: rgba(104,211,145,0.1);
+        border-color: #68D391;
+        transform: scale(1.05);
+    }
+
+    .ic-person-row {
+        transition: background 0.2s ease;
+        border-radius: 8px;
+        padding: 6px 8px;
+    }
+    .ic-person-row:hover {
+        background: rgba(104,211,145,0.05);
+    }
+`
+
+// ─── react-select custom styles ───────────────────────────────────────────────
+const buildSelectStyles = (isDark) => ({
+    control: (base, state) => ({
+        ...base,
+        fontFamily: "'Poppins', sans-serif",
+        fontSize: '0.85rem',
+        borderRadius: '10px',
+        border: state.isFocused
+            ? '1px solid #68D391'
+            : '1px solid rgba(104,211,145,0.35)',
+        boxShadow: state.isFocused ? '0 0 0 1px #68D391' : 'none',
+        background: isDark ? 'rgba(255,255,255,0.04)' : 'white',
+        color: isDark ? 'rgba(255,255,255,0.85)' : '#2D3748',
+        minWidth: '260px',
+        transition: 'all 0.2s ease',
+        '&:hover': { borderColor: '#68D391' },
+        cursor: 'pointer',
+    }),
+    menu: (base) => ({
+        ...base,
+        fontFamily: "'Poppins', sans-serif",
+        fontSize: '0.85rem',
+        borderRadius: '10px',
+        background: isDark ? '#1a202c' : 'white',
+        border: '1px solid rgba(104,211,145,0.25)',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+        overflow: 'hidden',
+    }),
+    option: (base, state) => ({
+        ...base,
+        background: state.isSelected
+            ? 'rgba(104,211,145,0.2)'
+            : state.isFocused
+                ? 'rgba(104,211,145,0.08)'
+                : 'transparent',
+        color: state.isSelected
+            ? '#68D391'
+            : isDark ? 'rgba(255,255,255,0.85)' : '#2D3748',
+        cursor: 'pointer',
+        transition: 'background 0.15s ease',
+    }),
+    placeholder: (base) => ({
+        ...base,
+        color: 'rgba(160,174,192,0.8)',
+        fontSize: '0.83rem',
+    }),
+    singleValue: (base) => ({
+        ...base,
+        color: isDark ? 'rgba(255,255,255,0.9)' : '#2D3748',
+        textTransform: 'capitalize',
+    }),
+    input: (base) => ({
+        ...base,
+        color: isDark ? 'rgba(255,255,255,0.9)' : '#2D3748',
+    }),
+    indicatorSeparator: () => ({ display: 'none' }),
+    dropdownIndicator: (base) => ({
+        ...base,
+        color: '#68D391',
+        '&:hover': { color: '#4FBF72' },
+    }),
+})
+
+// ─── HourCard ─────────────────────────────────────────────────────────────────
+function HourCard({ hour, people, selectedUser, selectedDay, selectedShift, onRemove, onMove, theme, delay }) {
+    const isDark = theme === 'dark'
+    const panelBg = isDark ? 'rgba(255,255,255,0.03)' : 'white'
+    const borderC = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(104,211,145,0.2)'
+    const textMain = isDark ? 'rgba(255,255,255,0.9)' : '#2D3748'
+    const textMuted = isDark ? 'rgba(255,255,255,0.35)' : '#A0AEC0'
+
+    const filledCount = people.filter(p => p !== null).length
+    const totalSlots = people.length
+    const occupancy = Math.round((filledCount / totalSlots) * 100)
+    const isUserHere = selectedUser && people.includes(selectedUser.toLowerCase())
+
+    return (
+        <Box
+            className="ic-hour-card"
+            style={{ animationDelay: `${delay}s` }}
+            bg={panelBg}
+            border="1px solid"
+            borderColor={isUserHere ? 'rgba(104,211,145,0.5)' : borderC}
+            borderRadius="14px"
+            p="16px 18px"
+            w={['100%', '48%', 'calc(33.33% - 12px)']}
+            flexShrink={0}
+        >
+            {/* Header */}
+            <Flex justifyContent="space-between" alignItems="center" mb="12px">
+                <Flex alignItems="baseline" gap="4px">
+                    <Text
+                        fontFamily='"Playfair Display", serif'
+                        fontSize="1.6rem"
+                        fontWeight="900"
+                        color="#68D391"
+                        lineHeight="1"
+                    >
+                        {hour}
+                    </Text>
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.75rem"
+                        color={textMuted}
+                        fontWeight="500"
+                    >
+                        :00 hs
+                    </Text>
+                </Flex>
+                <Box textAlign="right">
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.68rem"
+                        letterSpacing="0.1em"
+                        textTransform="uppercase"
+                        color={filledCount === totalSlots ? '#FC8181' : textMuted}
+                    >
+                        {filledCount}/{totalSlots}
+                    </Text>
+                    <Box
+                        mt="3px" w="48px" h="3px"
+                        bg={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}
+                        borderRadius="full" overflow="hidden"
+                    >
+                        <Box
+                            h="100%"
+                            w={`${occupancy}%`}
+                            bg={occupancy === 100 ? '#FC8181' : '#68D391'}
+                            borderRadius="full"
+                            transition="width 0.5s ease"
+                        />
+                    </Box>
+                </Box>
+            </Flex>
+
+            {/* Divider */}
+            <Box h="1px" bg={borderC} mb="10px" />
+
+            {/* Lista de personas */}
+            <Box display="flex" flexDir="column" gap="2px">
+                {people.map((person, index) => {
+                    const isSelected = selectedUser && selectedUser.toLowerCase() === person
+                    return (
+                        <Box
+                            key={index}
+                            className="ic-person-row"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            gap="8px"
+                        >
+                            <Flex alignItems="center" gap="8px" flex="1" minW={0}>
+                                <Box
+                                    w="6px" h="6px"
+                                    borderRadius="full"
+                                    flexShrink={0}
+                                    bg={person
+                                        ? (isSelected ? '#68D391' : (isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)'))
+                                        : 'transparent'}
+                                    border={!person ? '1px dashed' : 'none'}
+                                    borderColor={textMuted}
+                                />
+                                <Text
+                                    fontFamily='"Poppins", sans-serif'
+                                    fontSize="0.82rem"
+                                    fontWeight={isSelected ? '600' : '400'}
+                                    color={person ? (isSelected ? '#68D391' : textMain) : textMuted}
+                                    textTransform="capitalize"
+                                    noOfLines={1}
+                                    flex="1"
+                                    fontStyle={!person ? 'italic' : 'normal'}
+                                >
+                                    {person || 'Disponible'}
+                                </Text>
+                            </Flex>
+
+                            {/* Acciones — visibles para cualquier persona ocupada (admin) */}
+                            {person && (
+                                <Flex gap="4px" flexShrink={0}>
+                                    <button
+                                        className="ic-move-btn"
+                                        onClick={() => onMove(selectedDay, selectedShift, hour, index)}
+                                    >
+                                        Mover
+                                    </button>
+                                    <button
+                                        className="ic-remove-btn"
+                                        onClick={() => onRemove(selectedDay, selectedShift, hour, index)}
+                                    >
+                                        ✕
+                                    </button>
+                                </Flex>
+                            )}
+                        </Box>
+                    )
+                })}
+            </Box>
+        </Box>
+    )
+}
+
+// ─── Componente principal ─────────────────────────────────────────────────────
 const InitialCalendar = ({ theme, apiUrl }) => {
-    
-    // Calendario que se guarda en MONGODB
     const [calendar, setCalendar] = useState('')
-    const [ userData, setUserData ] = useState([])
-    const [selectedUser, setSelectedUser] = useState('');
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [userData, setUserData] = useState([])
+    const [selectedUser, setSelectedUser] = useState('')
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [selectedDay, setSelectedDay] = useState('')
+    const [selectedShift, setSelectedShift] = useState('')
+    const [selectedHour, setSelectedHour] = useState('')
+    const [horariosOcupados, setHorariosOcupados] = useState([])
+
+    const isDark = theme === 'dark'
+    const panelBg = isDark ? 'rgba(255,255,255,0.03)' : 'white'
+    const borderC = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(104,211,145,0.2)'
+    const textMain = isDark ? 'rgba(255,255,255,0.9)' : '#2D3748'
+    const textMuted = isDark ? 'rgba(255,255,255,0.45)' : '#A0AEC0'
+    const selectBg = isDark ? '#1a202c' : 'white'
+    const selectColor = isDark ? 'rgba(255,255,255,0.85)' : '#2D3748'
 
     useEffect(() => {
-        const fetchCalendar = async () => {
-            try {
-                const response = await axios.get(`${apiUrl}/api/admincalendar`);
-                setCalendar(response.data);
-            } catch (error) {
-                console.error('Error fetching calendar', error)
-            }
-        };
-        
-        fetchCalendar();
+        axios.get(`${apiUrl}/api/admincalendar`)
+            .then(r => setCalendar(r.data))
+            .catch(e => console.error('Error fetching calendar', e))
+        axios.get(`${apiUrl}/api/auth/users`)
+            .then(r => setUserData(r.data))
+            .catch(e => console.error('Error fetching users', e))
     }, [])
 
-    // Traer usuarios
-    useEffect(() => {
-        const fetchUsuario = async () => {
-            try {
-                const response = await axios.get(`${apiUrl}/api/auth/users`);
-                setUserData(response.data)
-            } catch (error) {
-                console.error('Error fetching usuario', error)
-            }
-        }
+    const toast = (icon, title) => Swal.mixin({
+        toast: true, position: 'top-end', showConfirmButton: false,
+        timer: 3000, timerProgressBar: true, color: 'black',
+        didOpen: (t) => { t.onmouseenter = Swal.stopTimer; t.onmouseleave = Swal.resumeTimer }
+    }).fire({ icon, title })
 
-        fetchUsuario()
-    }, [])
-    
-    //UseState para manejar las distintas cosas (nombre, dia, turno y hora)
-    const [selectedDay, setSelectedDay] = useState("");
-    const [selectedShift, setSelectedShift] = useState("");
-    const [selectedHour, setSelectedHour] = useState("");
-    const [horariosOcupados, setHorariosOcupados] = useState([]);
-
-    // Funcion para resetear el calendario al que estaba en el comienzo
     const handleResetCalendar = async () => {
         try {
             await axios.put(`${apiUrl}/api/admincalendar/reset`)
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                color: 'black',
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "success",
-                title: "Calendario reiniciado correctamente"
-            });
-        } catch (error) {
-            console.error('Error al reiniciarse el calendario', error)
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                color: 'black',
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "error",
-                title: "Error al reiniciar el calendario"
-            });
+            toast('success', 'Calendario reiniciado correctamente')
+        } catch {
+            toast('error', 'Error al reiniciar el calendario')
         }
-    };
+    }
 
-    const handleAddPerson = (day, shift, hour, selectedUser) => {
-        setCalendar((prev) => {
-            // Crear una copia profunda del estado previo
-            const updated = JSON.parse(JSON.stringify(prev));
-            const availableSlot = updated[day][shift][hour].indexOf(null);
-            const personaRepetida = updated[day][shift][hour].map(pers => pers === selectedUser.toLocaleLowerCase())
-
-            if(personaRepetida.filter(p => p === true).length > 0){
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    color: 'black',
-                    didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "warning",
-                    title: `Hola ${selectedUser}, ya estas registrado en este horario. Elije otro.`
-                });
+    const handleAddPerson = (day, shift, hour, user) => {
+        setCalendar(prev => {
+            const updated = JSON.parse(JSON.stringify(prev))
+            const availableSlot = updated[day][shift][hour].indexOf(null)
+            const repetido = updated[day][shift][hour].some(p => p === user.toLowerCase())
+            if (repetido) {
+                toast('warning', `${user} ya está registrado en este horario.`)
                 return prev
             } else if (availableSlot !== -1) {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    color: 'black',
-                    didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "success",
-                    title: `Turno confirmado: ${day}, ${hour}:00 hs`
-                })
-                updated[day][shift][hour][availableSlot] = selectedUser.toLocaleLowerCase();
+                toast('success', `Turno confirmado: ${day}, ${hour}:00 hs`)
+                updated[day][shift][hour][availableSlot] = user.toLowerCase()
                 axios.put(`${apiUrl}/api/admincalendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
-                return updated;
+                return updated
             } else {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    color: 'black',
-                    didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "error",
-                    title: "No hay espacios disponibles en este horario."
-                })
-                return prev;
+                toast('error', 'No hay espacios disponibles en este horario.')
+                return prev
             }
-        });
-    };
+        })
+    }
+
     const handleRemovePerson = (day, shift, hour, index) => {
-        setCalendar((prev) => {
+        setCalendar(prev => {
             const updated = { ...prev }
-            const updatedHour = [ ...updated[day][shift][hour] ];
-            updatedHour[index] = null;
-
-            // Actualizar el estado con la hora modificada
-            updated[day][shift][hour] = updatedHour;
-    
-            // Enviar solicitud PUT con datos correctos
-            axios.put(`${apiUrl}/api/admincalendar/remove`, { 
-                day, 
-                shift, 
-                hour, 
-                index 
-            })
-
-            .then(() => {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    color: 'black',
-                    didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "error",
-                    title: "Usuario eliminado"
-                });
-                
-            })
-            .catch((err) => {
-                console.error("Error removing person:", err.response?.data || err.message);
-            });
-    
-            return updated;
-        });
-    };
+            const updatedHour = [...updated[day][shift][hour]]
+            updatedHour[index] = null
+            updated[day][shift][hour] = updatedHour
+            axios.put(`${apiUrl}/api/admincalendar/remove`, { day, shift, hour, index })
+                .then(() => toast('error', 'Usuario eliminado'))
+                .catch(err => console.error('Error removing person:', err.response?.data || err.message))
+            return updated
+        })
+    }
 
     const handleMovePerson = (fromDay, fromShift, fromHour, index) => {
-        const person = calendar[fromDay][fromShift][fromHour][index];
-        
-        // Pedir al usuario que ingrese el turno de destino (mañana o tarde)
-        const toShift = prompt("Ingresa el turno de destino (mañana o tarde):");
-        if(toShift !== null){
-            // Validar que el turno sea válido
-        if (toShift.toLocaleLowerCase() !== "mañana" && toShift.toLocaleLowerCase() !== "tarde") {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                color: 'black',
-                didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "error",
-                title: "Turno invalido. Por favor ingresa mañana o tarde."
-            });
-            return;
-        }
-        }
-        
-        // Pedir al usuario que ingrese la hora de destino
-        const toHour = prompt("Ingresa la hora de destino (por ejemplo, 16):");
-        
-        // Convertir la hora ingresada a un número
-        let toHourNumber = parseInt(toHour, 10);
-    
-        // Validar que toHourNumber sea un número válido y que exista en el turno seleccionado
-        if (!isNaN(toHourNumber) && calendar[fromDay] && calendar[fromDay][toShift] && calendar[fromDay][toShift].hasOwnProperty(toHourNumber)) {
-            
-            const emptyIndex = calendar[fromDay][toShift][toHourNumber].indexOf(null);
-
-            // Remover la persona de su horario actual
-            const personaRepetida = calendar[fromDay][toShift][toHourNumber].map(pers => pers === person.toLocaleLowerCase())
-            if(!(personaRepetida.filter(p => p === true).length > 0)){
-                handleRemovePerson(fromDay, fromShift, fromHour, index);
+        const person = calendar[fromDay][fromShift][fromHour][index]
+        const toShift = prompt('Ingresá el turno de destino (mañana o tarde):')
+        if (toShift !== null) {
+            if (toShift.toLowerCase() !== 'mañana' && toShift.toLowerCase() !== 'tarde') {
+                toast('error', 'Turno inválido. Por favor ingresá mañana o tarde.')
+                return
             }
+        }
+        const toHour = prompt('Ingresá la hora de destino (por ejemplo, 16):')
+        const toHourNumber = parseInt(toHour, 10)
+        if (!isNaN(toHourNumber) && calendar[fromDay]?.[toShift]?.hasOwnProperty(toHourNumber)) {
+            const emptyIndex = calendar[fromDay][toShift][toHourNumber].indexOf(null)
+            const repetido = calendar[fromDay][toShift][toHourNumber].some(p => p === person.toLowerCase())
+            if (!repetido) handleRemovePerson(fromDay, fromShift, fromHour, index)
             if (emptyIndex !== -1) {
-                // Mover a la persona al nuevo horario
-                handleAddPerson(fromDay, toShift, toHourNumber, person);
+                handleAddPerson(fromDay, toShift, toHourNumber, person)
             } else {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    color: 'black',
-                    didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "warning",
-                    title: "El horario de destino esta completo."
-                });
-                // Si el horario de destino está completo, la persona se vuelve a añadir al horario original
-                handleAddPerson(fromDay, fromShift, fromHour, person);
+                toast('warning', 'El horario de destino está completo.')
+                handleAddPerson(fromDay, fromShift, fromHour, person)
             }
         } else {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                color: 'black',
-                didOpen: (toast) => {
-                toast.onmouseenter = Swal.stopTimer;
-                toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "warning",
-                title: "Hora inválida o el horario no existe en el calendario"
-            });
-            // Si la hora es inválida, la persona se vuelve a añadir al horario original
-            handleAddPerson(fromDay, fromShift, fromHour, person);
+            toast('warning', 'Hora inválida o el horario no existe en el calendario.')
+            handleAddPerson(fromDay, fromShift, fromHour, person)
         }
-    };
-    
+    }
 
-    //Funcion para guardar los dias y horarios ocupados
-    const getHorariosOcupados = (calendar, selectedUser) => {
-        const ocupado = [];
-        Object.keys(calendar).forEach(day => {
-            Object.keys(calendar[day]).forEach(shift => {
-                Object.keys(calendar[day][shift]).forEach(hour => {
-                    calendar[day][shift][hour].forEach((user, index) => {
-                        if(user === selectedUser.toLowerCase()){
-                            ocupado.push({day, shift, hour});
-                        };
-                    });
-                });
-            });
-        });
+    const getHorariosOcupados = (cal, user) => {
+        const ocupado = []
+        Object.keys(cal).forEach(day =>
+            Object.keys(cal[day]).forEach(shift =>
+                Object.keys(cal[day][shift]).forEach(hour => {
+                    if (cal[day][shift][hour].includes(user.toLowerCase()))
+                        ocupado.push({ day, shift, hour })
+                })
+            )
+        )
         return ocupado
     }
 
-    const options = userData.map((usuario) => ({value: usuario._id, label: `${usuario.username} ${usuario.userlastname}`}));
+    const options = userData.map(u => ({
+        value: u._id,
+        label: `${u.username} ${u.userlastname}`
+    }))
 
-    const handleSelectChange = (selectOption) => {
-        setSelectedUser(selectOption.label);
-        const ocupado = getHorariosOcupados(calendar, selectOption.label);
-        setHorariosOcupados(ocupado);
+    const handleSelectChange = (opt) => {
+        setSelectedUser(opt.label)
+        setHorariosOcupados(getHorariosOcupados(calendar, opt.label))
     }
 
     return (
-        <Box className='animate__animated animate__backInUp'>
-            <Box
-                margin='15px 0 0 0'
-                textAlign='center'
-                display='flex'
-                flexDir='column'
-                alignItems='center'
-                >
+        <Box
+            display="flex"
+            flexDir="column"
+            alignItems="center"
+            w="100%"
+            px={['16px', '24px', '40px']}
+            py={['28px', '44px']}
+        >
+            <style>{initialCalStyles}</style>
+
+            {/* ── Header ── */}
+            <Box className="ic-header" w="100%" maxW="960px" mb={['24px', '36px']}>
+                <Flex alignItems="center" gap="10px" mb="10px">
+                    <Box w="24px" h="2px" bg="green.400" borderRadius="full" />
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.7rem"
+                        letterSpacing="0.25em"
+                        textTransform="uppercase"
+                        color="gray.500"
+                    >
+                        Panel de administración
+                    </Text>
+                </Flex>
                 <Heading
-                    fontFamily='"Poppins", sans-serif;'
-                    fontSize={['1.6rem','2rem','2.3rem']}
-                    >Seccion del Administrador <br />
+                    fontFamily='"Playfair Display", serif'
+                    fontSize={['1.8rem', '2.4rem']}
+                    fontWeight="900"
+                    letterSpacing="-0.02em"
+                    color={isDark ? 'white' : 'gray.900'}
+                    lineHeight="1.1"
+                >
+                    Editar Calendario
                 </Heading>
-                <FormLabel
-                    marginTop='15px'
-                    textAlign='center'
-                    >
-                    Elije el usuario a modificar
-                </FormLabel>
-                <ReactSelect
-                    className='selectUser'  
-                    onChange={handleSelectChange} 
-                    placeholder="nombre del usuario"
-                    options={options}
-                    isSearchable
+                <Text
+                    mt="6px"
+                    fontFamily='"Poppins", sans-serif'
+                    fontSize="0.85rem"
+                    color={textMuted}
                 >
-                </ReactSelect>
+                    Seleccioná un usuario y modificá sus turnos
+                </Text>
             </Box>
-            {selectedUser && horariosOcupados.length > 0 && (
-                <Box
-                    mt='30px'
-                    display='flex'
-                    justifyContent='center'
-                    >
-                    <Button 
-                        onClick={() => setIsModalOpen(true)} 
-                        backgroundColor={theme === 'light' ? 'white' : 'black'}
-                        color={theme === 'light' ? 'black' : 'white'}
-                        border='1px solid #80c687'
-                        boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                        transition='all 0.3s ease'
-                        _hover={{
-                            boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                            transform: 'translateY(-2px)',
-                            backgroundColor:'#80c687',
-                            color: theme === 'light' ? 'white' : 'black'
-                        }}>Ver Turnos Asignados</Button>
-                    <ModalOcupados isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} horariosOcupados={horariosOcupados} />
-                </Box>
-            )}
-            
+
+            {/* ── Selector de usuario ── */}
             <Box
-                margin='30px 0 30px 0px'
-                textAlign='center'
-                >
-                <Flex
-                    marginTop='20px'
-                    columnGap={['0','30px','30px']}
-                    rowGap={['10px','10px','0']}
-                    justifyContent='center'
-                    alignItems='center'
-                    flexDir={['column', 'column', 'row']}
+                className="ic-controls"
+                w="100%" maxW="960px"
+                bg={panelBg}
+                border="1px solid"
+                borderColor={borderC}
+                borderRadius="16px"
+                p={['18px', '24px', '28px']}
+                mb={['20px', '28px']}
+            >
+                <Flex alignItems="center" gap="10px" mb="16px">
+                    <Box w="20px" h="2px" bg="green.400" borderRadius="full" />
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.7rem"
+                        letterSpacing="0.2em"
+                        textTransform="uppercase"
+                        color={textMuted}
                     >
-                    <Select w='250px' onChange={(e) => setSelectedDay(e.target.value)} value={selectedDay} border='1px solid #80c687'>
-                    <option value="">Seleccionar Día</option>
-                    {Object.keys(calendar).map((day) => (
-                        <option key={day} value={day}>{day}</option>
-                    ))}
-                    </Select>
+                        Usuario a modificar
+                    </Text>
+                </Flex>
 
-                    {selectedDay && 
-                        <Box
-                            display='flex'
-                            columnGap='30px'
-                            flexDir={['column', 'column', 'row']}
-                            rowGap={['10px','10px','0']}
+                <Flex
+                    gap={['10px', '14px']}
+                    flexDir={['column', 'row']}
+                    alignItems={['stretch', 'center']}
+                    flexWrap="wrap"
+                >
+                    <Box flex="1" minW="240px">
+                        <ReactSelect
+                            onChange={handleSelectChange}
+                            placeholder="Buscar usuario..."
+                            options={options}
+                            isSearchable
+                            styles={buildSelectStyles(isDark)}
+                        />
+                    </Box>
+
+                    {selectedUser && horariosOcupados.length > 0 && (
+                        <>
+                            <button
+                                className="ic-primary-btn"
+                                onClick={() => setIsModalOpen(true)}
                             >
-                            {selectedDay === 'sábado' ? 
-                            <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
-                                <option value="">Seleccionar Turno</option>
-                                <option value="mañana">Mañana (09:00 - 12:00)</option>
-                            </Select> :
-                            <Select w='250px' onChange={(e) => setSelectedShift(e.target.value)} value={selectedShift} border='1px solid #80c687'>
-                                <option value="">Seleccionar Turno</option>
-                                <option value="mañana">Mañana (07:00 - 12:00)</option>
-                                <option value="tarde">Tarde (13:00 - 20:00)</option>
-                            </Select>
-                            }
+                                Ver turnos asignados
+                            </button>
+                            <ModalOcupados
+                                isOpen={isModalOpen}
+                                onClose={() => setIsModalOpen(false)}
+                                horariosOcupados={horariosOcupados}
+                            />
+                        </>
+                    )}
+                </Flex>
+            </Box>
 
-                            {selectedShift && 
-                                <Select w='250px' onChange={(e) => setSelectedHour(e.target.value)} value={selectedHour} border='1px solid #80c687'>
-                                    <option value="">Seleccionar Hora</option>
-                                    {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
-                                        Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                            <option key={hour} value={hour}>{hour}:00</option>
-                                        ))
-                                        : <option value="">No hay horas disponibles</option>
-                                    }
-                                </Select>
-                            }
-                        </Box>
-                    }
-                    
+            {/* ── Selects día / turno / hora + inscribir ── */}
+            <Box
+                w="100%" maxW="960px"
+                bg={panelBg}
+                border="1px solid"
+                borderColor={borderC}
+                borderRadius="16px"
+                p={['18px', '24px', '28px']}
+                mb={['24px', '32px']}
+            >
+                <Flex alignItems="center" gap="10px" mb="16px">
+                    <Box w="20px" h="2px" bg="green.400" borderRadius="full" />
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.7rem"
+                        letterSpacing="0.2em"
+                        textTransform="uppercase"
+                        color={textMuted}
+                    >
+                        Seleccionar turno
+                    </Text>
+                </Flex>
 
-                    <Button
-                        backgroundColor={theme === 'light' ? 'white' : 'black'}
-                        color={theme === 'light' ? 'black' : 'white'}
-                        border='1px solid #80c687'
-                        boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                        transition='all 0.3s ease'
-                        _hover={{
-                            boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                            transform: 'translateY(-2px)',
-                            backgroundColor:'#80c687',
-                            color: theme === 'light' ? 'white' : 'black'
-                        }}
+                <Flex
+                    gap={['10px', '12px']}
+                    flexDir={['column', 'column', 'row']}
+                    alignItems={['stretch', 'stretch', 'center']}
+                    flexWrap="wrap"
+                >
+                    {/* Día */}
+                    <select
+                        className="ic-select"
+                        value={selectedDay}
+                        onChange={e => { setSelectedDay(e.target.value); setSelectedShift(''); setSelectedHour('') }}
+                        style={{ background: selectBg, color: selectColor }}
+                    >
+                        <option value="">Seleccionar día</option>
+                        {calendar && Object.keys(calendar).map(day => (
+                            <option key={day} value={day}>{day}</option>
+                        ))}
+                    </select>
+
+                    {/* Turno */}
+                    {selectedDay && (
+                        <select
+                            className="ic-select"
+                            value={selectedShift}
+                            onChange={e => { setSelectedShift(e.target.value); setSelectedHour('') }}
+                            style={{ background: selectBg, color: selectColor }}
+                        >
+                            <option value="">Seleccionar turno</option>
+                            <option value="mañana">Mañana</option>
+                            {selectedDay !== 'sábado' && <option value="tarde">Tarde</option>}
+                        </select>
+                    )}
+
+                    {/* Hora */}
+                    {selectedShift && (
+                        <select
+                            className="ic-select"
+                            value={selectedHour}
+                            onChange={e => setSelectedHour(e.target.value)}
+                            style={{ background: selectBg, color: selectColor }}
+                        >
+                            <option value="">Seleccionar hora</option>
+                            {calendar[selectedDay]?.[selectedShift]
+                                ? Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
+                                    <option key={hour} value={hour}>{hour}:00</option>
+                                ))
+                                : <option disabled>No hay horas disponibles</option>
+                            }
+                        </select>
+                    )}
+
+                    <button
+                        className="ic-inscribir-btn"
+                        disabled={!selectedUser || !selectedDay || !selectedShift || !selectedHour}
                         onClick={() => {
                             if (selectedDay && selectedShift && selectedHour && selectedUser) {
-                            handleAddPerson(selectedDay, selectedShift, selectedHour, selectedUser);
+                                handleAddPerson(selectedDay, selectedShift, selectedHour, selectedUser)
                             } else {
-                                const Toast = Swal.mixin({
-                                    toast: true,
-                                    position: "top-end",
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    timerProgressBar: true,
-                                    color: 'black',
-                                    didOpen: (toast) => {
-                                    toast.onmouseenter = Swal.stopTimer;
-                                    toast.onmouseleave = Swal.resumeTimer;
-                                    }
-                                });
-                                Toast.fire({
-                                    icon: "info",
-                                    title: "Selecciona un dia, un turno, una hora y proporciona tu nombre"
-                                });
+                                toast('info', 'Seleccioná un usuario, día, turno y hora.')
                             }
                         }}
-                        disabled={!selectedUser || !selectedDay || !selectedShift || !selectedHour}
                     >
-                    Inscribirme
-                    </Button>
+                        Inscribir usuario
+                    </button>
                 </Flex>
-                
             </Box>
 
-            {selectedDay && selectedShift && (   
-                <Box
-                    display='flex'
-                    flexDir='column'
-                    alignItems='center'
-                    rowGap='30px'
-                    >
-                    <Text
-                        fontWeight='bold'
-                        fontSize={['1.5rem','2rem','2rem']}
-                        textTransform='capitalize'
-                        textAlign='center'
-                        className='animate__animated animate__fadeInLeftBig'
-                        >{selectedDay} <br/> Turno {selectedShift === 'mañana' ? 'Mañana' : 'Tarde'}</Text>
-                    <Flex
-                        justifyContent='center'
-                        alignItems='center'
-                        flexDir={['column','column','row']}
-                        columnGap='16px'
-                        rowGap={['10px','10px','10px']}
-                        w={['85%','85%','95%']}
-                        flexWrap={['wrap','wrap','wrap']}
+            {/* ── Vista del día seleccionado ── */}
+            {selectedDay && selectedShift && (
+                <Box w="100%" maxW="960px">
+                    <Flex alignItems="center" gap="12px" mb={['20px', '28px']}>
+                        <Box w="28px" h="2px" bg="green.400" borderRadius="full" />
+                        <Text
+                            className="ic-day-title"
+                            fontFamily='"Playfair Display", serif'
+                            fontSize={['1.3rem', '1.7rem']}
+                            fontWeight="900"
+                            color={isDark ? 'white' : 'gray.800'}
+                            textTransform="capitalize"
+                            letterSpacing="-0.01em"
                         >
-                        {(calendar[selectedDay] && calendar[selectedDay][selectedShift]) ? 
-                            Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                <Flex className='animate__animated animate__backInUp' key={hour} flexDir='column' flex='0 0 calc(33.33% - 16px)' boxSizing='border-box' rowGap='5px' w={['95%','80%','300px']} alignItems='center' border='1px solid black' borderRadius='10px' padding='15px'>
-                                    <Text textDecor='underline' fontWeight='bold' fontSize='1.6rem' margin='0 20px 0 20px'>{hour}:00</Text>
-                                    {calendar[selectedDay][selectedShift][hour].map((person, index) => (
-                                        <Box key={index} w='85%' display='flex' flexDir='row' alignItems='center' justifyContent='space-around' paddingTop='5px' paddingBottom='5px'>
-                                            <Button
-                                                display={person ? 'flex' : 'none'}
-                                                backgroundColor={theme === 'light' ? 'white' : 'black'}
-                                                color='black'
-                                                boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                                                transition='all 0.3s ease'
-                                                border='1px solid #80c687'
-                                                _hover={{
-                                                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                    transform: 'translateY(-2px)',
-                                                    backgroundColor:'red'
-                                                }}
-                                                fontSize='.9rem' w='auto' h='5vh' onClick={() => handleRemovePerson(selectedDay, selectedShift, hour, index)}>
-                                                    🗑️
-                                                </Button>
-                                                <Text
-                                                    textTransform='capitalize'
-                                                    textDecor={selectedUser.toLocaleLowerCase() === person ? 'underline' : 'none'}
-                                                    textAlign='center'
-                                                    fontSize='0.9rem'
-                                                    w='100%'
-                                                    style={{fontWeight: 'bold', margin: '5px 0 10px 0'}} 
-                                                    color={person ? 'auto' : 'green'}
-                                                    >{person || "Disponible"}</Text>
-                                            <Button
-                                                display={person ? 'flex' : 'none'}
-                                                backgroundColor={theme === 'light' ? 'white' : 'black'}
-                                                color={theme === 'light' ? 'black' : 'white'}
-                                                border='1px solid #80c687'
-                                                boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                                                transition='all 0.3s ease'
-                                                _hover={{
-                                                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                                                    transform: 'translateY(-2px)',
-                                                    backgroundColor:'#80c687',
-                                                    color: theme === 'light' ? 'white' : 'black'
-                                                }}
-                                                fontSize='.8rem' w='32%' h='32px' onClick={() => {
-                                                handleMovePerson(selectedDay, selectedShift, hour, index);
-                                            }}>
-                                                Mover
-                                            </Button>
-                                        </Box>
-                                    ))}
-                                </Flex>
-                            )) 
-                            : <Text marginLeft='50px'>No hay horarios disponibles para este turno.</Text>
+                            {selectedDay} — Turno {selectedShift === 'mañana' ? 'Mañana' : 'Tarde'}
+                        </Text>
+                    </Flex>
+
+                    <Flex flexWrap="wrap" gap={['10px', '12px', '14px']} justifyContent={['center', 'flex-start']} mb="40px">
+                        {calendar[selectedDay]?.[selectedShift]
+                            ? Object.keys(calendar[selectedDay][selectedShift]).map((hour, i) => (
+                                <HourCard
+                                    key={hour}
+                                    hour={hour}
+                                    people={calendar[selectedDay][selectedShift][hour]}
+                                    selectedUser={selectedUser}
+                                    selectedDay={selectedDay}
+                                    selectedShift={selectedShift}
+                                    onRemove={handleRemovePerson}
+                                    onMove={handleMovePerson}
+                                    theme={theme}
+                                    delay={i * 0.05}
+                                />
+                            ))
+                            : (
+                                <Text fontFamily='"Poppins", sans-serif' fontSize="0.85rem" color={textMuted}>
+                                    No hay horarios disponibles para este turno.
+                                </Text>
+                            )
                         }
                     </Flex>
                 </Box>
-                )
-            }
+            )}
+
+            {/* ── Reset calendario ── */}
             <Box
-                margin='30px 0 20px 0'
-                display='flex'
-                alignItems='center'
-                justifyContent='center'
-                flexDir='column'
-                rowGap='10px'
-                >
+                w="100%" maxW="960px"
+                bg="rgba(252,129,129,0.04)"
+                border="1px solid rgba(252,129,129,0.2)"
+                borderRadius="16px"
+                p={['18px', '24px']}
+            >
+                <Flex alignItems="center" gap="10px" mb="12px">
+                    <Box w="20px" h="2px" bg="#FC8181" borderRadius="full" />
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.7rem"
+                        letterSpacing="0.2em"
+                        textTransform="uppercase"
+                        color="#FC8181"
+                    >
+                        Zona de peligro
+                    </Text>
+                </Flex>
                 <Text
-                    w='90%'
-                    color='red'
-                    textAlign='center'
-                    >
-                    Cuidado! Si apretas este boton todo lo que modificaste en este calendario se trasladara automaticamente al semanal
+                    fontFamily='"Poppins", sans-serif'
+                    fontSize="0.82rem"
+                    color={textMuted}
+                    lineHeight="1.65"
+                    mb="16px"
+                >
+                    Al resetear el calendario, todo lo modificado se trasladará automáticamente al calendario semanal. Esta acción no se puede deshacer.
                 </Text>
-                <Button
-                    backgroundColor={theme === 'light' ? 'white' : 'black'}
-                    color={theme === 'light' ? 'black' : 'white'}
-                    border='1px solid #80c687'
-                    boxShadow= '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)'
-                    transition='all 0.3s ease'
-                    _hover={{
-                        boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                        transform: 'translateY(-2px)',
-                        backgroundColor:'#80c687',
-                        color: theme === 'light' ? 'white' : 'black'
-                    }} 
-                    onClick={handleResetCalendar}
-                    >
-                    Resetear Calendario
-                </Button>
+                <button className="ic-reset-btn" onClick={handleResetCalendar}>
+                    Resetear calendario
+                </button>
             </Box>
         </Box>
-    );
-};
+    )
+}
 
 export default InitialCalendar;

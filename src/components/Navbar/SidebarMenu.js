@@ -1,235 +1,397 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  Image,
-  useToast,
-  VStack,
-  Text,
-  Flex,
-  Spinner
+  Box, Drawer, DrawerBody, DrawerContent, DrawerOverlay,
+  useToast, Text, Flex, Spinner
 } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 import { jwtDecode } from 'jwt-decode';
-import { Link, useNavigate } from 'react-router-dom';
-import menu from '../../img/menuuno.png';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import ProtectedRegisterButton from '../Registro/ProtectedRegisterButton';
 
+// ─── Estilos globales ─────────────────────────────────────────────────────────
+const sidebarStyles = `
+    @keyframes drawerIn {
+        from { opacity: 0; transform: translateX(24px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes linkIn {
+        from { opacity: 0; transform: translateX(16px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .sb-link {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 0;
+        transition: color 0.25s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1);
+        cursor: pointer;
+        background: none;
+        border: none;
+        text-align: left;
+        width: 100%;
+        position: relative;
+    }
+    .sb-link::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #68D391;
+        border-radius: 9999px;
+        transition: width 0.3s cubic-bezier(0.22,1,0.36,1);
+    }
+    .sb-link:hover::after { width: 100%; }
+    .sb-link:hover { transform: translateX(6px); }
+
+    .sb-link.light { color: #2D3748; }
+    .sb-link.dark  { color: rgba(255,255,255,0.88); }
+    .sb-link.light:hover { color: #68D391; }
+    .sb-link.dark:hover  { color: #68D391; }
+
+    .sb-link-item {
+        animation: linkIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    .sb-footer-btn {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 10px 20px;
+        border: 1px solid rgba(104,211,145,0.4);
+        transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+        white-space: nowrap;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .sb-footer-btn.primary {
+        background: #68D391;
+        color: #1a202c;
+        border-color: #68D391;
+    }
+    .sb-footer-btn.primary:hover {
+        background: #4FBF72;
+        border-color: #4FBF72;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(104,211,145,0.35);
+    }
+    .sb-footer-btn.secondary {
+        background: transparent;
+    }
+    .sb-footer-btn.secondary:hover {
+        background: rgba(104,211,145,0.08);
+        border-color: #68D391;
+        transform: translateY(-2px);
+    }
+    .sb-footer-btn.danger {
+        background: transparent;
+        border-color: rgba(252,129,129,0.4);
+        color: #FC8181;
+    }
+    .sb-footer-btn.danger:hover {
+        background: rgba(252,129,129,0.08);
+        border-color: #FC8181;
+        transform: translateY(-2px);
+    }
+    .sb-footer-btn.ghost {
+        background: transparent;
+        border-color: rgba(160,174,192,0.3);
+    }
+    .sb-footer-btn.ghost:hover {
+        background: rgba(160,174,192,0.08);
+        transform: translateY(-2px);
+    }
+`
+
+// ─── Hamburger animado ────────────────────────────────────────────────────────
+const AnimatedHamburger = ({ isOpen, theme, onClick }) => {
+  const color = theme === 'light' ? '#1A202C' : '#F7FAFC'
+  return (
+    <Box
+      onClick={onClick}
+      cursor="pointer"
+      position="relative"
+      w="40px" h="40px" m="5px"
+      transition="transform 0.2s"
+      _hover={{ transform: 'scale(1.1)' }}
+    >
+      <motion.div
+        animate={isOpen ? { rotate: 45, y: 10 } : { rotate: 0, y: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        style={{ position: 'absolute', width: '28px', height: '2.5px', backgroundColor: color, top: '10px', left: '6px', borderRadius: '3px' }}
+      />
+      <motion.div
+        animate={isOpen ? { opacity: 0, x: -20 } : { opacity: 1, x: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        style={{ position: 'absolute', width: '22px', height: '2.5px', backgroundColor: color, top: '20px', left: '6px', borderRadius: '3px' }}
+      />
+      <motion.div
+        animate={isOpen ? { rotate: -45, y: -10 } : { rotate: 0, y: 0 }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        style={{ position: 'absolute', width: '28px', height: '2.5px', backgroundColor: color, top: '30px', left: '6px', borderRadius: '3px' }}
+      />
+    </Box>
+  )
+}
+
+// ─── NavLink ──────────────────────────────────────────────────────────────────
+const NavLink = ({ to, children, onClick, theme, delay = 0 }) => (
+  <div className="sb-link-item" style={{ animationDelay: `${delay}s` }}>
+    <RouterLink to={to} onClick={onClick} className={`sb-link ${theme}`}>
+      {children}
+    </RouterLink>
+  </div>
+)
+
+const NavButton = ({ onClick, children, theme, delay = 0 }) => (
+  <div className="sb-link-item" style={{ animationDelay: `${delay}s` }}>
+    <button onClick={onClick} className={`sb-link ${theme}`}>
+      {children}
+    </button>
+  </div>
+)
+
+// ─── SidebarMenu ──────────────────────────────────────────────────────────────
 function SidebarMenu({ theme, userData }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const navigate = useNavigate()
+  const toast = useToast()
 
-  const onOpen = () => setIsOpen(true);
-  const onClose = () => setIsOpen(false);
+  const isDark = theme === 'dark'
+  const drawerBg = isDark
+    ? 'rgba(10,14,20,0.97)'
+    : 'rgba(255,255,255,0.97)'
+  const borderC = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(104,211,145,0.15)'
+  const textMuted = isDark ? 'rgba(255,255,255,0.35)' : '#A0AEC0'
+  const textMain = isDark ? 'rgba(255,255,255,0.88)' : '#2D3748'
 
-  const navigate = useNavigate();
-  const toast = useToast();
-
-  // Verifico si el usuario está autenticado
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token')
     if (token) {
       try {
-        const decoded = jwtDecode(token);
-        const currentTime = Date.now() / 1000; // Tiempo actual en segundos
-        if (decoded.exp > currentTime) {
-          setIsAuthenticated(true);
+        const decoded = jwtDecode(token)
+        if (decoded.exp > Date.now() / 1000) {
+          setIsAuthenticated(true)
         } else {
-          // Token expirado
-          localStorage.removeItem('token');
-          setIsAuthenticated(false);
+          localStorage.removeItem('token')
+          setIsAuthenticated(false)
         }
-      } catch (error) {
-        console.error("Error al decodificar el token:", error);
-        localStorage.removeItem('token');
-        setIsAuthenticated(false);
+      } catch {
+        localStorage.removeItem('token')
+        setIsAuthenticated(false)
       }
     } else {
-      setIsAuthenticated(false);
+      setIsAuthenticated(false)
     }
-  }, []);
+  }, [])
 
-  // Manejar click de cerrar Sesión
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    setIsAuthenticated(false);
-    toast({
-      title: 'Sesión Cerrada',
-      status: 'success',
-      duration: 5000,
-      isClosable: true,
-    });
-    navigate('/login');
-  };
+    localStorage.removeItem('token')
+    setIsAuthenticated(false)
+    toast({ title: 'Sesión cerrada', status: 'success', duration: 5000, isClosable: true })
+    navigate('/login')
+    setIsOpen(false)
+  }
 
-  // Función para desplazarse al footer
-  const scrollToFooter = (event) => {
-    event.preventDefault(); // Prevenir el comportamiento por defecto
-    onClose(); // Cerrar el menú
-
-    // Usar un timeout para asegurar que el menú se cierre antes de desplazarse
+  const scrollToFooter = (e) => {
+    e.preventDefault()
+    setIsOpen(false)
     setTimeout(() => {
-      const footer = document.getElementById('footer');
-      if (footer) {
-        footer.scrollIntoView({ behavior: 'smooth' }); // Desplazamiento suave
-      } else {
-        console.error('Footer no encontrado'); 
-      }
-    }, 300);
-  };
+      document.getElementById('footer')?.scrollIntoView({ behavior: 'smooth' })
+    }, 300)
+  }
+
+  const isAdmin = userData?.role === 'admin'
 
   return (
     <Box>
-      <Image _hover={{cursor: 'pointer', transform: 'scale(1.1)'}} onClick={onOpen} src={menu} alt="Menu desplegable" w="50px" h="50px" m="3px" />
+      <style>{sidebarStyles}</style>
 
-      <Drawer isOpen={isOpen} onClose={onClose} placement="right" size="sm">
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
-          <DrawerHeader>Menú de Navegación</DrawerHeader>
+      <AnimatedHamburger isOpen={isOpen} theme={theme} onClick={() => setIsOpen(true)} />
 
-          <DrawerBody>
-            {isAuthenticated ? 
+      <Drawer isOpen={isOpen} onClose={() => setIsOpen(false)} placement="right" size={['full', 'sm']}>
+        <DrawerOverlay bg="blackAlpha.500" backdropFilter="blur(8px)" />
+        <DrawerContent
+          bg={drawerBg}
+          backdropFilter="blur(20px)"
+          color={textMain}
+          display="flex"
+          flexDir="column"
+          borderLeft="1px solid"
+          borderColor={borderC}
+        >
+          {/* ── Header ── */}
+          <Box
+            px="28px"
+            pt="28px"
+            pb="20px"
+            borderBottom="1px solid"
+            borderColor={borderC}
+            flexShrink={0}
+          >
+            {/* Botón cerrar custom */}
+            <Flex justifyContent="space-between" alignItems="center" mb="16px">
+              <Flex alignItems="center" gap="10px">
+                <Box w="20px" h="2px" bg="green.400" borderRadius="full" />
+                <Text
+                  fontFamily='"Poppins", sans-serif'
+                  fontSize="0.65rem"
+                  letterSpacing="0.25em"
+                  textTransform="uppercase"
+                  color={textMuted}
+                >
+                  Navegación
+                </Text>
+              </Flex>
+              <Box
+                onClick={() => setIsOpen(false)}
+                cursor="pointer"
+                w="32px" h="32px"
+                borderRadius="full"
+                bg={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                transition="all 0.2s ease"
+                _hover={{
+                  bg: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)',
+                  transform: 'rotate(90deg)'
+                }}
+              >
+                <Text fontSize="0.85rem" color={textMuted} userSelect="none" lineHeight="1">✕</Text>
+              </Box>
+            </Flex>
+
+            {/* Nombre del usuario si está logueado */}
+            {isAuthenticated && userData && (
+              <Box>
+                <Text
+                  fontFamily='"Playfair Display", serif'
+                  fontSize="1.3rem"
+                  fontWeight="900"
+                  color={textMain}
+                  lineHeight="1.2"
+                  textTransform="capitalize"
+                >
+                  {userData.username} {userData.userlastname}
+                </Text>
+                <Flex alignItems="center" gap="6px" mt="4px">
+                  <Box w="6px" h="6px" borderRadius="full" bg="green.400" />
+                  <Text
+                    fontFamily='"Poppins", sans-serif'
+                    fontSize="0.68rem"
+                    letterSpacing="0.15em"
+                    textTransform="uppercase"
+                    color="green.400"
+                  >
+                    {isAdmin ? 'Administrador' : 'Miembro activo'}
+                  </Text>
+                </Flex>
+              </Box>
+            )}
+          </Box>
+
+          {/* ── Body — Links ── */}
+          <DrawerBody px="28px" py="28px" flex="1" overflowY="auto">
+            {isAuthenticated ? (
               !userData ? (
-                      <Flex
-                          w='100%'
-                          h='70vh'
-                          align='center'
-                          justify='center'
-                          flexDir='column'
-                          rowGap='10px'
-                          >
-                          Cargando...
-                          <Spinner size='lg' color='green' />
-                      </Flex>        
-              ) :
-              (
-              userData ? (
-                userData.role === 'admin' ? (
-                  <VStack align="start" spacing={4}>
-                    <Link to="/" onClick={onClose}>
-                      Home
-                    </Link>
-                    <Link to="/calendario" onClick={onClose}>
-                      Calendario
-                    </Link>
-                    <Link to='/homenutricion' onClick={onClose}>
-                      Nutrición
-                    </Link>
-                    <Link to="/seccionadmin" onClick={onClose}>
-                      Admin
-                    </Link>
-                  </VStack>
-                ) : (
-                  <VStack align="start" spacing={4}>
-                    <Link to="/" onClick={onClose}>
-                      Home
-                    </Link>
-                    <Link to="/calendario" onClick={onClose}>
-                      Calendario
-                    </Link>
-                    <Link to="/pagos" onClick={onClose}>
-                      Pagos
-                    </Link>
-                    <Link to="/perfil" onClick={onClose}>
-                      Perfil
-                    </Link>
-                    <Link to='/homenutricion' onClick={onClose}>
-                      Nutrición
-                    </Link>
-                    <Text as='button' onClick={scrollToFooter} variant="link" color={theme === 'light' ? '#1A202C' : '#EEEFF1'} >
-                      Contactanos
-                    </Text>
-                  </VStack>
-                )
+                <Flex w="100%" h="50vh" align="center" justify="center" flexDir="column" gap="12px">
+                  <Text fontFamily='"Poppins", sans-serif' fontSize="0.82rem" color={textMuted}>
+                    Cargando...
+                  </Text>
+                  <Spinner size="md" color="green.400" thickness="2px" />
+                </Flex>
+              ) : isAdmin ? (
+                <Flex flexDir="column" gap="4px">
+                  <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+                  <NavLink to="/calendario" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Calendario</NavLink>
+                  <NavLink to="/homenutricion" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Nutrición</NavLink>
+                  <NavLink to="/seccionadmin" onClick={() => setIsOpen(false)} theme={theme} delay={0.20}>Admin</NavLink>
+                </Flex>
               ) : (
-                <></>
+                <Flex flexDir="column" gap="4px">
+                  <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+                  <NavLink to="/calendario" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Calendario</NavLink>
+                  <NavLink to="/pagos" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Pagos</NavLink>
+                  <NavLink to="/perfil" onClick={() => setIsOpen(false)} theme={theme} delay={0.20}>Perfil</NavLink>
+                  <NavLink to="/homenutricion" onClick={() => setIsOpen(false)} theme={theme} delay={0.25}>Nutrición</NavLink>
+                  <NavButton onClick={scrollToFooter} theme={theme} delay={0.30}>Contactanos</NavButton>
+                </Flex>
               )
             ) : (
-              <VStack align="start" spacing={4}>
-                <Link to="/" onClick={onClose}>
-                  Home
-                </Link>
-                <Text as='button' onClick={scrollToFooter} variant="link" color={theme === 'light' ? '#1A202C' : '#EEEFF1'} >
-                  Contactanos
-                </Text>
-              </VStack>
+              <Flex flexDir="column" gap="4px">
+                <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+                <NavButton onClick={scrollToFooter} theme={theme} delay={0.10}>Contactanos</NavButton>
+              </Flex>
             )}
           </DrawerBody>
 
-          <DrawerFooter
+          {/* ── Footer — Acciones ── */}
+          <Box
+            px="28px"
+            py="20px"
+            borderTop="1px solid"
+            borderColor={borderC}
+            flexShrink={0}
             display="flex"
-            justifyContent={['center', 'space-between', 'space-between']}
-            columnGap={['15px', '0px', '0px']}
-            rowGap={['10px', '0px', '0px']}
-            flexWrap="wrap"
+            flexDir="column"
+            gap="10px"
           >
-            <Link to="/login" onClick={onClose}>
-              {isAuthenticated ? (
-                <Button
+            {isAuthenticated ? (
+              <>
+                <button
+                  className="sb-footer-btn danger"
+                  style={{ color: '#FC8181' }}
                   onClick={handleLogout}
-                  backgroundColor={theme === 'light' ? 'white' : 'black'}
-                  color={theme === 'light' ? 'black' : 'white'}
-                  border="1px solid #80c687"
-                  boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
-                  transition="all 0.3s ease"
-                  _hover={{
-                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                    transform: 'translateY(-2px)',
-                    backgroundColor: '#80c687',
-                    color: theme === 'light' ? 'white' : 'black',
-                  }}
                 >
-                  Cerrar Sesión
-                </Button>
-              ) : (
-                <Button
-                  backgroundColor={theme === 'light' ? 'white' : 'black'}
-                  color={theme === 'light' ? 'black' : 'white'}
-                  border="1px solid #80c687"
-                  boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
-                  transition="all 0.3s ease"
-                  _hover={{
-                    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                    transform: 'translateY(-2px)',
-                    backgroundColor: '#80c687',
-                    color: theme === 'light' ? 'white' : 'black',
-                  }}
+                  Cerrar sesión
+                </button>
+                <button
+                  className="sb-footer-btn ghost"
+                  style={{ color: textMuted }}
+                  onClick={() => setIsOpen(false)}
                 >
-                  Iniciar Sesión
-                </Button>
-              )}
-            </Link>
-            <Box display={isAuthenticated ? 'none' : 'block'}>
-              <ProtectedRegisterButton onClose1={onClose} theme={theme} />
-            </Box>
-            <Button
-              onClick={onClose}
-              backgroundColor={theme === 'light' ? 'white' : 'black'}
-              color={theme === 'light' ? 'black' : 'white'}
-              border="1px solid #80c687"
-              boxShadow="0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
-              transition="all 0.3s ease"
-              _hover={{
-                boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
-                transform: 'translateY(-2px)',
-                backgroundColor: '#80c687',
-                color: theme === 'light' ? 'white' : 'black',
-              }}
-            >
-              Cerrar
-            </Button>
-          </DrawerFooter>
+                  Cerrar menú
+                </button>
+              </>
+            ) : (
+              <>
+                <RouterLink to="/login" onClick={() => setIsOpen(false)} style={{ textDecoration: 'none' }}>
+                  <button className="sb-footer-btn primary" style={{ width: '100%' }}>
+                    Iniciar sesión
+                  </button>
+                </RouterLink>
+
+                <Box display={isAuthenticated ? 'none' : 'block'}>
+                  <ProtectedRegisterButton onClose1={() => setIsOpen(false)} theme={theme} />
+                </Box>
+
+                <button
+                  className="sb-footer-btn ghost"
+                  style={{ color: textMuted, width: '100%' }}
+                  onClick={() => setIsOpen(false)}
+                >
+                  Cerrar menú
+                </button>
+              </>
+            )}
+          </Box>
         </DrawerContent>
       </Drawer>
     </Box>
-  );
+  )
 }
 
-export default SidebarMenu;
+export default SidebarMenu

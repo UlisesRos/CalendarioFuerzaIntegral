@@ -24,6 +24,8 @@ import HistorialMensual from "./components/admin/clients/HistorialMensual";
 import Nutricion from "./components/nutricion/NutricionCalendar";
 import HomeNutricion from './components/nutricion/HomeNutricion';
 import AdminTurnosHistorial from "./components/nutricion/AdminTurnosHistorial";
+import GestionHorarios from "./components/admin/GestionHorarios";
+import PreciosAdmin from "./components/admin/PreciosAdmin";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 // const apiUrl = 'http://localhost:5000'; // URL base de la API
@@ -52,7 +54,7 @@ function App() {
                 // Manejo centralizado de errores 401
                 localStorage.removeItem('token');
                 setUserData(null);
-                
+
                 // Solo muestra error si no está en la página de login
                 if (!window.location.pathname.includes('/login')) {
                     setErrorMessage('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
@@ -67,14 +69,14 @@ function App() {
         const initializeApp = async () => {
             try {
                 setAppStatus('loading');
-                
+
                 // Verificar conexión a internet
                 if (!navigator.onLine) {
                     throw new Error('No hay conexión a internet. Por favor verifica tu conexión.');
                 }
 
                 // Configurar tema
-                const savedTheme = 'light';
+                const savedTheme = localStorage.getItem('theme') || 'light';
                 setTheme(savedTheme);
                 document.documentElement.setAttribute('data-theme', savedTheme);
 
@@ -99,8 +101,8 @@ function App() {
             } catch (error) {
                 console.error('Error inicializando la app:', error);
                 setErrorMessage(
-                    error.response?.data?.message || 
-                    error.message || 
+                    error.response?.data?.message ||
+                    error.message ||
                     'Error al cargar la aplicación. Por favor intenta nuevamente.'
                 );
                 setAppStatus('error');
@@ -119,6 +121,7 @@ function App() {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
     };
 
     const handleLoginSuccess = (token, user) => {
@@ -167,7 +170,7 @@ function App() {
                     animation: 'spin 1s linear infinite',
                     marginBottom: '20px'
                 }} />
-                <p style={{ 
+                <p style={{
                     color: theme === 'light' ? '#333' : '#fff',
                     fontSize: '18px',
                     textAlign: 'center',
@@ -203,14 +206,14 @@ function App() {
                 padding: '20px',
                 boxSizing: 'border-box'
             }}>
-                <div style={{ 
+                <div style={{
                     color: theme === 'light' ? '#d32f2f' : '#f44336',
                     fontSize: '24px',
                     marginBottom: '20px'
                 }}>
                     ⚠️
                 </div>
-                <h2 style={{ 
+                <h2 style={{
                     color: theme === 'light' ? '#333' : '#fff',
                     fontSize: '20px',
                     textAlign: 'center',
@@ -218,7 +221,7 @@ function App() {
                 }}>
                     Ocurrió un problema
                 </h2>
-                <p style={{ 
+                <p style={{
                     color: theme === 'light' ? '#666' : '#ccc',
                     fontSize: '16px',
                     textAlign: 'center',
@@ -268,8 +271,8 @@ function App() {
 
     // Aplicación principal
     return (
-        <div style={{ 
-            minWidth: '320px', 
+        <div style={{
+            minWidth: '320px',
             overflowX: 'hidden',
             minHeight: '100vh',
             display: 'flex',
@@ -277,102 +280,112 @@ function App() {
             backgroundColor: theme === 'light' ? '#ffffff' : '#121212'
         }}>
             <Router>
-                <Navbar 
-                    toggleTheme={toggleTheme} 
-                    theme={theme} 
+                <Navbar
+                    toggleTheme={toggleTheme}
+                    theme={theme}
                     userData={userData}
                     onLogout={handleLogout}
                 />
                 <main style={{ flex: 1 }}>
                     <Routes>
-                        <Route path="/" element={<Rutas apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
-                        <Route 
+                        <Route path="/" element={<Rutas userData={userData} apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
+                        <Route
                             path="/ingresousuario"
                             element={
                                 <AdminRoute>
-                                    <IngresoUsuario apiUrl={apiUrl} theme={theme}/>
+                                    <IngresoUsuario apiUrl={apiUrl} theme={theme} />
                                 </AdminRoute>
                             }
                         />
                         <Route path='/historialmensual' element={
                             <AdminRoute>
-                                <HistorialMensual apiUrl={apiUrl} theme={theme}/>
+                                <HistorialMensual apiUrl={apiUrl} theme={theme} />
                             </AdminRoute>
-                        }/>
+                        } />
                         <Route path="/admin/historial" element={
                             <AdminRoute>
                                 <AdminTurnosHistorial apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
                             </AdminRoute>
-                        }/>
+                        } />
                         <Route path="/calendario" element={
                             <ProtectedRouteToken>
                                 <Calendario apiUrl={apiUrl} theme={theme} userData={userData} />
                             </ProtectedRouteToken>
-                        }/>
+                        } />
                         <Route path="/pagos" element={
                             <ProtectedRouteToken>
                                 <OpcionesPago apiUrl={apiUrl} theme={theme} userData={userData} />
                             </ProtectedRouteToken>
-                        }/>
+                        } />
                         <Route path="/payment_success" element={
                             <ProtectedRouteToken>
                                 <PaymentSuccess apiUrl={apiUrl} userData={userData} />
                             </ProtectedRouteToken>
-                        }/>
+                        } />
                         <Route path="/perfil" element={
                             <ProtectedRouteToken>
                                 <Perfil userData={userData} theme={theme} onLogout={handleLogout} />
                             </ProtectedRouteToken>
-                        }/>
+                        } />
                         <Route path="/nutricion" element={
                             <ProtectedRouteToken>
                                 <Nutricion apiUrl={apiUrl} theme={theme} userData={userData} />
                             </ProtectedRouteToken>
-                        }/>
+                        } />
                         <Route path="/homenutricion" element={
                             <ProtectedRouteToken>
                                 <HomeNutricion apiUrl={apiUrl} theme={theme} userData={userData} />
                             </ProtectedRouteToken>
-                        }/>
+                        } />
                         <Route path='/seccionadmin' element={
                             <AdminRoute>
-                                <SeccionAdmin toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
+                                <SeccionAdmin toggleTheme={toggleTheme} theme={theme} administrador={userData} />
                             </AdminRoute>
-                        }/>
+                        } />
                         <Route path="/novedades" element={
                             <AdminRoute>
                                 <Novedades apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
                             </AdminRoute>
-                        }/>
+                        } />
+                        <Route path="/gestionhorarios" element={
+                            <AdminRoute>
+                                <GestionHorarios apiUrl={apiUrl} theme={theme} />
+                            </AdminRoute>
+                        } />
+                        <Route path="/preciosadmin" element={
+                            <AdminRoute>
+                                <PreciosAdmin apiUrl={apiUrl} theme={theme} />
+                            </AdminRoute>
+                        } />
                         <Route path="/initialcalendar" element={
                             <AdminRoute>
-                                <InitialCalendar apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} administrador={userData}/>
+                                <InitialCalendar apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} administrador={userData} />
                             </AdminRoute>
-                        }/>
+                        } />
                         <Route path="/registroclientes" element={
                             <AdminRoute>
                                 <RegistroClientes apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
                             </AdminRoute>
-                        }/>
+                        } />
                         <Route path="/registro" element={
                             <ProtectedRouteCode>
                                 <Registro apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />
                             </ProtectedRouteCode>
-                        }/>
+                        } />
                         <Route path="/login" element={
-                            <Login 
-                                apiUrl={apiUrl} 
-                                toggleTheme={toggleTheme} 
-                                theme={theme} 
+                            <Login
+                                apiUrl={apiUrl}
+                                toggleTheme={toggleTheme}
+                                theme={theme}
                                 onLoginSuccess={handleLoginSuccess}
                             />
-                        }/>
+                        } />
                         <Route path="/forgotpasswordform" element={
                             <ForgotPasswordForm apiUrl={apiUrl} theme={theme} />
-                        }/>
+                        } />
                         <Route path="/resetpasswordform" element={
                             <ResetPasswordForm apiUrl={apiUrl} theme={theme} />
-                        }/>
+                        } />
                         <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                 </main>

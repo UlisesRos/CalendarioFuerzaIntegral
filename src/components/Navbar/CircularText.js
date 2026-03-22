@@ -91,7 +91,7 @@ const CircularText = ({
   return (
     <motion.div
       initial={{ rotate: 0 }}
-      className='circular-text'
+      className={`circular-text ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}
       animate={controls}
       onUpdate={(latest) => setCurrentRotation(Number(latest.rotate))}
       onMouseEnter={handleHoverStart}

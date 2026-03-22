@@ -3,14 +3,14 @@ import '../../css/nav/Navbar.css'
 import Modal from '../modal/Modal'
 import Home from '../home/Home'
 
-function Rutas({toggleTheme, theme, apiUrl}) {
+function Rutas({ toggleTheme, userData, theme, apiUrl }) {
 
     return (
         <Flex
             flexDir='column'
-            >
+        >
             <Modal theme={theme} apiUrl={apiUrl} />
-            <Home />
+            <Home userData={userData} />
         </Flex>
     )
 }

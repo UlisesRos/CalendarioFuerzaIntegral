@@ -1,15 +1,30 @@
 .circular-text {
-    margin: 0 0;
-    border-radius: 50%;
-    width: 160px;
-    height: 160px;
-    font-weight: bold;
-    color: black;
-    font-weight: 900;
-    text-align: center;
-    cursor: pointer;
-    margin-left: 20px;
+  margin: 0;
+  border-radius: 50%;
+  width: 160px;
+  height: 160px;
+  font-weight: 900;
+  text-align: center;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: color 0.3s ease;
+}
+
+.circular-text.light-theme {
+  color: #1A202C; /* Chakra gray.800 */
+}
+
+.circular-text.dark-theme {
+  color: #F7FAFC; /* Chakra gray.50 */
+}
+
+@media (max-width: 768px) {
+  .circular-text {
+    width: 65px;
+    height: 65px;
+    margin-left: 0;
   }
+}
   
   .circular-text span {
     position: absolute;
@@ -20,4 +35,10 @@
     bottom: 0;
     font-size: 24px;
     transition: all 0.5s cubic-bezier(0, 0, 0, 1);
+  }
+  
+  @media (max-width: 768px) {
+    .circular-text span {
+      font-size: 11px;
+    }
   }

@@ -54,6 +54,7 @@ function OpcionesPago({ theme, userData, apiUrl }) {
                                     <Transferencia 
                                         theme={theme} 
                                         userData={userData} 
+                                        apiUrl={apiUrl}
                                     />
                                 </Box>
                             </Flex>
