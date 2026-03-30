@@ -239,7 +239,6 @@ const GestionHorarios = ({ theme, apiUrl }) => {
     const [closeDayDay, setCloseDayDay] = useState('');
     const [closeDayReason, setCloseDayReason] = useState('');
     const [closeHourDay, setCloseHourDay] = useState('');
-    const [closeHourShift, setCloseHourShift] = useState('');
     const [closeHourReason, setCloseHourReason] = useState('');
     const [selectedHours, setSelectedHours] = useState([]);
     const [addHourDay, setAddHourDay] = useState('');
@@ -286,14 +285,8 @@ const GestionHorarios = ({ theme, apiUrl }) => {
         }
     };
 
-    const getAvailableHours = () => {
-        if (!closeHourDay || !closeHourShift) return [];
-        if (closeHourDay === 'sábado') return SABADO_MAÑANA;
-        return closeHourShift === 'mañana' ? HORAS_MAÑANA : HORAS_TARDE;
-    };
-
-    const toggleHour = (hour) => {
-        const key = `${closeHourShift}.${hour}`;
+    const toggleHour = (shift, hour) => {
+        const key = `${shift}.${hour}`;
         setSelectedHours(prev => prev.includes(key) ? prev.filter(h => h !== key) : [...prev, key]);
     };
 
@@ -305,7 +298,7 @@ const GestionHorarios = ({ theme, apiUrl }) => {
                 day: closeHourDay, closedDay: false, closedHours: selectedHours, reason: closeHourReason
             });
             showToast('¡Éxito!', `Horarios cerrados en ${closeHourDay}`, 'success');
-            setCloseHourDay(''); setCloseHourShift(''); setCloseHourReason(''); setSelectedHours([]); fetchData();
+            setCloseHourDay(''); setCloseHourReason(''); setSelectedHours([]); fetchData();
         } catch (err) {
             showToast('Error', err.response?.data?.error || 'No se pudo cerrar los horarios', 'error');
         }
@@ -320,7 +313,7 @@ const GestionHorarios = ({ theme, apiUrl }) => {
         try {
             await axios.post(`${apiUrl}/api/schedule/add-hour`, { day: addHourDay, shift: addHourShift, hour: hourNum });
             showToast('¡Éxito!', `Hora ${hourNum}:00 agregada permanentemente`, 'success');
-            setAddHourDay(''); setAddHourShift(''); setAddHourValue(''); fetchData();
+            setAddHourShift(''); setAddHourValue(''); fetchData();
         } catch (err) {
             showToast('Error', err.response?.data?.error || 'No se pudo agregar la hora', 'error');
         }
@@ -359,7 +352,7 @@ const GestionHorarios = ({ theme, apiUrl }) => {
                 data: { day: removeHourDay, shift: removeHourShift, hour: removeHourValue }
             });
             showToast('¡Éxito!', `Hora ${removeHourValue}:00 eliminada`, 'success');
-            setRemoveHourDay(''); setRemoveHourShift(''); setRemoveHourValue(''); fetchData();
+            setRemoveHourShift(''); setRemoveHourValue(''); fetchData();
         } catch (err) {
             showToast('Error', err.response?.data?.error || 'No se pudo eliminar la hora', 'error');
         }
@@ -474,31 +467,26 @@ const GestionHorarios = ({ theme, apiUrl }) => {
                     <VStack align="stretch" spacing="16px">
                         <SectionLabel>Cerrar horarios específicos</SectionLabel>
                         <Text fontFamily='"Poppins", sans-serif' fontSize="0.82rem" color="gray.500" lineHeight="1.6" mt="-8px">
-                            Seleccioná el día, turno y las horas a cerrar. El resto del día permanecerá abierto.
+                            Seleccioná el día y las horas a cerrar. Podés elegir horas de mañana y tarde al mismo tiempo.
                         </Text>
-                        <StyledSelect placeholder="Seleccionar día" value={closeHourDay} onChange={e => { setCloseHourDay(e.target.value); setCloseHourShift(''); setSelectedHours([]); }} theme={theme}>
+                        <StyledSelect placeholder="Seleccionar día" value={closeHourDay} onChange={e => { setCloseHourDay(e.target.value); setSelectedHours([]); }} theme={theme}>
                             {DIAS.map(d => <option key={d} value={d}>{d}</option>)}
                         </StyledSelect>
                         {closeHourDay && (
-                            <StyledSelect placeholder="Seleccionar turno" value={closeHourShift} onChange={e => { setCloseHourShift(e.target.value); setSelectedHours([]); }} theme={theme}>
-                                <option value="mañana">Mañana</option>
-                                <option value="tarde">Tarde</option>
-                            </StyledSelect>
-                        )}
-                        {closeHourShift && (
                             <Box>
-                                <Text fontFamily='"Poppins", sans-serif' fontSize="0.78rem" color="gray.500" mb="10px" letterSpacing="0.06em" textTransform="uppercase">
-                                    Horas a cerrar
+                                {/* Sección Mañana */}
+                                <Text fontFamily='"Poppins", sans-serif' fontSize="0.78rem" color="gray.500" mb="8px" letterSpacing="0.06em" textTransform="uppercase">
+                                    Mañana
                                 </Text>
-                                <Flex flexWrap="wrap" gap="8px">
-                                    {getAvailableHours().map(h => {
-                                        const key = `${closeHourShift}.${h}`
+                                <Flex flexWrap="wrap" gap="8px" mb="16px">
+                                    {(closeHourDay === 'sábado' ? SABADO_MAÑANA : HORAS_MAÑANA).map(h => {
+                                        const key = `mañana.${h}`
                                         const isSelected = selectedHours.includes(key)
                                         return (
                                             <button
-                                                key={h}
+                                                key={key}
                                                 className={`gh-hour-btn${isSelected ? ' selected' : ''}`}
-                                                onClick={() => toggleHour(h)}
+                                                onClick={() => toggleHour('mañana', h)}
                                                 style={{
                                                     background: isSelected
                                                         ? '#68D391'
@@ -513,12 +501,43 @@ const GestionHorarios = ({ theme, apiUrl }) => {
                                         )
                                     })}
                                 </Flex>
+                                {/* Sección Tarde - solo si no es sábado */}
+                                {closeHourDay !== 'sábado' && (
+                                    <>
+                                        <Text fontFamily='"Poppins", sans-serif' fontSize="0.78rem" color="gray.500" mb="8px" letterSpacing="0.06em" textTransform="uppercase">
+                                            Tarde
+                                        </Text>
+                                        <Flex flexWrap="wrap" gap="8px">
+                                            {HORAS_TARDE.map(h => {
+                                                const key = `tarde.${h}`
+                                                const isSelected = selectedHours.includes(key)
+                                                return (
+                                                    <button
+                                                        key={key}
+                                                        className={`gh-hour-btn${isSelected ? ' selected' : ''}`}
+                                                        onClick={() => toggleHour('tarde', h)}
+                                                        style={{
+                                                            background: isSelected
+                                                                ? '#68D391'
+                                                                : isDark ? 'rgba(255,255,255,0.04)' : 'white',
+                                                            color: isSelected
+                                                                ? '#1a202c'
+                                                                : isDark ? 'rgba(255,255,255,0.7)' : '#4A5568',
+                                                        }}
+                                                    >
+                                                        {h}:00
+                                                    </button>
+                                                )
+                                            })}
+                                        </Flex>
+                                    </>
+                                )}
                                 {selectedHours.length > 0 && (
                                     <HStack mt="12px" flexWrap="wrap" spacing="1">
                                         <Text fontFamily='"Poppins", sans-serif' fontSize="0.72rem" color="gray.400">Seleccionadas:</Text>
                                         {selectedHours.map(h => (
                                             <Tag key={h} colorScheme="green" size="sm" borderRadius="full">
-                                                <TagLabel>{h.split('.')[1]}:00</TagLabel>
+                                                <TagLabel>{h.split('.')[1]}:00 ({h.split('.')[0]})</TagLabel>
                                                 <TagCloseButton onClick={() => setSelectedHours(prev => prev.filter(x => x !== h))} />
                                             </Tag>
                                         ))}
