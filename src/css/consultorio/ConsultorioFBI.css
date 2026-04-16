@@ -1,0 +1,108 @@
+/* ── Keyframes ────────────────────────────────────────────────────────────── */
+@keyframes consultCardReveal {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tabPanelIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes contactBtnIn {
+  0%   { opacity: 0; transform: scale(0.92); }
+  60%  { opacity: 1; transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modalBackdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modalPanelIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes modalPanelInMobile {
+  from { opacity: 0; transform: translateY(100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────────── */
+.consult-card {
+  animation: consultCardReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.consult-card:nth-child(1) { animation-delay: 0.05s; }
+.consult-card:nth-child(2) { animation-delay: 0.15s; }
+.consult-card:nth-child(3) { animation-delay: 0.25s; }
+
+.consult-card .c-card-photo {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease;
+  filter: grayscale(60%);
+}
+.consult-card:hover .c-card-photo {
+  transform: scale(1.06);
+  filter: grayscale(0%);
+}
+
+.c-card-overlay {
+  transition: opacity 0.5s ease;
+  opacity: 0.25;
+}
+.consult-card:hover .c-card-overlay {
+  opacity: 0.55;
+}
+
+.c-accent-bar {
+  transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  height: 3px;
+}
+.consult-card:hover .c-accent-bar {
+  height: 100%;
+}
+
+.c-card-hint {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.consult-card:hover .c-card-hint {
+  opacity: 1;
+}
+
+/* ── Tab panel ────────────────────────────────────────────────────────────── */
+.tab-panel-active {
+  animation: tabPanelIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Contact buttons ──────────────────────────────────────────────────────── */
+.contact-btn {
+  animation: contactBtnIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.contact-btn-wa { animation-delay: 0.15s; }
+.contact-btn-ig { animation-delay: 0.25s; }
+
+/* ── Modal ────────────────────────────────────────────────────────────────── */
+.consult-modal-backdrop {
+  animation: modalBackdropIn 0.3s ease both;
+}
+@media (min-width: 600px) {
+  .consult-modal-panel {
+    animation: modalPanelIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@media (max-width: 599px) {
+  .consult-modal-panel {
+    animation: modalPanelInMobile 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* ── Nutricionistas grid: centrar 3ra card en mobile (2 col) ──────────────── */
+@media (max-width: 767px) {
+  .nutri-grid .consult-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 5px);
+    margin: 0 auto;
+  }
+}
