@@ -231,6 +231,8 @@ function SidebarMenu({ theme, userData }) {
           flexDir="column"
           borderLeft="1px solid"
           borderColor={borderC}
+          h="100dvh"
+          overflowY="hidden"
         >
           {/* ── Header ── */}
           <Box
@@ -317,23 +319,24 @@ function SidebarMenu({ theme, userData }) {
                 <Flex flexDir="column" gap="4px">
                   <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
                   <NavLink to="/calendario" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Calendario</NavLink>
-                  <NavLink to="/homenutricion" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Nutrición</NavLink>
+                  <NavLink to="/consultoriofbi" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Consultorio FBI</NavLink>
                   <NavLink to="/seccionadmin" onClick={() => setIsOpen(false)} theme={theme} delay={0.20}>Admin</NavLink>
                 </Flex>
               ) : (
                 <Flex flexDir="column" gap="4px">
                   <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
                   <NavLink to="/calendario" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Calendario</NavLink>
-                  <NavLink to="/pagos" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Pagos</NavLink>
-                  <NavLink to="/perfil" onClick={() => setIsOpen(false)} theme={theme} delay={0.20}>Perfil</NavLink>
-                  <NavLink to="/homenutricion" onClick={() => setIsOpen(false)} theme={theme} delay={0.25}>Nutrición</NavLink>
+                  <NavLink to="/consultoriofbi" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Consultorio FBI</NavLink>
+                  <NavLink to="/pagos" onClick={() => setIsOpen(false)} theme={theme} delay={0.20}>Pagos</NavLink>
+                  <NavLink to="/perfil" onClick={() => setIsOpen(false)} theme={theme} delay={0.25}>Perfil</NavLink>
                   <NavButton onClick={scrollToFooter} theme={theme} delay={0.30}>Contactanos</NavButton>
                 </Flex>
               )
             ) : (
               <Flex flexDir="column" gap="4px">
                 <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
-                <NavButton onClick={scrollToFooter} theme={theme} delay={0.10}>Contactanos</NavButton>
+                <NavLink to="/consultoriofbi" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Consultorio FBI</NavLink>
+                <NavButton onClick={scrollToFooter} theme={theme} delay={0.15}>Contactanos</NavButton>
               </Flex>
             )}
           </DrawerBody>
