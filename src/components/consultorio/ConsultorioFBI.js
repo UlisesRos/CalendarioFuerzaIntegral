@@ -369,27 +369,92 @@ function ProfessionalCard({ professional, onClick }) {
         <Box className="c-card-overlay" position="absolute" inset="0" bg="blackAlpha.600" />
       </Box>
 
-      {/* Name */}
+      {/* Name + contact icons */}
       <Box position="absolute" bottom="0" left="0" right="0" zIndex="10" p={['12px', '18px']}>
-        <Text
-          fontFamily='"Playfair Display", serif'
-          fontSize={['0.9rem', '1.05rem', '1.2rem']}
-          fontWeight="700"
-          color="white"
-          lineHeight="1.2"
-        >
-          {professional.name}
-        </Text>
-        <Text
-          fontFamily='"Poppins", sans-serif'
-          fontSize={['0.62rem', '0.68rem']}
-          color="green.300"
-          letterSpacing="0.2em"
-          textTransform="uppercase"
-          mt="2px"
-        >
-          {professional.profesion}
-        </Text>
+        <Flex justifyContent="space-between" alignItems="flex-end">
+          <Box>
+            <Text
+              fontFamily='"Playfair Display", serif'
+              fontSize={['0.9rem', '1.05rem', '1.2rem']}
+              fontWeight="700"
+              color="white"
+              lineHeight="1.2"
+            >
+              {professional.name}
+            </Text>
+            <Text
+              fontFamily='"Poppins", sans-serif'
+              fontSize={['0.62rem', '0.68rem']}
+              color="green.300"
+              letterSpacing="0.2em"
+              textTransform="uppercase"
+              mt="2px"
+            >
+              {professional.profesion}
+            </Text>
+          </Box>
+
+          {/* Botones de contacto rápido */}
+          <Flex gap="6px" mb="2px" flexShrink={0}>
+            <Box
+              as="a"
+              href={professional.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              w={['30px', '34px']}
+              h={['30px', '34px']}
+              borderRadius="full"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              color="white"
+              sx={{
+                background: '#25D366',
+                backdropFilter: 'blur(4px)',
+                transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
+                flexShrink: 0,
+                '&:hover': {
+                  transform: 'scale(1.15)',
+                  boxShadow: '0 4px 14px rgba(37,211,102,0.55)',
+                },
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.121 1.535 5.853L.057 23.854a.5.5 0 00.589.588l6.122-1.604A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.69-.505-5.23-1.385l-.374-.217-3.88 1.017 1.033-3.772-.237-.388A9.955 9.955 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+              </svg>
+            </Box>
+            <Box
+              as="a"
+              href={professional.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              w={['30px', '34px']}
+              h={['30px', '34px']}
+              borderRadius="full"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              color="white"
+              sx={{
+                background: 'linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)',
+                backdropFilter: 'blur(4px)',
+                transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
+                flexShrink: 0,
+                '&:hover': {
+                  transform: 'scale(1.15)',
+                  boxShadow: '0 4px 14px rgba(253,29,29,0.45)',
+                },
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+              </svg>
+            </Box>
+          </Flex>
+        </Flex>
       </Box>
 
       {/* Hint badge */}
@@ -493,9 +558,9 @@ function ConsultorioFBI({ theme }) {
 
       {/* ── Tabs + Cards ── */}
       <Box w="90%" mb="60px">
-        {/* Label */}
-        <Flex alignItems="center" gap="12px" mb={['16px', '20px']}>
-          <Box w="28px" h="2px" bg="green.400" borderRadius="full" />
+        {/* Label + descripción */}
+        <Flex alignItems="center" gap="12px" mb="10px">
+          <Box w="28px" h="2px" bg="green.400" borderRadius="full" flexShrink={0} />
           <Text
             fontFamily='"Poppins", sans-serif'
             fontSize={['0.7rem', '0.8rem']}
@@ -507,6 +572,17 @@ function ConsultorioFBI({ theme }) {
             Nuestros profesionales
           </Text>
         </Flex>
+        <Text
+          fontFamily='"Poppins", sans-serif'
+          fontSize={['0.82rem', '0.92rem']}
+          color="gray.500"
+          _dark={{ color: 'whiteAlpha.600' }}
+          lineHeight="1.7"
+          mb={['20px', '28px']}
+          maxW="640px"
+        >
+          Acá encontrás a todos los profesionales que trabajan día a día junto a Fuerza Base Integral, acompañando a cada persona desde su área de especialidad.
+        </Text>
 
         {/* Tab bar */}
         <Box position="relative" mb={['24px', '36px']}>
@@ -559,16 +635,14 @@ function ConsultorioFBI({ theme }) {
           key={panelKey}
           className={isNutri ? 'tab-panel-active nutri-grid' : 'tab-panel-active'}
           display="grid"
-          gridTemplateColumns={
-            isNutri
-              ? ['1fr 1fr', '1fr 1fr', 'repeat(3, 1fr)']
-              : '1fr'
-          }
+          gridTemplateColumns={['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)']}
           gap={['10px', '14px', '16px']}
-          justifyItems={isNutri ? 'stretch' : 'center'}
+          /* Para kine/oste (1 card): misma anchura que una card de nutri, centrada */
+          maxW={!isNutri ? ['100%', 'calc(50% - 7px)', 'calc(33.33% - 11px)'] : undefined}
+          mx={!isNutri ? 'auto' : undefined}
         >
           {currentProfessionals.map((p) => (
-            <Box key={p.id} maxW={isNutri ? 'none' : '320px'} w="100%">
+            <Box key={p.id} w="100%">
               <ProfessionalCard
                 professional={p}
                 onClick={() => setSelectedProfessional(p)}

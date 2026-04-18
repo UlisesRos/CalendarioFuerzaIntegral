@@ -98,11 +98,4 @@
   }
 }
 
-/* ── Nutricionistas grid: centrar 3ra card en mobile (2 col) ──────────────── */
-@media (max-width: 767px) {
-  .nutri-grid .consult-card:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
-    max-width: calc(50% - 5px);
-    margin: 0 auto;
-  }
-}
+/* ── Nutricionistas grid: mobile = 1 columna (sin regla extra) ────────────── */
