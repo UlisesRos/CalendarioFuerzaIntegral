@@ -635,9 +635,13 @@ function ConsultorioFBI({ theme }) {
           key={panelKey}
           className={isNutri ? 'tab-panel-active nutri-grid' : 'tab-panel-active'}
           display="grid"
-          gridTemplateColumns={['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)']}
+          gridTemplateColumns={
+            isNutri
+              ? ['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)']
+              : '1fr'   /* 1 sola columna para kine/oste */
+          }
           gap={['10px', '14px', '16px']}
-          /* Para kine/oste (1 card): misma anchura que una card de nutri, centrada */
+          /* Para kine/oste: container del mismo ancho que una card de nutri, centrado */
           maxW={!isNutri ? ['100%', 'calc(50% - 7px)', 'calc(33.33% - 11px)'] : undefined}
           mx={!isNutri ? 'auto' : undefined}
         >
