@@ -73,20 +73,24 @@ const globalStyles = `
     .trainer-card:nth-child(3) { animation-delay: 0.25s; }
     .trainer-card:nth-child(4) { animation-delay: 0.35s; }
 
+    /* Mobile/touch: full color, sin opacidad */
     .trainer-card .card-photo {
         transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease;
-        filter: grayscale(60%);
-    }
-    .trainer-card:hover .card-photo {
-        transform: scale(1.06);
-        filter: grayscale(0%);
-    }
-    .trainer-card:hover .card-overlay {
-        opacity: 0.55;
     }
     .card-overlay {
         transition: opacity 0.5s ease;
-        opacity: 0.25;
+        opacity: 0;
+    }
+
+    /* Desktop (hover real): escala de grises + overlay, se ilumina al hover */
+    @media (hover: hover) {
+        .trainer-card .card-photo { filter: grayscale(60%); }
+        .trainer-card:hover .card-photo {
+            transform: scale(1.06);
+            filter: grayscale(0%);
+        }
+        .card-overlay { opacity: 0.25; }
+        .trainer-card:hover .card-overlay { opacity: 0.55; }
     }
 
     .accent-bar {

@@ -1,8 +1,186 @@
+# Consultorio FBI — Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Agregar la sección pública "Consultorio FBI" con tabs animados, cards de profesionales y modal de contacto (WhatsApp + Instagram).
+
+**Architecture:** Un componente nuevo `ConsultorioFBI.js` con sus propios estilos en `ConsultorioFBI.css`. La ruta `/consultoriofbi` es pública (sin `ProtectedRouteToken`). El sidebar agrega el link en los tres bloques de navegación (admin, usuario, no autenticado).
+
+**Tech Stack:** React 18, Chakra UI, CSS animations (keyframes inline en archivo .css), React Router v6, imágenes locales en `src/img/`.
+
+---
+
+## Mapa de archivos
+
+| Archivo | Acción | Responsabilidad |
+|---|---|---|
+| `src/css/consultorio/ConsultorioFBI.css` | Crear | Keyframes y clases de animación |
+| `src/components/consultorio/ConsultorioFBI.js` | Crear | Componente completo (data, cards, modal, tabs) |
+| `src/App.js` | Modificar | Import + ruta `/consultoriofbi` |
+| `src/components/Navbar/SidebarMenu.js` | Modificar | NavLink "Consultorio FBI" en los 3 bloques |
+
+---
+
+## Task 1: Crear CSS con todas las animaciones
+
+**Files:**
+- Create: `src/css/consultorio/ConsultorioFBI.css`
+
+- [ ] **Step 1: Crear el directorio y archivo CSS**
+
+```bash
+mkdir -p src/css/consultorio
+```
+
+Crear `src/css/consultorio/ConsultorioFBI.css` con el siguiente contenido exacto:
+
+```css
+/* ── Keyframes ────────────────────────────────────────────────────────────── */
+@keyframes consultCardReveal {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tabPanelIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes contactBtnIn {
+  0%   { opacity: 0; transform: scale(0.92); }
+  60%  { opacity: 1; transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modalBackdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modalPanelIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes modalPanelInMobile {
+  from { opacity: 0; transform: translateY(100%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Cards ────────────────────────────────────────────────────────────────── */
+.consult-card {
+  animation: consultCardReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.consult-card:nth-child(1) { animation-delay: 0.05s; }
+.consult-card:nth-child(2) { animation-delay: 0.15s; }
+.consult-card:nth-child(3) { animation-delay: 0.25s; }
+
+.consult-card .c-card-photo {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease;
+  filter: grayscale(60%);
+}
+.consult-card:hover .c-card-photo {
+  transform: scale(1.06);
+  filter: grayscale(0%);
+}
+
+.c-card-overlay {
+  transition: opacity 0.5s ease;
+  opacity: 0.25;
+}
+.consult-card:hover .c-card-overlay {
+  opacity: 0.55;
+}
+
+.c-accent-bar {
+  transition: height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  height: 3px;
+}
+.consult-card:hover .c-accent-bar {
+  height: 100%;
+}
+
+.c-card-hint {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.consult-card:hover .c-card-hint {
+  opacity: 1;
+}
+
+/* ── Tab panel ────────────────────────────────────────────────────────────── */
+.tab-panel-active {
+  animation: tabPanelIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Contact buttons ──────────────────────────────────────────────────────── */
+.contact-btn {
+  animation: contactBtnIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.contact-btn-wa { animation-delay: 0.15s; }
+.contact-btn-ig { animation-delay: 0.25s; }
+
+/* ── Modal ────────────────────────────────────────────────────────────────── */
+.consult-modal-backdrop {
+  animation: modalBackdropIn 0.3s ease both;
+}
+@media (min-width: 600px) {
+  .consult-modal-panel {
+    animation: modalPanelIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@media (max-width: 599px) {
+  .consult-modal-panel {
+    animation: modalPanelInMobile 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* ── Nutricionistas grid: centrar 3ra card en mobile (2 col) ──────────────── */
+@media (max-width: 767px) {
+  .nutri-grid .consult-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 5px);
+    margin: 0 auto;
+  }
+}
+```
+
+- [ ] **Step 2: Verificar que el archivo existe**
+
+```bash
+ls src/css/consultorio/ConsultorioFBI.css
+```
+Resultado esperado: el archivo aparece listado.
+
+---
+
+## Task 2: Crear ConsultorioFBI.js
+
+**Files:**
+- Create: `src/components/consultorio/ConsultorioFBI.js`
+
+> **Nota sobre imágenes:** El usuario cargará las imágenes luego. Hasta entonces, los imports causarán error de build. Solución temporal en Step 1.
+
+- [ ] **Step 1: Crear el directorio y el archivo con placeholders de imagen**
+
+```bash
+mkdir -p src/components/consultorio
+```
+
+Crear `src/components/consultorio/ConsultorioFBI.js` con el contenido completo de abajo.
+
+**IMPORTANTE:** Si las imágenes aún no están en `src/img/`, comentar temporalmente los imports de imagen y reemplazar cada `img: nutri1` etc. por `img: null` hasta que el usuario las cargue.
+
+Contenido completo del archivo:
+
+```jsx
 import React, { useState, useEffect } from 'react'
 import { Box, Flex, Heading, Image, Text } from '@chakra-ui/react'
 import '../../css/consultorio/ConsultorioFBI.css'
 
-// ── Importar imágenes (el usuario las reemplaza en src/img/) ──────────────
+// ── Importar imágenes (el usuario las carga en src/img/) ──────────────────
+// Si el build falla por imágenes faltantes, comentar los imports
+// y reemplazar los valores img: con img: null temporalmente.
 import nutri1 from '../../img/nutri1.png'
 import nutri2 from '../../img/nutri2.png'
 import nutri3 from '../../img/nutri3.png'
@@ -32,8 +210,8 @@ const PROFESSIONALS = {
       name: 'Florencia Bertaña',
       profesion: 'Lic. en Nutrición',
       desc: 'Soy Florencia Bertaña, licenciada en Nutrición recibida en la Universidad del Centro Educativo Latinoamericano (UCEL). Me especializo en nutrición deportiva, particularmente en fútbol, y en estrategias orientadas a mejorar el rendimiento y modificar la composición corporal. Soy antropometrista nivel 2, lo que me permite evaluar la composición corporal de manera precisa y realizar un seguimiento objetivo de los cambios. Además, realicé formación en coaching nutricional, lo que me permite acompañar no solo a deportistas, sino también a personas que buscan mejorar sus hábitos y su composición corporal, aunque no practiquen deporte. Mi objetivo es acompañar a cada persona en la mejora de sus hábitos, optimizar el rendimiento (deportivo o cotidiano) y ayudar a que cada uno se sienta mejor, generando cambios sostenibles a largo plazo.',
-      whatsapp: 'https://wa.me/5493468530296?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
-      instagram: 'https://www.instagram.com/lic.florenciabertania?igsh=eHhhaG0xYWM0bHFj',
+      whatsapp: '#',
+      instagram: '#',
     },
     {
       id: 'nutri2',
@@ -41,8 +219,8 @@ const PROFESSIONALS = {
       name: 'Carolina Giandomenico',
       profesion: 'Lic. en Nutrición',
       desc: 'Soy Carolina Giandomenico, licenciada en nutrición. Siempre me interesó la actividad física y muchos de los posgrados que realicé fueron de nutrición deportiva. Pero, la verdad es que muchas áreas de la profesión me encantan, y por ende mi interés abarca desde patologías crónicas como la diabetes hasta elecciones alimentarias como el vegetarianismo. Considero que lo más importante cuando hablamos de alimentación es reestablecer una manera más amorosa y amable de vincularnos con la comida, el cuerpo y la salud en general. Cuando una persona llega a la consulta, amo escuchar y conocer su contexto, historia y necesidades para poder darles herramientas y acompañar el proceso de cambio.',
-      whatsapp: 'https://wa.me/5493416216545?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
-      instagram: 'https://www.instagram.com/lic.nutricion.caro.g?igsh=c2E5eDVrMGZlNTA1',
+      whatsapp: '#',
+      instagram: '#',
     },
     {
       id: 'nutri3',
@@ -50,8 +228,8 @@ const PROFESSIONALS = {
       name: 'Julieta Martini',
       profesion: 'Lic. en Nutrición',
       desc: 'Soy Julieta Martini, me recibí como Licenciada en Nutrición en Ucel, también realicé la diplomatura en Nutrición Deportiva de la UNR y el curso ISAK de las mediciones antropométricas para poder brindar más herramientas a mis pacientes. Me especializo en el ámbito deportivo. Mi principal objetivo es mejorar el rendimiento de las personas: que tengan más energía, se sientan mejor y aprendan a mirar más allá del número en la balanza. Por eso me enfoco en analizar la composición corporal con las mediciones antropométricas, acompañando la evolución de la masa muscular y la grasa, y enseñando a comer de forma adecuada para evitar la pérdida de músculo y construir hábitos que se sostengan en el tiempo.',
-      whatsapp: 'https://wa.me/5493413052727?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
-      instagram: 'https://www.instagram.com/licenciada.jm?igsh=MXg0MjliN211azI4Yw==',
+      whatsapp: '#',
+      instagram: '#',
     },
   ],
   kinesiologa: [
@@ -61,8 +239,8 @@ const PROFESSIONALS = {
       name: 'Milagros Rinaldi',
       profesion: 'Lic. en Kinesiología y Fisiatría',
       desc: 'Soy Milagros Rinaldi, Licenciada en Kinesiología y Fisiatría, egresada de la UAI, y diplomada en Estimulación Temprana del IUNIR. Me incorporo al equipo con una mirada integral, convencida de que la salud no es solo el correcto funcionamiento del cuerpo, sino el equilibrio del ser en todas sus dimensiones. A lo largo de mi formación fui integrando diferentes herramientas como terapias manuales, masoterapia, técnicas de relajación y entrenamiento, desde pilates hasta el trabajo de fuerza. Todo esto me permite acompañar a cada persona con un enfoque personalizado, priorizando un movimiento de calidad, seguro y consciente. Creo profundamente en la importancia de dedicarnos un momento en el día para conectar con nosotros mismos. Ese espacio es uno de los mayores actos de cuidado y bondad que podemos tener con nuestro propio cuerpo. Mi objetivo es acompañarte en ese camino: que puedas moverte mejor, sentirte bien y habitar tu cuerpo desde un lugar más saludable y equilibrado.',
-      whatsapp: 'https://wa.me/5492352443138?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
-      instagram: 'https://www.instagram.com/calm.rosario?igsh=MWo0cXd3ZDZ3aGlueg==',
+      whatsapp: '#',
+      instagram: '#',
     },
   ],
   osteopata: [
@@ -72,8 +250,8 @@ const PROFESSIONALS = {
       name: 'Ignacio Albornoz',
       profesion: 'Osteópata Deportivo',
       desc: 'Soy Ignacio Albornoz, licenciado en Kinesiología, certificado en Osteopatía Deportiva (TMID) y Applied Performance Coach (APCC) con una sólida trayectoria orientada al alto rendimiento, la readaptación deportiva y la preparación física. Mi enfoque integra la rehabilitación clínica con el entrenamiento de fuerza, permitiéndome abordar al deportista de forma integral, desde la prevención hasta la vuelta a la competencia. Mi objetivo es la optimización del rendimiento humano, aplicando herramientas de vanguardia en biomecánica y terapia manual para minimizar riesgos de lesión y maximizar la capacidad física de los atletas en entornos competitivos de alto nivel.',
-      whatsapp: 'https://wa.me/5493401647574?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
-      instagram: 'https://www.instagram.com/lic.nachoalbornoz?igsh=NDI0eHgyZ2FnMXZj',
+      whatsapp: '#',
+      instagram: '#',
     },
   ],
 }
@@ -369,92 +547,27 @@ function ProfessionalCard({ professional, onClick }) {
         <Box className="c-card-overlay" position="absolute" inset="0" bg="blackAlpha.600" />
       </Box>
 
-      {/* Name + contact icons */}
+      {/* Name */}
       <Box position="absolute" bottom="0" left="0" right="0" zIndex="10" p={['12px', '18px']}>
-        <Flex justifyContent="space-between" alignItems="flex-end">
-          <Box>
-            <Text
-              fontFamily='"Playfair Display", serif'
-              fontSize={['0.9rem', '1.05rem', '1.2rem']}
-              fontWeight="700"
-              color="white"
-              lineHeight="1.2"
-            >
-              {professional.name}
-            </Text>
-            <Text
-              fontFamily='"Poppins", sans-serif'
-              fontSize={['0.62rem', '0.68rem']}
-              color="green.300"
-              letterSpacing="0.2em"
-              textTransform="uppercase"
-              mt="2px"
-            >
-              {professional.profesion}
-            </Text>
-          </Box>
-
-          {/* Botones de contacto rápido */}
-          <Flex gap="6px" mb="2px" flexShrink={0}>
-            <Box
-              as="a"
-              href={professional.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              w={['30px', '34px']}
-              h={['30px', '34px']}
-              borderRadius="full"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              color="white"
-              sx={{
-                background: '#25D366',
-                backdropFilter: 'blur(4px)',
-                transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
-                flexShrink: 0,
-                '&:hover': {
-                  transform: 'scale(1.15)',
-                  boxShadow: '0 4px 14px rgba(37,211,102,0.55)',
-                },
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.121 1.535 5.853L.057 23.854a.5.5 0 00.589.588l6.122-1.604A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.69-.505-5.23-1.385l-.374-.217-3.88 1.017 1.033-3.772-.237-.388A9.955 9.955 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-              </svg>
-            </Box>
-            <Box
-              as="a"
-              href={professional.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              w={['30px', '34px']}
-              h={['30px', '34px']}
-              borderRadius="full"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              color="white"
-              sx={{
-                background: 'linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%)',
-                backdropFilter: 'blur(4px)',
-                transition: 'all 0.25s cubic-bezier(0.22,1,0.36,1)',
-                flexShrink: 0,
-                '&:hover': {
-                  transform: 'scale(1.15)',
-                  boxShadow: '0 4px 14px rgba(253,29,29,0.45)',
-                },
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-              </svg>
-            </Box>
-          </Flex>
-        </Flex>
+        <Text
+          fontFamily='"Playfair Display", serif'
+          fontSize={['0.9rem', '1.05rem', '1.2rem']}
+          fontWeight="700"
+          color="white"
+          lineHeight="1.2"
+        >
+          {professional.name}
+        </Text>
+        <Text
+          fontFamily='"Poppins", sans-serif'
+          fontSize={['0.62rem', '0.68rem']}
+          color="green.300"
+          letterSpacing="0.2em"
+          textTransform="uppercase"
+          mt="2px"
+        >
+          {professional.profesion}
+        </Text>
       </Box>
 
       {/* Hint badge */}
@@ -486,8 +599,8 @@ function ProfessionalCard({ professional, onClick }) {
 
 // ── ConsultorioFBI ────────────────────────────────────────────────────────
 function ConsultorioFBI({ theme }) {
-  const [activeTab, setActiveTab]                       = useState('nutricionistas')
-  const [panelKey, setPanelKey]                         = useState(0)
+  const [activeTab, setActiveTab]                     = useState('nutricionistas')
+  const [panelKey, setPanelKey]                       = useState(0)
   const [selectedProfessional, setSelectedProfessional] = useState(null)
 
   const handleTabChange = (newTab) => {
@@ -558,9 +671,9 @@ function ConsultorioFBI({ theme }) {
 
       {/* ── Tabs + Cards ── */}
       <Box w="90%" mb="60px">
-        {/* Label + descripción */}
-        <Flex alignItems="center" gap="12px" mb="10px">
-          <Box w="28px" h="2px" bg="green.400" borderRadius="full" flexShrink={0} />
+        {/* Label */}
+        <Flex alignItems="center" gap="12px" mb={['16px', '20px']}>
+          <Box w="28px" h="2px" bg="green.400" borderRadius="full" />
           <Text
             fontFamily='"Poppins", sans-serif'
             fontSize={['0.7rem', '0.8rem']}
@@ -572,17 +685,6 @@ function ConsultorioFBI({ theme }) {
             Nuestros profesionales
           </Text>
         </Flex>
-        <Text
-          fontFamily='"Poppins", sans-serif'
-          fontSize={['0.82rem', '0.92rem']}
-          color="gray.500"
-          _dark={{ color: 'whiteAlpha.600' }}
-          lineHeight="1.7"
-          mb={['20px', '28px']}
-          maxW="640px"
-        >
-          Acá encontrás a todos los profesionales que trabajan día a día junto a Fuerza Base Integral, acompañando a cada persona desde su área de especialidad.
-        </Text>
 
         {/* Tab bar */}
         <Box position="relative" mb={['24px', '36px']}>
@@ -637,16 +739,14 @@ function ConsultorioFBI({ theme }) {
           display="grid"
           gridTemplateColumns={
             isNutri
-              ? ['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)']
-              : '1fr'   /* 1 sola columna para kine/oste */
+              ? ['1fr 1fr', '1fr 1fr', 'repeat(3, 1fr)']
+              : '1fr'
           }
           gap={['10px', '14px', '16px']}
-          /* Para kine/oste: container del mismo ancho que una card de nutri, centrado */
-          maxW={!isNutri ? ['100%', 'calc(50% - 7px)', 'calc(33.33% - 11px)'] : undefined}
-          mx={!isNutri ? 'auto' : undefined}
+          justifyItems={isNutri ? 'stretch' : 'center'}
         >
           {currentProfessionals.map((p) => (
-            <Box key={p.id} w="100%">
+            <Box key={p.id} maxW={isNutri ? 'none' : '320px'} w="100%">
               <ProfessionalCard
                 professional={p}
                 onClick={() => setSelectedProfessional(p)}
@@ -682,3 +782,237 @@ function ConsultorioFBI({ theme }) {
 }
 
 export default ConsultorioFBI
+```
+
+- [ ] **Step 2: Verificar que el archivo existe**
+
+```bash
+ls src/components/consultorio/ConsultorioFBI.js
+```
+Resultado esperado: el archivo aparece listado.
+
+---
+
+## Task 3: Agregar ruta en App.js
+
+**Files:**
+- Modify: `src/App.js`
+
+- [ ] **Step 1: Agregar import de ConsultorioFBI**
+
+En `src/App.js`, agregar después de la línea que importa `PreciosAdmin` (línea ~26):
+
+```js
+import ConsultorioFBI from "./components/consultorio/ConsultorioFBI";
+```
+
+- [ ] **Step 2: Agregar la ruta pública**
+
+En `src/App.js`, dentro del bloque `<Routes>`, agregar la siguiente ruta **después** de `<Route path="/" .../>` y **antes** de `<Route path="/ingresousuario" .../>`:
+
+```jsx
+<Route path="/consultoriofbi" element={<ConsultorioFBI theme={theme} />} />
+```
+
+El bloque de rutas debe quedar así en esa sección:
+
+```jsx
+<Route path="/" element={<Rutas userData={userData} apiUrl={apiUrl} toggleTheme={toggleTheme} theme={theme} />} />
+<Route path="/consultoriofbi" element={<ConsultorioFBI theme={theme} />} />
+<Route
+    path="/ingresousuario"
+    element={
+        <AdminRoute>
+            <IngresoUsuario apiUrl={apiUrl} theme={theme} />
+        </AdminRoute>
+    }
+/>
+```
+
+- [ ] **Step 3: Verificar que el archivo compila sin errores**
+
+```bash
+npx react-scripts build 2>&1 | head -30
+```
+Resultado esperado: sin errores de módulo no encontrado para ConsultorioFBI. (Si falla por imágenes faltantes, ver nota en Task 2 Step 1 sobre comentar imports temporalmente.)
+
+---
+
+## Task 4: Agregar NavLink en SidebarMenu.js
+
+**Files:**
+- Modify: `src/components/Navbar/SidebarMenu.js`
+
+Hay 3 bloques de navegación dentro del `<DrawerBody>`. Cada uno recibe el nuevo link "Consultorio FBI". Los delays se reajustan para mantener el escalonado.
+
+- [ ] **Step 1: Bloque admin**
+
+Localizar el bloque `isAdmin` (buscar `to="/seccionadmin"`). Reemplazar:
+
+```jsx
+<Flex flexDir="column" gap="4px">
+  <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+  <NavLink to="/calendario" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Calendario</NavLink>
+  <NavLink to="/seccionadmin" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Admin</NavLink>
+</Flex>
+```
+
+Por:
+
+```jsx
+<Flex flexDir="column" gap="4px">
+  <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+  <NavLink to="/calendario" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Calendario</NavLink>
+  <NavLink to="/consultoriofbi" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Consultorio FBI</NavLink>
+  <NavLink to="/seccionadmin" onClick={() => setIsOpen(false)} theme={theme} delay={0.20}>Admin</NavLink>
+</Flex>
+```
+
+- [ ] **Step 2: Bloque usuario autenticado (no admin)**
+
+Localizar el bloque con `to="/pagos"` y `to="/perfil"`. Reemplazar:
+
+```jsx
+<Flex flexDir="column" gap="4px">
+  <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+  <NavLink to="/calendario" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Calendario</NavLink>
+  <NavLink to="/pagos" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Pagos</NavLink>
+  <NavLink to="/perfil" onClick={() => setIsOpen(false)} theme={theme} delay={0.20}>Perfil</NavLink>
+  <NavButton onClick={scrollToFooter} theme={theme} delay={0.25}>Contactanos</NavButton>
+</Flex>
+```
+
+Por:
+
+```jsx
+<Flex flexDir="column" gap="4px">
+  <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+  <NavLink to="/calendario" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Calendario</NavLink>
+  <NavLink to="/consultoriofbi" onClick={() => setIsOpen(false)} theme={theme} delay={0.15}>Consultorio FBI</NavLink>
+  <NavLink to="/pagos" onClick={() => setIsOpen(false)} theme={theme} delay={0.20}>Pagos</NavLink>
+  <NavLink to="/perfil" onClick={() => setIsOpen(false)} theme={theme} delay={0.25}>Perfil</NavLink>
+  <NavButton onClick={scrollToFooter} theme={theme} delay={0.30}>Contactanos</NavButton>
+</Flex>
+```
+
+- [ ] **Step 3: Bloque usuario no autenticado**
+
+Localizar el bloque que solo tiene `to="/"` y `Contactanos` (sin calendario ni pagos). Reemplazar:
+
+```jsx
+<Flex flexDir="column" gap="4px">
+  <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+  <NavButton onClick={scrollToFooter} theme={theme} delay={0.10}>Contactanos</NavButton>
+</Flex>
+```
+
+Por:
+
+```jsx
+<Flex flexDir="column" gap="4px">
+  <NavLink to="/" onClick={() => setIsOpen(false)} theme={theme} delay={0.05}>Home</NavLink>
+  <NavLink to="/consultoriofbi" onClick={() => setIsOpen(false)} theme={theme} delay={0.10}>Consultorio FBI</NavLink>
+  <NavButton onClick={scrollToFooter} theme={theme} delay={0.15}>Contactanos</NavButton>
+</Flex>
+```
+
+- [ ] **Step 4: Verificar visualmente los 3 bloques**
+
+Abrir la app en el navegador (`npm start`), abrir el menú hamburguesa y verificar:
+- Usuario no autenticado: ve Home → Consultorio FBI → Contactanos
+- Usuario autenticado: ve Home → Calendario → Consultorio FBI → Pagos → Perfil → Contactanos
+- Admin: ve Home → Calendario → Consultorio FBI → Admin
+
+---
+
+## Task 5: Smoke test visual completo
+
+- [ ] **Step 1: Levantar el servidor de desarrollo**
+
+```bash
+npm start
+```
+
+- [ ] **Step 2: Navegar a `/consultoriofbi`**
+
+Abrir `http://localhost:3000/consultoriofbi` en el navegador.
+
+Verificar:
+- El hero "Consultorio FBI" aparece con el texto "FBI" en verde
+- Se ven los 3 tabs: Nutricionistas / Kinesióloga / Osteópata
+- Las cards de las 3 nutricionistas aparecen con animación staggered al cargar
+
+- [ ] **Step 3: Probar cambio de tabs**
+
+Click en "Kinesióloga" → verificar:
+- El indicador verde se desliza suavemente al segundo tab
+- Las cards reaparecen con animación `tabPanelIn`
+- Se ve 1 card centrada con Milagros Rinaldi
+
+Click en "Osteópata" → verificar:
+- El indicador desliza al tercer tab
+- Se ve 1 card centrada con Ignacio Albornoz
+
+- [ ] **Step 4: Probar el modal**
+
+Click en cualquier card → verificar:
+- Se abre el modal con backdrop blur
+- La foto ocupa la parte superior con gradiente y nombre superpuesto
+- La sección "Sobre mí" muestra la descripción
+- La sección "Contacto" muestra los botones WhatsApp (verde) e Instagram (degradado)
+- Hover en los botones: suben 2px y aparece box-shadow de color
+
+- [ ] **Step 5: Probar hover de cards**
+
+Hover sobre una card → verificar:
+- La foto pasa de grayscale a color
+- La barra verde izquierda sube desde abajo
+- Aparece el badge "Ver perfil"
+
+- [ ] **Step 6: Probar cierre de modal**
+
+- Click fuera del modal → se cierra
+- Tecla Escape → se cierra
+- Click en ✕ → se cierra
+
+- [ ] **Step 7: Probar en mobile (DevTools)**
+
+Abrir DevTools → modo mobile (375px de ancho) → verificar:
+- Hero: heading se escala correctamente
+- Tabs: texto legible en pantalla pequeña
+- Cards de nutricionistas: grid 2 columnas, la 3ra card centrada
+- Cards de kine/oste: 1 columna centrada
+- Modal: aparece desde abajo (sheet pattern)
+- Botones de contacto: apilados verticalmente
+
+- [ ] **Step 8: Verificar modo dark/light**
+
+Togglear el tema desde la navbar → verificar:
+- Los tabs inactivos cambian de color (gris oscuro en dark, gris claro en light)
+- El borde del tab bar se ve en ambos modos
+
+---
+
+## Notas de implementación
+
+### Imágenes faltantes
+Si las imágenes no están en `src/img/` todavía, el build de React fallará porque los imports de módulo fallan en tiempo de compilación. Solución temporal:
+
+```js
+// Comentar los imports reales:
+// import nutri1 from '../../img/nutri1.png'
+// ...
+
+// Y reemplazar en PROFESSIONALS:
+img: null,  // o usar un placeholder SVG data URI
+```
+
+Cuando el usuario cargue las imágenes, descomentar los imports y quitar los `null`.
+
+### Links de contacto
+Cuando el usuario provea los links de WhatsApp e Instagram, reemplazar los `'#'` en el array `PROFESSIONALS` con:
+- WhatsApp: `'https://wa.me/549XXXXXXXXXX'`
+- Instagram: `'https://instagram.com/usuario'`
+
+### Extensión de imágenes
+El componente importa `.png`. Si el usuario carga `.jpg`, cambiar la extensión en los 5 imports al inicio del archivo.

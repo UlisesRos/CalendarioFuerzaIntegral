@@ -38,21 +38,24 @@
 .consult-card:nth-child(2) { animation-delay: 0.15s; }
 .consult-card:nth-child(3) { animation-delay: 0.25s; }
 
+/* Mobile/touch: full color, sin opacidad */
 .consult-card .c-card-photo {
   transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.5s ease;
-  filter: grayscale(60%);
 }
-.consult-card:hover .c-card-photo {
-  transform: scale(1.06);
-  filter: grayscale(0%);
-}
-
 .c-card-overlay {
   transition: opacity 0.5s ease;
-  opacity: 0.25;
+  opacity: 0;
 }
-.consult-card:hover .c-card-overlay {
-  opacity: 0.55;
+
+/* Desktop (hover real): escala de grises + overlay, se ilumina al hover */
+@media (hover: hover) {
+  .consult-card .c-card-photo { filter: grayscale(60%); }
+  .consult-card:hover .c-card-photo {
+    transform: scale(1.06);
+    filter: grayscale(0%);
+  }
+  .c-card-overlay { opacity: 0.25; }
+  .consult-card:hover .c-card-overlay { opacity: 0.55; }
 }
 
 .c-accent-bar {
