@@ -24,6 +24,7 @@ import HistorialMensual from "./components/admin/clients/HistorialMensual";
 import GestionHorarios from "./components/admin/GestionHorarios";
 import PreciosAdmin from "./components/admin/PreciosAdmin";
 import ConsultorioFBI from "./components/consultorio/ConsultorioFBI";
+import ModalRestriccionPago from "./components/modal/ModalRestriccionPago";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 // const apiUrl = 'http://localhost:5000'; // URL base de la API
@@ -33,6 +34,7 @@ function App() {
     const [userData, setUserData] = useState(null);
     const [appStatus, setAppStatus] = useState('loading');
     const [errorMessage, setErrorMessage] = useState('');
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     // Configuración de interceptores de axios
     axios.interceptors.request.use((config) => {
@@ -114,6 +116,15 @@ function App() {
 
         return () => clearTimeout(timer);
     }, []);
+
+    // Mostrar modal de restricción de pago al cargar el usuario (día 12+ sin pago)
+    useEffect(() => {
+        if (!userData || userData.role === 'admin') return;
+        const dayOfMonth = new Date().getDate();
+        if (dayOfMonth >= 12 && !userData.pago) {
+            setShowPaymentModal(true);
+        }
+    }, [userData]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -278,6 +289,11 @@ function App() {
             backgroundColor: theme === 'light' ? '#ffffff' : '#121212'
         }}>
             <Router>
+                <ModalRestriccionPago
+                    isOpen={showPaymentModal}
+                    onClose={() => setShowPaymentModal(false)}
+                    variant="login"
+                />
                 <Navbar
                     toggleTheme={toggleTheme}
                     theme={theme}

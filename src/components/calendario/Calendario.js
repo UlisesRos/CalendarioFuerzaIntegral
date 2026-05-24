@@ -4,6 +4,7 @@ import Swal from 'sweetalert2'
 import io from 'socket.io-client'
 import axios from 'axios'
 import ModalTurnos from './modalTurnos'
+import ModalRestriccionPago from '../modal/ModalRestriccionPago'
 
 const socket = io('/')
 
@@ -147,6 +148,12 @@ const calendarioStyles = `
     }
     .person-row:hover {
         background: rgba(104,211,145,0.05);
+    }
+
+    @keyframes rpPulse {
+        0%   { box-shadow: 0 0 0 0 rgba(252,129,129,0.5); }
+        70%  { box-shadow: 0 0 0 7px rgba(252,129,129,0); }
+        100% { box-shadow: 0 0 0 0 rgba(252,129,129,0); }
     }
 `
 
@@ -324,6 +331,12 @@ const Calendario = ({ theme, userData, apiUrl }) => {
     const [selectedHour, setSelectedHour] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
 
+    // Restricción de pago: activa a partir del día 12 si el usuario no pagó
+    const isRestricted = userData && userData.role !== 'admin' && new Date().getDate() >= 12 && !userData.pago
+    const [showPaymentModal, setShowPaymentModal] = useState(() =>
+        !!(userData && userData.role !== 'admin' && new Date().getDate() >= 12 && !userData.pago)
+    )
+
     const isDark = theme === 'dark'
     const panelBg = isDark ? 'rgba(255,255,255,0.03)' : 'white'
     const borderC = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(104,211,145,0.2)'
@@ -450,6 +463,10 @@ const Calendario = ({ theme, userData, apiUrl }) => {
 
     const handleEnter = (e) => {
         if (e.key === 'Enter') {
+            if (isRestricted) {
+                setShowPaymentModal(true)
+                return
+            }
             if (selectedDay && selectedShift && selectedHour && usuario) {
                 handleAddPerson(selectedDay, selectedShift, selectedHour, usuario)
             } else {
@@ -490,6 +507,13 @@ const Calendario = ({ theme, userData, apiUrl }) => {
         >
             <style>{calendarioStyles}</style>
 
+            {/* ── Modal restricción de pago (aparece cada vez que el usuario entra al calendario) ── */}
+            <ModalRestriccionPago
+                isOpen={showPaymentModal}
+                onClose={() => setShowPaymentModal(false)}
+                variant="calendar"
+            />
+
             {/* ── Header ── */}
             <Box className="cal-header" w="100%" maxW="960px" mb={['24px', '32px']}>
                 <Flex alignItems="center" gap="10px" mb="10px">
@@ -525,6 +549,64 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                     Seleccioná un día y hora para inscribirte
                 </Text>
             </Box>
+
+            {/* ── Banner de restricción de pago ── */}
+            {isRestricted && (
+                <Box
+                    w="100%"
+                    maxW="960px"
+                    bg="rgba(252,129,129,0.07)"
+                    border="1px solid rgba(252,129,129,0.3)"
+                    borderRadius="14px"
+                    p={['14px 16px', '16px 22px']}
+                    mb={['16px', '24px']}
+                >
+                    <Flex alignItems={['flex-start', 'center']} gap="12px" flexDir={['column', 'row']}>
+                        <Flex alignItems="center" gap="10px" flex="1">
+                            <Box
+                                w="8px"
+                                h="8px"
+                                borderRadius="full"
+                                bg="#FC8181"
+                                flexShrink={0}
+                                style={{ animation: 'rpPulse 2s infinite' }}
+                            />
+                            <Text
+                                fontFamily='"Poppins", sans-serif'
+                                fontSize={['0.78rem', '0.84rem']}
+                                color="#FC8181"
+                                fontWeight="500"
+                                lineHeight="1.5"
+                            >
+                                Tu cuota del mes no está abonada. No podés inscribirte en ningún horario.
+                            </Text>
+                        </Flex>
+                        <button
+                            onClick={() => setShowPaymentModal(true)}
+                            style={{
+                                fontFamily: "'Poppins', sans-serif",
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                letterSpacing: '0.1em',
+                                textTransform: 'uppercase',
+                                cursor: 'pointer',
+                                borderRadius: '8px',
+                                padding: '7px 14px',
+                                border: '1px solid rgba(252,129,129,0.5)',
+                                color: '#FC8181',
+                                background: 'rgba(252,129,129,0.08)',
+                                transition: 'all 0.2s ease',
+                                flexShrink: 0,
+                                whiteSpace: 'nowrap',
+                            }}
+                            onMouseEnter={e => { e.target.style.background = 'rgba(252,129,129,0.15)'; e.target.style.borderColor = '#FC8181'; }}
+                            onMouseLeave={e => { e.target.style.background = 'rgba(252,129,129,0.08)'; e.target.style.borderColor = 'rgba(252,129,129,0.5)'; }}
+                        >
+                            Ver detalles
+                        </button>
+                    </Flex>
+                </Box>
+            )}
 
             {/* ── Panel de controles ── */}
             <Box
@@ -610,14 +692,19 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                     {/* Inscribir */}
                     <button
                         className="cal-inscribir-btn"
-                        disabled={!usuario || !selectedDay || !selectedShift || !selectedHour}
+                        disabled={!usuario || !selectedDay || !selectedShift || !selectedHour || isRestricted}
                         onClick={() => {
+                            if (isRestricted) {
+                                setShowPaymentModal(true)
+                                return
+                            }
                             if (selectedDay && selectedShift && selectedHour && usuario) {
                                 handleAddPerson(selectedDay, selectedShift, selectedHour, usuario)
                             }
                         }}
+                        title={isRestricted ? 'Debés abonar la cuota para inscribirte' : ''}
                     >
-                        Inscribirme
+                        {isRestricted ? '🔒 Inscribirme' : 'Inscribirme'}
                     </button>
                 </Flex>
             </Box>
