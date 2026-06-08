@@ -242,6 +242,7 @@ function SidebarMenu({ theme, userData }) {
             borderBottom="1px solid"
             borderColor={borderC}
             flexShrink={0}
+            flexBasis="auto"
           >
             {/* Botón cerrar custom */}
             <Flex justifyContent="space-between" alignItems="center" mb="16px">
@@ -306,7 +307,7 @@ function SidebarMenu({ theme, userData }) {
           </Box>
 
           {/* ── Body — Links ── */}
-          <DrawerBody px="28px" py="28px" flex="1" overflowY="auto">
+          <DrawerBody px="28px" py="28px" flex="1" minH="0" overflowY="auto">
             {isAuthenticated ? (
               !userData ? (
                 <Flex w="100%" h="50vh" align="center" justify="center" flexDir="column" gap="12px">
