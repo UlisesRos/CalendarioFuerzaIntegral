@@ -26,6 +26,7 @@ import PreciosAdmin from "./components/admin/PreciosAdmin";
 import ConsultorioFBI from "./components/consultorio/ConsultorioFBI";
 import ModalRestriccionPago from "./components/modal/ModalRestriccionPago";
 import ModalFormularioFBI from "./components/modal/ModalFormularioFBI";
+import ModalRecordatorioFBI from "./components/modal/ModalRecordatorioFBI";
 import Swal from 'sweetalert2';
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -38,6 +39,7 @@ function App() {
     const [errorMessage, setErrorMessage] = useState('');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showFormModal, setShowFormModal] = useState(false);
+    const [showReminderModal, setShowReminderModal] = useState(false);
 
     // Configuración de interceptores de axios
     axios.interceptors.request.use((config) => {
@@ -123,8 +125,15 @@ function App() {
     // Mostrar modal de formulario FBI si el usuario no lo completó aún
     useEffect(() => {
         if (!userData || userData.role === 'admin') return;
-        if (!userData.formularioFBICompletado) {
+        const userId = userData._id || userData.id;
+        const yaAbrioFormulario = localStorage.getItem(`fbi_form_opened_${userId}`);
+        if (!userData.formularioFBICompletado && !yaAbrioFormulario) {
             setShowFormModal(true);
+        } else {
+            const dismissed = localStorage.getItem(`fbi_reminder_dismissed_${userId}`);
+            if (!dismissed) {
+                setShowReminderModal(true);
+            }
         }
     }, [userData]);
 
@@ -157,19 +166,18 @@ function App() {
         setAppStatus('ready');
     };
 
-    const handleFormularioCompletado = async () => {
-        try {
-            await axios.patch(`${apiUrl}/api/auth/formulario-fbi`);
-            setUserData(prev => ({ ...prev, formularioFBICompletado: true }));
-            setShowFormModal(false);
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudo guardar. Por favor intentá de nuevo.',
-                confirmButtonColor: '#68D391',
-            });
-        }
+    const handleFormularioCompletado = () => {
+        const userId = userData?._id || userData?.id;
+        localStorage.setItem(`fbi_form_opened_${userId}`, 'true');
+        setShowFormModal(false);
+        setUserData(prev => ({ ...prev, formularioFBICompletado: true }));
+        axios.patch(`${apiUrl}/api/auth/formulario-fbi`).catch(() => {});
+    };
+
+    const handleReminderDismissed = () => {
+        const userId = userData?._id || userData?.id;
+        localStorage.setItem(`fbi_reminder_dismissed_${userId}`, 'true');
+        setShowReminderModal(false);
     };
 
     const handleRetry = () => {
@@ -318,6 +326,11 @@ function App() {
                 <ModalFormularioFBI
                     isOpen={showFormModal}
                     onConfirm={handleFormularioCompletado}
+                />
+                <ModalRecordatorioFBI
+                    isOpen={showReminderModal}
+                    onDismiss={handleReminderDismissed}
+                    formUrl="https://docs.google.com/forms/d/e/1FAIpQLSfgjFCA-opZ7jM6eW7fdCXVSzsBrPqBtMt_QY7slVJ7OXjJCA/viewform"
                 />
                 <ModalRestriccionPago
                     isOpen={showPaymentModal}

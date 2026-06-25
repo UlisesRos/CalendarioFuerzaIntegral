@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfgjFCA-opZ7jM6eW7fdCXVSzsBrPqBtMt_QY7slVJ7OXjJCA/viewform';
 
@@ -47,32 +47,9 @@ const styles = `
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(104,211,145,0.35);
     }
-
-    .fbi-btn-confirmar {
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.78rem;
-        font-weight: 500;
-        cursor: pointer;
-        border-radius: 10px;
-        padding: 11px 28px;
-        border: 1px solid rgba(255,255,255,0.1);
-        color: rgba(255,255,255,0.4);
-        background: transparent;
-        transition: all 0.25s ease;
-        width: 100%;
-    }
-    .fbi-btn-confirmar:hover:not(:disabled) {
-        border-color: rgba(104,211,145,0.4);
-        color: rgba(104,211,145,0.85);
-    }
-    .fbi-btn-confirmar:disabled {
-        opacity: 0.35;
-        cursor: not-allowed;
-    }
 `;
 
 const ModalFormularioFBI = ({ isOpen, onConfirm }) => {
-    const [hasOpenedForm, setHasOpenedForm] = useState(false);
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 600;
 
     useEffect(() => {
@@ -87,7 +64,7 @@ const ModalFormularioFBI = ({ isOpen, onConfirm }) => {
 
     const handleAbrirFormulario = () => {
         window.open(FORM_URL, '_blank', 'noopener,noreferrer');
-        setHasOpenedForm(true);
+        onConfirm();
     };
 
     const content = (
@@ -256,15 +233,20 @@ const ModalFormularioFBI = ({ isOpen, onConfirm }) => {
                             <button className="fbi-btn-completar" onClick={handleAbrirFormulario}>
                                 📝 Completar formulario
                             </button>
-                            <button
-                                className="fbi-btn-confirmar"
-                                onClick={onConfirm}
-                                disabled={!hasOpenedForm}
-                                title={!hasOpenedForm ? 'Primero abrí el formulario' : ''}
-                            >
-                                Ya completé el formulario
-                            </button>
                         </div>
+
+                        {/* Nota aclaratoria */}
+                        <p style={{
+                            fontFamily: "'Poppins', sans-serif",
+                            fontSize: '0.72rem',
+                            color: 'rgba(255,255,255,0.28)',
+                            textAlign: 'center',
+                            marginTop: '16px',
+                            marginBottom: 0,
+                            lineHeight: 1.55,
+                        }}>
+                            (Si te aparece este cartel pero ya completaste el formulario, ingresa al botón "completar formulario" y volvé a la app para que se salga este cartel y puedas utilizar la app con normalidad.)
+                        </p>
                     </div>
                 </div>
             </div>
