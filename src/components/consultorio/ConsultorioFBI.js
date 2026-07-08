@@ -23,6 +23,16 @@ const InstagramIcon = () => (
   </svg>
 )
 
+// ─── Calcular edad ────────────────────────────────────────────────────────────
+function calcularEdad(fechaNacimiento) {
+  const [dia, mes, anio] = fechaNacimiento.split('/').map(Number)
+  const hoy = new Date()
+  let edad = hoy.getFullYear() - anio
+  const mDiff = hoy.getMonth() - (mes - 1)
+  if (mDiff < 0 || (mDiff === 0 && hoy.getDate() < dia)) edad--
+  return edad
+}
+
 // ── Data ──────────────────────────────────────────────────────────────────
 const PROFESSIONALS = {
   nutricionistas: [
@@ -31,7 +41,8 @@ const PROFESSIONALS = {
       img: nutri1,
       name: 'Florencia Bertaña',
       profesion: 'Lic. en Nutrición',
-      desc: 'Soy Florencia Bertaña, licenciada en Nutrición recibida en la Universidad del Centro Educativo Latinoamericano (UCEL). Me especializo en nutrición deportiva, particularmente en fútbol, y en estrategias orientadas a mejorar el rendimiento y modificar la composición corporal. Soy antropometrista nivel 2, lo que me permite evaluar la composición corporal de manera precisa y realizar un seguimiento objetivo de los cambios. Además, realicé formación en coaching nutricional, lo que me permite acompañar no solo a deportistas, sino también a personas que buscan mejorar sus hábitos y su composición corporal, aunque no practiquen deporte. Mi objetivo es acompañar a cada persona en la mejora de sus hábitos, optimizar el rendimiento (deportivo o cotidiano) y ayudar a que cada uno se sienta mejor, generando cambios sostenibles a largo plazo.',
+      birthDate: '04/12/1997',
+      desc: 'Soy Florencia Bertaña, tengo ##EDAD## años, licenciada en Nutrición recibida en la Universidad del Centro Educativo Latinoamericano (UCEL). Me especializo en nutrición deportiva, particularmente en fútbol, y en estrategias orientadas a mejorar el rendimiento y modificar la composición corporal. Soy antropometrista nivel 2, lo que me permite evaluar la composición corporal de manera precisa y realizar un seguimiento objetivo de los cambios. Además, realicé formación en coaching nutricional, lo que me permite acompañar no solo a deportistas, sino también a personas que buscan mejorar sus hábitos y su composición corporal, aunque no practiquen deporte. Mi objetivo es acompañar a cada persona en la mejora de sus hábitos, optimizar el rendimiento (deportivo o cotidiano) y ayudar a que cada uno se sienta mejor, generando cambios sostenibles a largo plazo.',
       whatsapp: 'https://wa.me/5493468530296?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
       instagram: 'https://www.instagram.com/lic.florenciabertania?igsh=eHhhaG0xYWM0bHFj',
     },
@@ -40,7 +51,8 @@ const PROFESSIONALS = {
       img: nutri2,
       name: 'Carolina Giandomenico',
       profesion: 'Lic. en Nutrición',
-      desc: 'Soy Carolina Giandomenico, licenciada en nutrición. Siempre me interesó la actividad física y muchos de los posgrados que realicé fueron de nutrición deportiva. Pero, la verdad es que muchas áreas de la profesión me encantan, y por ende mi interés abarca desde patologías crónicas como la diabetes hasta elecciones alimentarias como el vegetarianismo. Considero que lo más importante cuando hablamos de alimentación es reestablecer una manera más amorosa y amable de vincularnos con la comida, el cuerpo y la salud en general. Cuando una persona llega a la consulta, amo escuchar y conocer su contexto, historia y necesidades para poder darles herramientas y acompañar el proceso de cambio.',
+      birthDate: '10/11/1986',
+      desc: 'Soy Carolina Giandomenico, tengo ##EDAD## años, licenciada en nutrición. Siempre me interesó la actividad física y muchos de los posgrados que realicé fueron de nutrición deportiva. Pero, la verdad es que muchas áreas de la profesión me encantan, y por ende mi interés abarca desde patologías crónicas como la diabetes hasta elecciones alimentarias como el vegetarianismo. Considero que lo más importante cuando hablamos de alimentación es reestablecer una manera más amorosa y amable de vincularnos con la comida, el cuerpo y la salud en general. Cuando una persona llega a la consulta, amo escuchar y conocer su contexto, historia y necesidades para poder darles herramientas y acompañar el proceso de cambio.',
       whatsapp: 'https://wa.me/5493416216545?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
       instagram: 'https://www.instagram.com/lic.nutricion.caro.g?igsh=c2E5eDVrMGZlNTA1',
     },
@@ -49,7 +61,8 @@ const PROFESSIONALS = {
       img: nutri3,
       name: 'Julieta Martini',
       profesion: 'Lic. en Nutrición',
-      desc: 'Soy Julieta Martini, me recibí como Licenciada en Nutrición en Ucel, también realicé la diplomatura en Nutrición Deportiva de la UNR y el curso ISAK de las mediciones antropométricas para poder brindar más herramientas a mis pacientes. Me especializo en el ámbito deportivo. Mi principal objetivo es mejorar el rendimiento de las personas: que tengan más energía, se sientan mejor y aprendan a mirar más allá del número en la balanza. Por eso me enfoco en analizar la composición corporal con las mediciones antropométricas, acompañando la evolución de la masa muscular y la grasa, y enseñando a comer de forma adecuada para evitar la pérdida de músculo y construir hábitos que se sostengan en el tiempo.',
+      birthDate: '28/01/2001',
+      desc: 'Soy Julieta Martini, tengo ##EDAD## años, me recibí como Licenciada en Nutrición en Ucel, también realicé la diplomatura en Nutrición Deportiva de la UNR y el curso ISAK de las mediciones antropométricas para poder brindar más herramientas a mis pacientes. Me especializo en el ámbito deportivo. Mi principal objetivo es mejorar el rendimiento de las personas: que tengan más energía, se sientan mejor y aprendan a mirar más allá del número en la balanza. Por eso me enfoco en analizar la composición corporal con las mediciones antropométricas, acompañando la evolución de la masa muscular y la grasa, y enseñando a comer de forma adecuada para evitar la pérdida de músculo y construir hábitos que se sostengan en el tiempo.',
       whatsapp: 'https://wa.me/5493413052727?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
       instagram: 'https://www.instagram.com/licenciada.jm?igsh=MXg0MjliN211azI4Yw==',
     },
@@ -60,7 +73,8 @@ const PROFESSIONALS = {
       img: kine,
       name: 'Milagros Rinaldi',
       profesion: 'Lic. en Kinesiología y Fisiatría',
-      desc: 'Soy Milagros Rinaldi, Licenciada en Kinesiología y Fisiatría, egresada de la UAI, y diplomada en Estimulación Temprana del IUNIR. Me incorporo al equipo con una mirada integral, convencida de que la salud no es solo el correcto funcionamiento del cuerpo, sino el equilibrio del ser en todas sus dimensiones. A lo largo de mi formación fui integrando diferentes herramientas como terapias manuales, masoterapia, técnicas de relajación y entrenamiento, desde pilates hasta el trabajo de fuerza. Todo esto me permite acompañar a cada persona con un enfoque personalizado, priorizando un movimiento de calidad, seguro y consciente. Creo profundamente en la importancia de dedicarnos un momento en el día para conectar con nosotros mismos. Ese espacio es uno de los mayores actos de cuidado y bondad que podemos tener con nuestro propio cuerpo. Mi objetivo es acompañarte en ese camino: que puedas moverte mejor, sentirte bien y habitar tu cuerpo desde un lugar más saludable y equilibrado.',
+      birthDate: '25/04/1996',
+      desc: 'Soy Milagros Rinaldi, tengo ##EDAD## años, Licenciada en Kinesiología y Fisiatría, egresada de la UAI, y diplomada en Estimulación Temprana del IUNIR. Me incorporo al equipo con una mirada integral, convencida de que la salud no es solo el correcto funcionamiento del cuerpo, sino el equilibrio del ser en todas sus dimensiones. A lo largo de mi formación fui integrando diferentes herramientas como terapias manuales, masoterapia, técnicas de relajación y entrenamiento, desde pilates hasta el trabajo de fuerza. Todo esto me permite acompañar a cada persona con un enfoque personalizado, priorizando un movimiento de calidad, seguro y consciente. Creo profundamente en la importancia de dedicarnos un momento en el día para conectar con nosotros mismos. Ese espacio es uno de los mayores actos de cuidado y bondad que podemos tener con nuestro propio cuerpo. Mi objetivo es acompañarte en ese camino: que puedas moverte mejor, sentirte bien y habitar tu cuerpo desde un lugar más saludable y equilibrado.',
       whatsapp: 'https://wa.me/5492352443138?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
       instagram: 'https://www.instagram.com/calm.rosario?igsh=MWo0cXd3ZDZ3aGlueg==',
     },
@@ -71,7 +85,8 @@ const PROFESSIONALS = {
       img: oste,
       name: 'Ignacio Albornoz',
       profesion: 'Osteópata Deportivo',
-      desc: 'Soy Ignacio Albornoz, licenciado en Kinesiología, certificado en Osteopatía Deportiva (TMID) y Applied Performance Coach (APCC) con una sólida trayectoria orientada al alto rendimiento, la readaptación deportiva y la preparación física. Mi enfoque integra la rehabilitación clínica con el entrenamiento de fuerza, permitiéndome abordar al deportista de forma integral, desde la prevención hasta la vuelta a la competencia. Mi objetivo es la optimización del rendimiento humano, aplicando herramientas de vanguardia en biomecánica y terapia manual para minimizar riesgos de lesión y maximizar la capacidad física de los atletas en entornos competitivos de alto nivel.',
+      birthDate: '18/02/2001',
+      desc: 'Soy Ignacio Albornoz, tengo ##EDAD## años, licenciado en Kinesiología, certificado en Osteopatía Deportiva (TMID) y Applied Performance Coach (APCC) con una sólida trayectoria orientada al alto rendimiento, la readaptación deportiva y la preparación física. Mi enfoque integra la rehabilitación clínica con el entrenamiento de fuerza, permitiéndome abordar al deportista de forma integral, desde la prevención hasta la vuelta a la competencia. Mi objetivo es la optimización del rendimiento humano, aplicando herramientas de vanguardia en biomecánica y terapia manual para minimizar riesgos de lesión y maximizar la capacidad física de los atletas en entornos competitivos de alto nivel.',
       whatsapp: 'https://wa.me/5493401647574?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
       instagram: 'https://www.instagram.com/lic.nachoalbornoz?igsh=NDI0eHgyZ2FnMXZj',
     },
@@ -229,7 +244,7 @@ function ProfessionalModal({ professional, onClose }) {
               color="gray.300"
               lineHeight="1.85"
             >
-              {professional.desc}
+              {professional.desc.replace('##EDAD##', calcularEdad(professional.birthDate))}
             </Text>
           </Box>
 
