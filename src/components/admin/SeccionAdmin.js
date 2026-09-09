@@ -18,6 +18,8 @@ const adminStyles = `
     .admin-card:nth-child(4) { animation-delay: 0.22s; }
     .admin-card:nth-child(5) { animation-delay: 0.28s; }
     .admin-card:nth-child(6) { animation-delay: 0.34s; }
+    .admin-card:nth-child(7) { animation-delay: 0.40s; }
+    .admin-card:nth-child(8) { animation-delay: 0.46s; }
 
     .admin-card .ac-bar {
         width: 0;
@@ -59,6 +61,7 @@ const ADMIN_ITEMS = [
     { to: '/historialmensual', label: 'Historial Mensual', icon: '📊', desc: 'Revisá el historial por mes' },
     { to: '/ingresousuario', label: 'Ingreso de Usuarios', icon: '🔐', desc: 'Gestioná accesos al sistema' },
     { to: '/gestionhorarios', label: 'Gestión de Horarios', icon: '🕐', desc: 'Configurá turnos y horarios' },
+    { to: '/restriccioneshorarios', label: 'Restricción de Horarios', icon: '🔒', desc: 'Limitá horarios por usuario' },
     { to: '/preciosadmin', label: 'Configurar Precios', icon: '💰', desc: 'Ajustá cuotas y descuentos' },
 ]
 

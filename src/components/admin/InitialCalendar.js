@@ -381,6 +381,7 @@ const InitialCalendar = ({ theme, apiUrl }) => {
     const [selectedShift, setSelectedShift] = useState('')
     const [selectedHour, setSelectedHour] = useState('')
     const [horariosOcupados, setHorariosOcupados] = useState([])
+    const [restricciones, setRestricciones] = useState([])
 
     const isDark = theme === 'dark'
     const panelBg = isDark ? 'rgba(255,255,255,0.03)' : 'white'
@@ -397,7 +398,38 @@ const InitialCalendar = ({ theme, apiUrl }) => {
         axios.get(`${apiUrl}/api/auth/users`)
             .then(r => setUserData(r.data))
             .catch(e => console.error('Error fetching users', e))
+        axios.get(`${apiUrl}/api/schedule-restrictions`)
+            .then(r => setRestricciones(r.data || []))
+            .catch(e => console.error('Error fetching schedule restrictions', e))
     }, [])
+
+    // ── Restricciones de horarios cargadas desde el panel de administración ──
+    const restriccionDe = (nombre) => {
+        const buscado = (nombre || '').trim().toLowerCase()
+        if (!buscado) return null
+        return restricciones.find(r => {
+            const completo = `${r.user?.username || ''} ${r.user?.userlastname || ''}`.trim().toLowerCase()
+            return completo === buscado && r.activo !== false && r.slots?.length > 0
+        }) || null
+    }
+
+    const slotRestringido = (restriccion, day, shift, hour) => {
+        if (!restriccion) return false
+        const incluido = restriccion.slots.includes(`${day}.${shift}.${hour}`)
+        return restriccion.mode === 'allow' ? !incluido : incluido
+    }
+
+    const confirmarHorarioRestringido = (restriccion, nombre, day, hour) => Swal.fire({
+        title: 'Horario restringido',
+        html: `<b style="text-transform:capitalize">${nombre}</b> tiene una restricción de horarios y <b>${day} ${hour}:00 hs</b> no está entre los habilitados.` +
+            (restriccion.reason ? `<br/><br/><i>${restriccion.reason}</i>` : ''),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Anotarlo igual',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#68D391',
+        cancelButtonColor: '#A0AEC0',
+    })
 
     const toast = (icon, title) => Swal.mixin({
         toast: true, position: 'top-end', showConfirmButton: false,
@@ -414,7 +446,21 @@ const InitialCalendar = ({ theme, apiUrl }) => {
         }
     }
 
-    const handleAddPerson = (day, shift, hour, user) => {
+    const handleAddPerson = (day, shift, hour, user, omitirChequeo = false) => {
+        // Aviso si el usuario tiene ese horario restringido (el admin puede forzarlo)
+        if (!omitirChequeo) {
+            const restriccion = restriccionDe(user)
+            if (slotRestringido(restriccion, day, shift, hour)) {
+                confirmarHorarioRestringido(restriccion, user, day, hour).then(res => {
+                    if (res.isConfirmed) agregarPersona(day, shift, hour, user)
+                })
+                return
+            }
+        }
+        agregarPersona(day, shift, hour, user)
+    }
+
+    const agregarPersona = (day, shift, hour, user) => {
         setCalendar(prev => {
             const updated = JSON.parse(JSON.stringify(prev))
             const availableSlot = updated[day][shift][hour].indexOf(null)
@@ -447,7 +493,7 @@ const InitialCalendar = ({ theme, apiUrl }) => {
         })
     }
 
-    const handleMovePerson = (fromDay, fromShift, fromHour, index) => {
+    const handleMovePerson = async (fromDay, fromShift, fromHour, index) => {
         const person = calendar[fromDay][fromShift][fromHour][index]
         const toShift = prompt('Ingresá el turno de destino (mañana o tarde):')
         if (toShift !== null) {
@@ -459,14 +505,23 @@ const InitialCalendar = ({ theme, apiUrl }) => {
         const toHour = prompt('Ingresá la hora de destino (por ejemplo, 16):')
         const toHourNumber = parseInt(toHour, 10)
         if (!isNaN(toHourNumber) && calendar[fromDay]?.[toShift]?.hasOwnProperty(toHourNumber)) {
+            // Chequeamos la restricción ANTES de sacarlo del horario actual
+            const restriccion = restriccionDe(person)
+            if (slotRestringido(restriccion, fromDay, toShift, toHourNumber)) {
+                const confirmacion = await confirmarHorarioRestringido(restriccion, person, fromDay, toHourNumber)
+                if (!confirmacion.isConfirmed) {
+                    toast('info', 'Movimiento cancelado. El turno quedó como estaba.')
+                    return
+                }
+            }
             const emptyIndex = calendar[fromDay][toShift][toHourNumber].indexOf(null)
             const repetido = calendar[fromDay][toShift][toHourNumber].some(p => p === person.toLowerCase())
             if (!repetido) handleRemovePerson(fromDay, fromShift, fromHour, index)
             if (emptyIndex !== -1) {
-                handleAddPerson(fromDay, toShift, toHourNumber, person)
+                handleAddPerson(fromDay, toShift, toHourNumber, person, true)
             } else {
                 toast('warning', 'El horario de destino está completo.')
-                handleAddPerson(fromDay, fromShift, fromHour, person)
+                handleAddPerson(fromDay, fromShift, fromHour, person, true)
             }
         } else {
             toast('warning', 'Hora inválida o el horario no existe en el calendario.')

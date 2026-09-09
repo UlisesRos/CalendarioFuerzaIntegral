@@ -22,11 +22,10 @@ import ForgotPasswordForm from "./components/Login/ForgotPasswordForm";
 import ResetPasswordForm from "./components/Login/ResetPasswordForm";
 import HistorialMensual from "./components/admin/clients/HistorialMensual";
 import GestionHorarios from "./components/admin/GestionHorarios";
+import RestriccionesHorarios from "./components/admin/RestriccionesHorarios";
 import PreciosAdmin from "./components/admin/PreciosAdmin";
 import ConsultorioFBI from "./components/consultorio/ConsultorioFBI";
 import ModalRestriccionPago from "./components/modal/ModalRestriccionPago";
-import ModalFormularioFBI from "./components/modal/ModalFormularioFBI";
-import Swal from 'sweetalert2';
 
 const apiUrl = process.env.REACT_APP_API_URL;
 // const apiUrl = 'http://localhost:5000'; // URL base de la API
@@ -37,7 +36,6 @@ function App() {
     const [appStatus, setAppStatus] = useState('loading');
     const [errorMessage, setErrorMessage] = useState('');
     const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [showFormModal, setShowFormModal] = useState(false);
 
     // Configuración de interceptores de axios
     axios.interceptors.request.use((config) => {
@@ -120,14 +118,6 @@ function App() {
         return () => clearTimeout(timer);
     }, []);
 
-    // Mostrar modal de formulario FBI si el usuario no lo completó aún
-    useEffect(() => {
-        if (!userData || userData.role === 'admin') return;
-        if (!userData.formularioFBICompletado) {
-            setShowFormModal(true);
-        }
-    }, [userData]);
-
     // Mostrar modal de restricción de pago al cargar el usuario (día 12+ sin pago)
     useEffect(() => {
         if (!userData || userData.role === 'admin') return;
@@ -155,21 +145,6 @@ function App() {
         setUserData(null);
         // No usar window.location.reload() para mantener el estado del tema
         setAppStatus('ready');
-    };
-
-    const handleFormularioCompletado = async () => {
-        try {
-            await axios.patch(`${apiUrl}/api/auth/formulario-fbi`);
-            setUserData(prev => ({ ...prev, formularioFBICompletado: true }));
-            setShowFormModal(false);
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'No se pudo guardar. Por favor intentá de nuevo.',
-                confirmButtonColor: '#68D391',
-            });
-        }
     };
 
     const handleRetry = () => {
@@ -315,10 +290,6 @@ function App() {
             backgroundColor: theme === 'light' ? '#ffffff' : '#121212'
         }}>
             <Router>
-                <ModalFormularioFBI
-                    isOpen={showFormModal}
-                    onConfirm={handleFormularioCompletado}
-                />
                 <ModalRestriccionPago
                     isOpen={showPaymentModal}
                     onClose={() => setShowPaymentModal(false)}
@@ -380,6 +351,11 @@ function App() {
                         <Route path="/gestionhorarios" element={
                             <AdminRoute>
                                 <GestionHorarios apiUrl={apiUrl} theme={theme} />
+                            </AdminRoute>
+                        } />
+                        <Route path="/restriccioneshorarios" element={
+                            <AdminRoute>
+                                <RestriccionesHorarios apiUrl={apiUrl} theme={theme} />
                             </AdminRoute>
                         } />
                         <Route path="/preciosadmin" element={

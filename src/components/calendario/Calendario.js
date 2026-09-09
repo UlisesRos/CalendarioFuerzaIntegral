@@ -158,7 +158,7 @@ const calendarioStyles = `
 `
 
 // ─── Componente HourCard ──────────────────────────────────────────────────────
-function HourCard({ hour, people, usuario, selectedDay, selectedShift, onRemove, onMove, isClosed, theme, delay }) {
+function HourCard({ hour, people, usuario, selectedDay, selectedShift, onRemove, onMove, isClosed, isRestricted, theme, delay }) {
     const isDark = theme === 'dark'
     const panelBg = isDark ? 'rgba(255,255,255,0.03)' : 'white'
     const borderBase = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(104,211,145,0.2)'
@@ -179,13 +179,14 @@ function HourCard({ hour, people, usuario, selectedDay, selectedShift, onRemove,
             borderColor={
                 isClosed ? 'rgba(252,129,129,0.35)' :
                     isUserHere ? 'rgba(104,211,145,0.5)' :
-                        borderBase
+                        isRestricted ? 'rgba(160,174,192,0.35)' :
+                            borderBase
             }
             borderRadius="14px"
             p="16px 18px"
             w={['100%', '48%', 'calc(33.33% - 12px)']}
             flexShrink={0}
-            opacity={isClosed ? 0.7 : 1}
+            opacity={isClosed ? 0.7 : (isRestricted && !isUserHere ? 0.55 : 1)}
         >
             {/* Header de la card */}
             <Flex justifyContent="space-between" alignItems="center" mb="12px">
@@ -243,6 +244,21 @@ function HourCard({ hour, people, usuario, selectedDay, selectedShift, onRemove,
 
             {/* Divider */}
             <Box h="1px" bg={isClosed ? 'rgba(252,129,129,0.2)' : borderBase} mb="10px" />
+
+            {/* Horario no habilitado para este usuario */}
+            {!isClosed && isRestricted && (
+                <Flex alignItems="center" gap="8px" mb="8px">
+                    <Box w="6px" h="6px" borderRadius="full" bg="#A0AEC0" flexShrink={0} />
+                    <Text
+                        fontFamily='"Poppins", sans-serif'
+                        fontSize="0.74rem"
+                        color={textMuted}
+                        fontWeight="600"
+                    >
+                        No habilitado para vos
+                    </Text>
+                </Flex>
+            )}
 
             {/* Cerrado */}
             {isClosed ? (
@@ -326,6 +342,7 @@ function HourCard({ hour, people, usuario, selectedDay, selectedShift, onRemove,
 const Calendario = ({ theme, userData, apiUrl }) => {
     const [calendar, setCalendar] = useState('')
     const [closedSchedules, setClosedSchedules] = useState([])
+    const [restriccion, setRestriccion] = useState(null)
     const [selectedDay, setSelectedDay] = useState('')
     const [selectedShift, setSelectedShift] = useState('')
     const [selectedHour, setSelectedHour] = useState('')
@@ -360,6 +377,13 @@ const Calendario = ({ theme, userData, apiUrl }) => {
             .then(res => setClosedSchedules(res.data))
             .catch(err => console.error('Error fetching closed schedules', err))
 
+        // Restricción de horarios del usuario (la carga el admin desde el panel)
+        if (localStorage.getItem('token')) {
+            axios.get(`${apiUrl}/api/schedule-restrictions/me`)
+                .then(res => setRestriccion(res.data))
+                .catch(err => console.error('Error fetching schedule restrictions', err))
+        }
+
         socket.on('updateCalendar', (updateCalendar) => setCalendar(updateCalendar))
         return () => socket.off('updateCalendar')
     }, [])
@@ -367,6 +391,26 @@ const Calendario = ({ theme, userData, apiUrl }) => {
     const isDayClosed = (day) => closedSchedules.some(cs => cs.day === day && cs.closedDay)
     const isHourClosed = (day, shift, hour) => closedSchedules.some(cs => cs.day === day && !cs.closedDay && cs.closedHours?.includes(`${shift}.${hour}`))
     const getClosedReason = (day) => closedSchedules.find(cs => cs.day === day)?.reason || ''
+
+    // ── Restricción de horarios por usuario ──────────────────────────────────
+    const tieneRestriccion = !!(restriccion?.tieneRestriccion && restriccion.slots?.length)
+
+    // Un horario está restringido si:
+    //  - modo 'allow' -> NO está dentro de los horarios habilitados
+    //  - modo 'block' -> SÍ está dentro de los horarios bloqueados
+    const isHourRestricted = (day, shift, hour) => {
+        if (!tieneRestriccion) return false
+        const incluido = restriccion.slots.includes(`${day}.${shift}.${hour}`)
+        return restriccion.mode === 'allow' ? !incluido : incluido
+    }
+
+    const isDayRestricted = (day) => {
+        if (!tieneRestriccion || !calendar || !calendar[day]) return false
+        const horas = Object.keys(calendar[day]).flatMap(shift =>
+            Object.keys(calendar[day][shift]).map(hour => ({ shift, hour }))
+        )
+        return horas.length > 0 && horas.every(({ shift, hour }) => isHourRestricted(day, shift, hour))
+    }
 
     if (!userData) {
         return (
@@ -379,7 +423,29 @@ const Calendario = ({ theme, userData, apiUrl }) => {
 
     const usuario = `${userData?.username || ''} ${userData?.userlastname || ''}`
 
+    // Toast reutilizable (mismo estilo que el resto del calendario)
+    const showToast = (icon, title) => Swal.mixin({
+        toast: true, position: 'top-end', showConfirmButton: false,
+        timer: 4000, timerProgressBar: true, color: 'black',
+        didOpen: (t) => { t.onmouseenter = Swal.stopTimer; t.onmouseleave = Swal.resumeTimer }
+    }).fire({ icon, title })
+
+    const recargarCalendario = () => {
+        axios.get(`${apiUrl}/api/calendar`)
+            .then(res => setCalendar(res.data))
+            .catch(err => console.error('Error refreshing calendar', err))
+    }
+
     const handleAddPerson = (day, shift, hour, mover) => {
+        // El admin puede restringirle horarios a un usuario: no lo dejamos anotarse
+        if (isHourRestricted(day, shift, hour)) {
+            showToast('warning', restriccion?.reason
+                ? `No podés anotarte en este horario. ${restriccion.reason}`
+                : 'No tenés habilitado este horario. Consultá con el gimnasio.'
+            )
+            return
+        }
+
         setCalendar((prev) => {
             const updated = JSON.parse(JSON.stringify(prev))
             const availableSlot = updated[day][shift][hour].indexOf(null)
@@ -398,6 +464,21 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                 toast('success', mover ? 'Usuario movido a otro horario.' : `Turno confirmado: ${day}, ${hour}:00 hs`)
                 updated[day][shift][hour][availableSlot] = usuario.toLocaleLowerCase()
                 axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, updatedHour: updated[day][shift][hour] })
+                    .catch(err => {
+                        const data = err.response?.data
+                        // El servidor rechazó la inscripción (restricción de horarios o de pago)
+                        if (data?.code === 'SCHEDULE_RESTRICTED' || data?.code === 'PAYMENT_REQUIRED') {
+                            showToast('warning', data.msg)
+                        } else {
+                            showToast('error', 'No se pudo guardar el turno. Intentá de nuevo.')
+                            console.error('Error adding person:', data || err.message)
+                        }
+                        // Volvemos a traer el calendario real para no dejar el turno "fantasma"
+                        recargarCalendario()
+                        axios.get(`${apiUrl}/api/schedule-restrictions/me`)
+                            .then(res => setRestriccion(res.data))
+                            .catch(() => { })
+                    })
                 return updated
             } else {
                 toast('error', 'No hay espacios disponibles en este horario.')
@@ -442,6 +523,15 @@ const Calendario = ({ theme, userData, apiUrl }) => {
         }
         const toHour = prompt('Ingresá la hora de destino (por ejemplo, 16):')
         const toHourNumber = parseInt(toHour, 10)
+
+        // No lo movemos a un horario que tiene restringido (perdería el turno actual)
+        if (!isNaN(toHourNumber) && isHourRestricted(fromDay, toShift, toHourNumber)) {
+            toast('warning', restriccion?.reason
+                ? `No podés anotarte en ese horario. ${restriccion.reason}`
+                : 'No tenés habilitado ese horario. Tu turno actual queda como estaba.'
+            )
+            return
+        }
 
         if (!isNaN(toHourNumber) && calendar[fromDay]?.[toShift]?.hasOwnProperty(toHourNumber)) {
             const emptyIndex = calendar[fromDay][toShift][toHourNumber].indexOf(null)
@@ -494,6 +584,21 @@ const Calendario = ({ theme, userData, apiUrl }) => {
     }
 
     const dayClosed = selectedDay && isDayClosed(selectedDay)
+    const horaRestringida = !!(selectedDay && selectedShift && selectedHour && isHourRestricted(selectedDay, selectedShift, selectedHour))
+
+    // Cantidad de horarios habilitados (para el aviso de restricción)
+    const horariosHabilitados = (() => {
+        if (!tieneRestriccion || !calendar) return []
+        const habilitados = []
+        Object.keys(calendar).forEach(day =>
+            Object.keys(calendar[day]).forEach(shift =>
+                Object.keys(calendar[day][shift]).forEach(hour => {
+                    if (!isHourRestricted(day, shift, hour)) habilitados.push({ day, shift, hour })
+                })
+            )
+        )
+        return habilitados
+    })()
 
     return (
         <Box
@@ -608,6 +713,45 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                 </Box>
             )}
 
+            {/* ── Banner de restricción de horarios ── */}
+            {tieneRestriccion && (
+                <Box
+                    w="100%"
+                    maxW="960px"
+                    bg={isDark ? 'rgba(104,211,145,0.06)' : 'rgba(104,211,145,0.07)'}
+                    border="1px solid rgba(104,211,145,0.35)"
+                    borderRadius="14px"
+                    p={['14px 16px', '16px 22px']}
+                    mb={['16px', '24px']}
+                >
+                    <Flex alignItems="flex-start" gap="10px">
+                        <Box fontSize="1rem" lineHeight="1.4" flexShrink={0}>🔒</Box>
+                        <Box flex="1">
+                            <Text
+                                fontFamily='"Poppins", sans-serif'
+                                fontSize={['0.8rem', '0.86rem']}
+                                color="#68D391"
+                                fontWeight="600"
+                                lineHeight="1.5"
+                                mb="4px"
+                            >
+                                Tenés horarios asignados
+                            </Text>
+                            <Text
+                                fontFamily='"Poppins", sans-serif'
+                                fontSize={['0.76rem', '0.8rem']}
+                                color={textMuted}
+                                lineHeight="1.6"
+                            >
+                                Podés anotarte en {horariosHabilitados.length} de los horarios del calendario. Los que no
+                                tenés habilitados aparecen con el candado 🔒.
+                                {restriccion?.reason ? ` Motivo: ${restriccion.reason}` : ''}
+                            </Text>
+                        </Box>
+                    </Flex>
+                </Box>
+            )}
+
             {/* ── Panel de controles ── */}
             <Box
                 className="cal-controls"
@@ -652,7 +796,7 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                         <option value="">Seleccionar día</option>
                         {calendar && Object.keys(calendar).map(day => (
                             <option key={day} value={day}>
-                                {day}{isDayClosed(day) ? ' 🔴' : ''}
+                                {day}{isDayClosed(day) ? ' 🔴' : ''}{isDayRestricted(day) ? ' 🔒' : ''}
                             </option>
                         ))}
                     </select>
@@ -681,9 +825,14 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                         >
                             <option value="">Seleccionar hora</option>
                             {(calendar[selectedDay]?.[selectedShift])
-                                ? Object.keys(calendar[selectedDay][selectedShift]).map(hour => (
-                                    <option key={hour} value={hour}>{hour}:00</option>
-                                ))
+                                ? Object.keys(calendar[selectedDay][selectedShift]).map(hour => {
+                                    const restringida = isHourRestricted(selectedDay, selectedShift, hour)
+                                    return (
+                                        <option key={hour} value={hour} disabled={restringida}>
+                                            {hour}:00{restringida ? ' 🔒 no habilitado' : ''}
+                                        </option>
+                                    )
+                                })
                                 : <option disabled>No hay horas disponibles</option>
                             }
                         </select>
@@ -692,7 +841,7 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                     {/* Inscribir */}
                     <button
                         className="cal-inscribir-btn"
-                        disabled={!usuario || !selectedDay || !selectedShift || !selectedHour || isRestricted}
+                        disabled={!usuario || !selectedDay || !selectedShift || !selectedHour || isRestricted || horaRestringida}
                         onClick={() => {
                             if (isRestricted) {
                                 setShowPaymentModal(true)
@@ -702,9 +851,13 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                                 handleAddPerson(selectedDay, selectedShift, selectedHour, usuario)
                             }
                         }}
-                        title={isRestricted ? 'Debés abonar la cuota para inscribirte' : ''}
+                        title={
+                            isRestricted ? 'Debés abonar la cuota para inscribirte'
+                                : horaRestringida ? 'No tenés habilitado este horario'
+                                    : ''
+                        }
                     >
-                        {isRestricted ? '🔒 Inscribirme' : 'Inscribirme'}
+                        {isRestricted || horaRestringida ? '🔒 Inscribirme' : 'Inscribirme'}
                     </button>
                 </Flex>
             </Box>
@@ -781,6 +934,7 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                                         onRemove={handleRemovePerson}
                                         onMove={handleMovePerson}
                                         isClosed={isHourClosed(selectedDay, selectedShift, hour)}
+                                        isRestricted={isHourRestricted(selectedDay, selectedShift, hour)}
                                         theme={theme}
                                         delay={i * 0.05}
                                     />
