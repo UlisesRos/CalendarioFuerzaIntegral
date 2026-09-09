@@ -42,6 +42,16 @@ function useTypewriter(phrases, typingSpeed = 80, deletingSpeed = 40, pause = 20
     return displayText
 }
 
+// ─── Calcular edad ────────────────────────────────────────────────────────────
+function calcularEdad(fechaNacimiento) {
+    const [dia, mes, anio] = fechaNacimiento.split('/').map(Number)
+    const hoy = new Date()
+    let edad = hoy.getFullYear() - anio
+    const mDiff = hoy.getMonth() - (mes - 1)
+    if (mDiff < 0 || (mDiff === 0 && hoy.getDate() < dia)) edad--
+    return edad
+}
+
 // ─── Estilos globales ─────────────────────────────────────────────────────────
 const globalStyles = `
     @keyframes blink {
@@ -284,7 +294,7 @@ function TrainerModal({ trainer, onClose }) {
                             color="gray.300"
                             lineHeight="1.85"
                         >
-                            {trainer.desc}
+                            {trainer.desc.replace('##EDAD##', calcularEdad(trainer.birthDate))}
                         </Text>
                     </Box>
                 </Box>
@@ -416,19 +426,23 @@ function Home({ userData }) {
     const trainers = [
         {
             id: 0, img: manu, name: 'Manuel Martino', profesion: 'Fundador/Profe',
-            desc: 'Soy Manuel Martino, tengo 29 años. Me recibi en el ISEF 11 como profesor de Educación Física, preparador físico especialista en fútbol en APEFFA y especialista en el entrenamiento de la fuerza en GRUPO 757 y FEFA. Mi principal objetivo es que cada persona que llegue al gimnasio vivencie y obtenga los frutos que nos proporciona el entrenamiento de fuerza. Me representan dos frases: "Sé el profe que siempre quisiste tener" y "al relacionarte con un alma humana, sé apenas otra alma humana". Fanático de Messi, de los yuyos en el mate y del reggaeton.'
+            birthDate: '05/06/1996',
+            desc: 'Soy Manuel Martino, tengo ##EDAD## años. Me recibi en el ISEF 11 como profesor de Educación Física, preparador físico especialista en fútbol en APEFFA y especialista en el entrenamiento de la fuerza en GRUPO 757 y FEFA. Mi principal objetivo es que cada persona que llegue al gimnasio vivencie y obtenga los frutos que nos proporciona el entrenamiento de fuerza. Me representan dos frases: "Sé el profe que siempre quisiste tener" y "al relacionarte con un alma humana, sé apenas otra alma humana". Fanático de Messi, de los yuyos en el mate y del reggaeton.'
         },
         {
             id: 1, img: juli, name: 'Julian Atencio', profesion: 'Fundador/Profe',
-            desc: 'Soy Julián Atencio, tengo 26 años. Recibido en el ISEF 11 como profesor de Educación Física, Licenciado en Actividad Física en la UGR, Preparador Físico de Futbol en FyP y Especialista en Entrenamiento de Fuerza en Grupo 757 y FEFA. Mi principal objetivo es que cada atleta alcance su máximo nivel en su deporte y que cada persona lleve una vida saludable a través del entrenamiento de fuerza. "No dejes nunca de luchar, el fracaso está en abandonar." Fanático de la música, el mate y el futbol.'
+            birthDate: '24/04/1999',
+            desc: 'Soy Julián Atencio, tengo ##EDAD## años. Recibido en el ISEF 11 como profesor de Educación Física, Licenciado en Actividad Física en la UGR, Preparador Físico de Futbol en FyP y Especialista en Entrenamiento de Fuerza en Grupo 757 y FEFA. Mi principal objetivo es que cada atleta alcance su máximo nivel en su deporte y que cada persona lleve una vida saludable a través del entrenamiento de fuerza. "No dejes nunca de luchar, el fracaso está en abandonar." Fanático de la música, el mate y el futbol.'
         },
         {
             id: 2, img: vicky, name: 'Victoria Mastromarino', profesion: 'Profesora',
-            desc: 'Soy Victoria Mastromarino, tengo 23 años. Me recibí en el ISEF 11 como profesora de Educación Física y soy preparadora física en Grupo 757. Mi principal objetivo es que cada persona que llegue al gimnasio se sienta acompañada durante su proceso de entrenamiento y pueda entrenar de manera segura y confiada. Hay una frase que me representa: "Todos fuimos principiantes alguna vez." Fanática del café frío y de la música.'
+            birthDate: '21/08/2002',
+            desc: 'Soy Victoria Mastromarino, tengo ##EDAD## años. Me recibí en el ISEF 11 como profesora de Educación Física y soy preparadora física en Grupo 757. Mi principal objetivo es que cada persona que llegue al gimnasio se sienta acompañada durante su proceso de entrenamiento y pueda entrenar de manera segura y confiada. Hay una frase que me representa: "Todos fuimos principiantes alguna vez." Fanática del café frío y de la música.'
         },
         {
             id: 3, img: flor, name: 'Florencia Payaro', profesion: 'Profesora',
-            desc: 'Mi nombre es Florencia Payaro y tengo 28 años. Soy profesora de Educación Física recibida en el ISEF 11. Mi objetivo es que quienes vengan al gimnasio puedan vivenciar el entrenamiento de fuerza adaptado a sus necesidades y objetivos y que, sobre todo, puedan adquirir confianza en sí mismos a lo largo del proceso. Porque no, también contagiarlos para que hagan del entrenamiento un hábito fundamental en sus vidas. Les comparto dos frases relacionadas con el entrenamiento que me representan: "Arrancar liviano, progresar lento, ser extremadamente consistente" y "Lo realmente difícil, es hacerlo simple"'
+            birthDate: '16/04/1997',
+            desc: 'Mi nombre es Florencia Payaro y tengo ##EDAD## años. Soy profesora de Educación Física recibida en el ISEF 11. Mi objetivo es que quienes vengan al gimnasio puedan vivenciar el entrenamiento de fuerza adaptado a sus necesidades y objetivos y que, sobre todo, puedan adquirir confianza en sí mismos a lo largo del proceso. Porque no, también contagiarlos para que hagan del entrenamiento un hábito fundamental en sus vidas. Les comparto dos frases relacionadas con el entrenamiento que me representan: "Arrancar liviano, progresar lento, ser extremadamente consistente" y "Lo realmente difícil, es hacerlo simple"'
         },
     ]
 
