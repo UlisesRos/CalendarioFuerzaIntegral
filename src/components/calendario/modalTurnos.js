@@ -51,9 +51,12 @@ const TURNO_LABELS = {
     'tarde': '🌆 Tarde',
 }
 
-const ModalTurnos = ({ isOpen, onClose, getUserSchedule }) => {
+const RESERVA_COLOR = '#F6AD55'
+
+const ModalTurnos = ({ isOpen, onClose, getUserSchedule, getUserReservas }) => {
     const isMobile = window.innerWidth < 600
     const schedule = getUserSchedule()
+    const reservas = getUserReservas ? getUserReservas() : []
 
     useEffect(() => {
         if (!isOpen) return
@@ -145,6 +148,7 @@ const ModalTurnos = ({ isOpen, onClose, getUserSchedule }) => {
                         margin: 0,
                     }}>
                         {schedule.length} {schedule.length === 1 ? 'turno registrado' : 'turnos registrados'}
+                        {reservas.length > 0 && ` · ${reservas.length} en reserva`}
                     </p>
                 </div>
 
@@ -156,7 +160,16 @@ const ModalTurnos = ({ isOpen, onClose, getUserSchedule }) => {
                     scrollbarWidth: 'thin',
                     scrollbarColor: 'rgba(104,211,145,0.4) transparent',
                 }}>
-                    {schedule.length === 0 ? (
+                    {schedule.length === 0 && reservas.length > 0 ? (
+                        <span style={{
+                            fontFamily: "'Poppins', sans-serif",
+                            fontSize: '0.8rem',
+                            color: 'rgba(255,255,255,0.45)',
+                            padding: '4px 2px',
+                        }}>
+                            No tenés turnos confirmados todavía.
+                        </span>
+                    ) : schedule.length === 0 ? (
                         <div style={{
                             display: 'flex', flexDirection: 'column',
                             alignItems: 'center', justifyContent: 'center',
@@ -235,6 +248,96 @@ const ModalTurnos = ({ isOpen, onClose, getUserSchedule }) => {
                                 </div>
                             </div>
                         ))
+                    )}
+
+                    {/* ── Horarios en lista de reserva ── */}
+                    {reservas.length > 0 && (
+                        <>
+                            <div style={{ marginTop: '10px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                    <div style={{ width: '16px', height: '2px', background: RESERVA_COLOR, borderRadius: '9999px' }} />
+                                    <span style={{
+                                        fontFamily: "'Poppins', sans-serif",
+                                        fontSize: '0.65rem', letterSpacing: '0.2em',
+                                        textTransform: 'uppercase', color: RESERVA_COLOR,
+                                    }}>
+                                        En lista de reserva
+                                    </span>
+                                </div>
+                                <p style={{
+                                    fontFamily: "'Poppins', sans-serif",
+                                    fontSize: '0.72rem', lineHeight: 1.5,
+                                    color: 'rgba(255,255,255,0.5)',
+                                    margin: 0,
+                                }}>
+                                    Todavía no tenés lugar en estos horarios. Si alguien se baja, entrás automáticamente y te avisamos por mail.
+                                </p>
+                            </div>
+
+                            {reservas.map((item, i) => (
+                                <div
+                                    key={`reserva-${item.day}-${item.shift}-${item.hour}`}
+                                    className="mt-schedule-card"
+                                    style={{
+                                        background: 'rgba(246,173,85,0.05)',
+                                        border: '1px dashed rgba(246,173,85,0.35)',
+                                        borderRadius: '12px',
+                                        padding: '14px 16px',
+                                        animationDelay: `${(schedule.length + i) * 0.06}s`,
+                                    }}
+                                >
+                                    <div style={{
+                                        display: 'flex', alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '10px',
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div style={{
+                                                width: '6px', height: '6px',
+                                                borderRadius: '50%', background: RESERVA_COLOR, flexShrink: 0,
+                                            }} />
+                                            <span style={{
+                                                fontFamily: "'Playfair Display', serif",
+                                                fontSize: '1rem', fontWeight: 700,
+                                                color: 'white', textTransform: 'capitalize',
+                                            }}>
+                                                {item.day}
+                                            </span>
+                                        </div>
+                                        <span style={{
+                                            fontFamily: "'Poppins', sans-serif",
+                                            fontSize: '1rem', fontWeight: 700, color: RESERVA_COLOR,
+                                        }}>
+                                            {item.hour}:00 hs
+                                        </span>
+                                    </div>
+
+                                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', marginBottom: '10px' }} />
+
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{
+                                            fontFamily: "'Poppins', sans-serif",
+                                            fontSize: '0.82rem', fontWeight: 500,
+                                            color: 'rgba(255,255,255,0.7)',
+                                        }}>
+                                            {TURNO_LABELS[item.shift] || item.shift}
+                                        </span>
+                                        <span style={{
+                                            fontFamily: "'Poppins', sans-serif",
+                                            fontSize: '0.68rem', fontWeight: 600,
+                                            letterSpacing: '0.08em', textTransform: 'uppercase',
+                                            color: RESERVA_COLOR,
+                                            border: '1px solid rgba(246,173,85,0.4)',
+                                            borderRadius: '9999px',
+                                            padding: '3px 10px',
+                                            whiteSpace: 'nowrap',
+                                        }}>
+                                            Reserva · posición {item.posicion}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </>
                     )}
                 </div>
             </div>
