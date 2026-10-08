@@ -5,6 +5,8 @@ import io from 'socket.io-client'
 import axios from 'axios'
 import ModalTurnos from './modalTurnos'
 import ModalRestriccionPago from '../modal/ModalRestriccionPago'
+import ModalAvisoTurno from '../modal/ModalAvisoTurno'
+import { estadoBloqueoBaja } from '../../utils/bajasTurnos'
 
 const socket = io('/')
 
@@ -513,6 +515,15 @@ const Calendario = ({ theme, userData, apiUrl }) => {
     const [maxReservas, setMaxReservas] = useState(MAX_RESERVAS_DEFAULT)
     const [procesando, setProcesando] = useState(false)
     const procesandoRef = useRef(false)
+    // Cartel amable de bajas: turno muy cercano (bloqueo) o aviso por cantidad de bajas del mes
+    const [avisoTurno, setAvisoTurno] = useState(null)
+    // Diferencia entre el reloj del servidor y el del dispositivo (ms). Permite saber con
+    // precisión si un turno está muy cerca aunque el celular tenga la hora mal puesta.
+    // Mientras sea null (todavía no se sincronizó) no se avisa desde acá: decide el servidor.
+    const desfaseRelojRef = useRef(null)
+    const sincronizarReloj = (ahoraServidor) => {
+        if (Number.isFinite(ahoraServidor)) desfaseRelojRef.current = ahoraServidor - Date.now()
+    }
 
     // Restricción de pago: activa a partir del día 12 si el usuario no pagó
     const isRestricted = userData && userData.role !== 'admin' && new Date().getDate() >= 12 && !userData.pago
@@ -543,6 +554,7 @@ const Calendario = ({ theme, userData, apiUrl }) => {
             .then(res => {
                 setReservas(res.data?.reservas || {})
                 if (res.data?.maxReservas) setMaxReservas(res.data.maxReservas)
+                sincronizarReloj(res.data?.ahora)
             })
             .catch(err => console.error('Error fetching reservas', err))
         fetchReservas()
@@ -629,7 +641,10 @@ const Calendario = ({ theme, userData, apiUrl }) => {
             .then(res => setCalendar(res.data))
             .catch(err => console.error('Error refreshing calendar', err))
         axios.get(`${apiUrl}/api/calendar/reservas`)
-            .then(res => setReservas(res.data?.reservas || {}))
+            .then(res => {
+                setReservas(res.data?.reservas || {})
+                sincronizarReloj(res.data?.ahora)
+            })
             .catch(err => console.error('Error refreshing reservas', err))
     }
 
@@ -666,9 +681,13 @@ const Calendario = ({ theme, userData, apiUrl }) => {
         }
     }
 
-    const apiQuitar = async (day, shift, hour, index, nombre) => {
+    // esMovimiento: la baja es parte de mover el turno a otro horario (no suma al contador de bajas)
+    const apiQuitar = async (day, shift, hour, index, nombre, esMovimiento = false) => {
         try {
-            const { data } = await axios.put(`${apiUrl}/api/calendar/remove`, { day, shift, hour, index, nombre })
+            const { data } = await axios.put(`${apiUrl}/api/calendar/remove`, {
+                day, shift, hour, index, nombre,
+                ...(esMovimiento ? { esMovimiento: true } : {}),
+            })
             if (Array.isArray(data?.horario)) aplicarEstadoHorario(day, shift, hour, data)
             else recargarCalendario()
             return data || {}
@@ -701,6 +720,23 @@ const Calendario = ({ theme, userData, apiUrl }) => {
         cancelButtonText: 'Elegir otro horario',
         confirmButtonColor: '#C05621',
     })
+
+    // Muestra el cartel de "turno muy cercano" si el usuario común intenta borrarse o mover un
+    // turno que empieza en 15 minutos o menos (o ya empezó). Devuelve true si lo mostró.
+    // Es un aviso rápido: el servidor valida lo mismo y tiene la última palabra.
+    const avisarSiTurnoCercano = (day, hour, accion) => {
+        if (isAdmin || desfaseRelojRef.current === null) return false
+        const bloqueo = estadoBloqueoBaja(day, hour, Date.now() + desfaseRelojRef.current)
+        if (!bloqueo.bloqueado) return false
+        setAvisoTurno({
+            tipo: 'bloqueo',
+            accion,
+            hora: hour,
+            enCurso: bloqueo.enCurso,
+            minutosParaInicio: bloqueo.minutosParaInicio,
+        })
+        return true
+    }
 
     // Evita dobles envíos (doble click, Enter + click) mientras hay una operación en curso
     const conBloqueo = async (operacion) => {
@@ -802,6 +838,9 @@ const Calendario = ({ theme, userData, apiUrl }) => {
         const esPropio = normalizarNombre(persona) === usuarioKey
         if (!esPropio && !isAdmin) return
 
+        // Muy cerca de la clase: no se puede borrar (se avisa antes de pedir cualquier confirmación)
+        if (esPropio && avisarSiTurnoCercano(day, hour, 'cancelar')) return
+
         const siguiente = reservasDe(day, shift, hour)[0]
         const horarioTexto = `<b>${escaparHtml(day)} a las ${escaparHtml(hour)}:00&nbsp;hs</b>`
 
@@ -836,9 +875,23 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                 ? `${mensajeBase} Entró ${capitalizar(promovido)} desde la reserva.`
                 : mensajeBase
             )
+
+            // Desde la 8ª baja del mes: cartel amable de advertencia (8ª y 9ª) o de límite (10ª en adelante)
+            if (data.bajas?.aviso) setAvisoTurno({ tipo: data.bajas.aviso, ...data.bajas })
         } catch (err) {
             const data = err.response?.data
-            showToast('warning', data?.msg || 'No se pudo quitar del horario. Intentá de nuevo.')
+            if (data?.code === 'BAJA_BLOQUEADA') {
+                // El servidor detectó que el turno está muy cerca (por ejemplo, justo pasó el límite)
+                setAvisoTurno({
+                    tipo: 'bloqueo',
+                    accion: 'cancelar',
+                    hora: hour,
+                    enCurso: data.enCurso,
+                    minutosParaInicio: data.minutosParaInicio,
+                })
+            } else {
+                showToast('warning', data?.msg || 'No se pudo quitar del horario. Intentá de nuevo.')
+            }
             if (!data?.horario) recargarCalendario()
         }
     })
@@ -880,6 +933,9 @@ const Calendario = ({ theme, userData, apiUrl }) => {
     const handleMovePerson = (fromDay, fromShift, fromHour, index) => conBloqueo(async () => {
         const persona = calendar?.[fromDay]?.[fromShift]?.[fromHour]?.[index]
         if (!persona || normalizarNombre(persona) !== usuarioKey) return
+
+        // Moverlo deja libre este lugar: si la clase está muy cerca no se puede (y no hace falta pedir datos)
+        if (avisarSiTurnoCercano(fromDay, fromHour, 'mover')) return
 
         const toShiftRaw = prompt('Ingresá el turno de destino (mañana o tarde):')
         if (toShiftRaw === null) return
@@ -924,6 +980,10 @@ const Calendario = ({ theme, userData, apiUrl }) => {
             return
         }
 
+        // Completar los datos lleva tiempo: se vuelve a controlar antes de anotarlo en el destino,
+        // para no dejarlo en dos horarios si mientras tanto la clase quedó muy cerca
+        if (avisarSiTurnoCercano(fromDay, fromHour, 'mover')) return
+
         // Primero se asegura el lugar nuevo y recién después se libera el anterior:
         // si el destino se llena en el medio, el usuario no pierde su turno actual.
         try {
@@ -939,9 +999,22 @@ const Calendario = ({ theme, userData, apiUrl }) => {
         }
 
         try {
-            await apiQuitar(fromDay, fromShift, fromHour, index, persona)
+            await apiQuitar(fromDay, fromShift, fromHour, index, persona, true)
             showToast('success', `Turno movido a ${fromDay}, ${toHour}:00 hs`)
         } catch (err) {
+            if (err.response?.data?.code === 'BAJA_BLOQUEADA') {
+                // Poco probable: la clase quedó a menos de 15 minutos justo entre ambos pasos.
+                // Se deshace la inscripción en el destino para no dejarlo en dos horarios
+                // (el servidor lo encuentra por nombre, por eso alcanza con cualquier índice).
+                try {
+                    await apiQuitar(fromDay, toShift, toHour, 0, persona, true)
+                    showToast('warning', `No pudimos mover tu turno porque falta muy poco para la clase de las ${fromHour}:00 hs. Lo dejamos como estaba: te esperamos.`)
+                } catch {
+                    showToast('warning', `Te anotamos a las ${toHour}:00 hs, pero tu turno de las ${fromHour}:00 hs ya no se puede liberar porque falta muy poco para la clase. Por ahora quedás anotado en ambos horarios.`)
+                    recargarCalendario()
+                }
+                return
+            }
             showToast('warning', `Te anotamos a las ${toHour}:00 hs, pero no se pudo liberar tu turno de las ${fromHour}:00 hs. Cancelalo manualmente.`)
             recargarCalendario()
         }
@@ -1051,6 +1124,9 @@ const Calendario = ({ theme, userData, apiUrl }) => {
                 onClose={() => setShowPaymentModal(false)}
                 variant="calendar"
             />
+
+            {/* ── Carteles de bajas: turno muy cercano / advertencia / límite del mes ── */}
+            <ModalAvisoTurno aviso={avisoTurno} onClose={() => setAvisoTurno(null)} />
 
             {/* ── Header ── */}
             <Box className="cal-header" w="100%" maxW="960px" mb={['24px', '32px']}>
