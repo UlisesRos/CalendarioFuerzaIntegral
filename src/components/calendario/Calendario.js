@@ -666,9 +666,27 @@ const Calendario = ({ theme, userData, apiUrl }) => {
         }
     }
 
-    const apiInscribir = async (day, shift, hour, aceptaReserva) => {
+    // Un solo horario por día: devuelve la hora en la que el usuario ya está anotado ese día
+    // (sin contar el horario elegido ni los de `excluir`), o null. Las reservas no cuentan.
+    // Es un aviso rápido: el servidor valida lo mismo y tiene la última palabra.
+    const otroHorarioDelDia = (day, shift, hour, excluir = []) => {
+        if (isAdmin) return null
+        const ignorar = [{ shift, hour }, ...excluir].map(s => `${s.shift}.${String(s.hour)}`)
+        for (const turno of ['mañana', 'tarde']) {
+            for (const [hora, personas] of Object.entries(calendar?.[day]?.[turno] || {})) {
+                if (ignorar.includes(`${turno}.${hora}`)) continue
+                if (Array.isArray(personas) && personas.some(p => normalizarNombre(p) === usuarioKey)) return hora
+            }
+        }
+        return null
+    }
+
+    const avisarUnHorarioPorDia = (day, horaExistente) => setAvisoTurno({ tipo: 'unHorarioPorDia', dia: day, horaExistente })
+
+    // extra: datos opcionales del pedido (por ejemplo, moviendoDesde al mover el turno)
+    const apiInscribir = async (day, shift, hour, aceptaReserva, extra = {}) => {
         try {
-            const { data } = await axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, aceptaReserva })
+            const { data } = await axios.put(`${apiUrl}/api/calendar`, { day, shift, hour, aceptaReserva, ...extra })
             // Sin "estado" la respuesta no es del servidor actualizado: no confirmamos nada
             if (!data || typeof data !== 'object' || !data.estado) {
                 throw new Error('Respuesta inesperada del servidor al inscribir')
@@ -760,6 +778,8 @@ const Calendario = ({ theme, userData, apiUrl }) => {
             } else {
                 showToast('success', `Turno confirmado: ${day}, ${hour}:00 hs`)
             }
+            // Al confirmarse, el servidor descarta sus reservas en otros horarios de ese día
+            if (data.reservasDescartadas) recargarCalendario()
             return data.estado
         } catch (err) {
             const data = err.response?.data
@@ -768,6 +788,13 @@ const Calendario = ({ theme, userData, apiUrl }) => {
             if (data?.code === 'HORARIO_COMPLETO') {
                 const { isConfirmed } = await confirmarReserva(day, hour, data.reservasOcupadas ?? 0)
                 return isConfirmed ? enviarInscripcion(day, shift, hour, true) : null
+            }
+
+            if (data?.code === 'UN_HORARIO_POR_DIA') {
+                avisarUnHorarioPorDia(day, data.horarioExistente?.hour)
+                // Probablemente la pantalla estaba desactualizada (por ejemplo, se anotó desde otro dispositivo)
+                recargarCalendario()
+                return null
             }
 
             if (data?.msg && data?.code) {
@@ -813,6 +840,13 @@ const Calendario = ({ theme, userData, apiUrl }) => {
         const miPosicion = enReserva.findIndex(r => r.nombre === usuarioKey)
         if (miPosicion !== -1) {
             showToast('info', `Ya estás en la reserva de este horario (posición ${miPosicion + 1}).`)
+            return null
+        }
+
+        // Un solo horario por día (también para anotarse en la reserva)
+        const horaExistente = otroHorarioDelDia(day, shift, hour)
+        if (horaExistente) {
+            avisarUnHorarioPorDia(day, horaExistente)
             return null
         }
 
@@ -980,16 +1014,43 @@ const Calendario = ({ theme, userData, apiUrl }) => {
             return
         }
 
+        // Un solo horario por día: el turno que se mueve no cuenta, pero no puede tener otro más ese día
+        const horaExistente = otroHorarioDelDia(fromDay, toShift, toHour, [{ shift: fromShift, hour: fromHour }])
+        if (horaExistente) {
+            avisarUnHorarioPorDia(fromDay, horaExistente)
+            return
+        }
+
         // Completar los datos lleva tiempo: se vuelve a controlar antes de anotarlo en el destino,
         // para no dejarlo en dos horarios si mientras tanto la clase quedó muy cerca
         if (avisarSiTurnoCercano(fromDay, fromHour, 'mover')) return
 
         // Primero se asegura el lugar nuevo y recién después se libera el anterior:
         // si el destino se llena en el medio, el usuario no pierde su turno actual.
+        // Con "moviendoDesde" el servidor sabe que es un cambio de turno (el origen no cuenta
+        // para la regla de un horario por día) y él mismo libera el origen.
+        let inscripcion
         try {
-            await apiInscribir(fromDay, toShift, toHour, false)
+            inscripcion = await apiInscribir(fromDay, toShift, toHour, false, {
+                moviendoDesde: { shift: fromShift, hour: String(fromHour) },
+            })
         } catch (err) {
             const data = err.response?.data
+            if (data?.code === 'UN_HORARIO_POR_DIA') {
+                avisarUnHorarioPorDia(fromDay, data.horarioExistente?.hour)
+                recargarCalendario()
+                return
+            }
+            if (data?.code === 'BAJA_BLOQUEADA') {
+                setAvisoTurno({
+                    tipo: 'bloqueo',
+                    accion: 'mover',
+                    hora: fromHour,
+                    enCurso: data.enCurso,
+                    minutosParaInicio: data.minutosParaInicio,
+                })
+                return
+            }
             showToast('warning', data?.code === 'HORARIO_COMPLETO'
                 ? 'El horario de destino se completó. Tu turno actual queda como estaba.'
                 : (data?.msg || 'No se pudo mover el turno. Tu turno actual queda como estaba.')
@@ -998,6 +1059,15 @@ const Calendario = ({ theme, userData, apiUrl }) => {
             return
         }
 
+        // El servidor ya liberó el turno anterior
+        if (inscripcion?.movimiento?.liberado) {
+            if (Array.isArray(inscripcion.movimiento.horario)) aplicarEstadoHorario(fromDay, fromShift, fromHour, inscripcion.movimiento)
+            else recargarCalendario()
+            showToast('success', `Turno movido a ${fromDay}, ${toHour}:00 hs`)
+            return
+        }
+
+        // Servidor sin liberación automática (o falló): se libera el anterior desde acá, como siempre
         try {
             await apiQuitar(fromDay, fromShift, fromHour, index, persona, true)
             showToast('success', `Turno movido a ${fromDay}, ${toHour}:00 hs`)

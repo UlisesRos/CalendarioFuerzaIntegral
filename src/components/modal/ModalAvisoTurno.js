@@ -7,11 +7,14 @@ import { MINUTOS_BLOQUEO_ANTES } from '../../utils/bajasTurnos';
 //   - 'bloqueo'     (azul)  : falta muy poco para la clase, no puede borrarse/moverlo
 //   - 'advertencia' (ámbar) : 8ª y 9ª baja del mes
 //   - 'limite'      (rojo)  : 10ª baja del mes en adelante
-// Son sólo avisos informativos: nada de esto bloquea a nadie en el calendario.
+// Las bajas son sólo avisos informativos: nada de esto bloquea a nadie en el calendario.
+// Además:
+//   - 'unHorarioPorDia' (violeta): ya está anotado en otro horario ese día
 // ============================================================================
 
 const TEMAS = {
     bloqueo:     { color: '#63B3ED', rgb: '99,179,237',  icono: '⏰' },
+    unHorarioPorDia: { color: '#B794F4', rgb: '183,148,244', icono: '📅' },
     advertencia: { color: '#F6AD55', rgb: '246,173,85',  icono: '⚠️' },
     limite:      { color: '#FC8181', rgb: '252,129,129', icono: '🚫' },
 };
@@ -155,6 +158,20 @@ const armarContenido = (aviso) => {
                     'que asistas a tu turno: hay personas que quieren ocupar ese lugar.',
             ],
             destacado: `Podés ${mover ? 'mover tu turno' : 'borrarte'} hasta ${MINUTOS_BLOQUEO_ANTES} minutos antes de la clase.`,
+        };
+    }
+
+    if (aviso.tipo === 'unHorarioPorDia') {
+        const dia = aviso.dia ? ` el ${aviso.dia}` : ' ese día';
+        const anotado = aviso.horaExistente ? `${dia} a las ${aviso.horaExistente}:00 hs` : dia;
+        return {
+            eyebrow: 'Un horario por día',
+            titulo: 'Ya tenés un turno ese día',
+            parrafos: [
+                `Ya estás anotado${anotado}. No podés anotarte en más de un horario en el mismo día.`,
+                'Si preferís otro horario, usá la opción de mover tu turno, o borrate del actual y anotate en el nuevo.',
+            ],
+            destacado: 'Podés anotarte en un solo horario por día.',
         };
     }
 
