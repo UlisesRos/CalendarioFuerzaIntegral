@@ -4,10 +4,8 @@ import '../../css/consultorio/ConsultorioFBI.css'
 
 // ── Importar imágenes (el usuario las reemplaza en src/img/) ──────────────
 import nutri1 from '../../img/nutri1.png'
-import nutri2 from '../../img/nutri2.png'
 import nutri3 from '../../img/nutri3.png'
 import kine   from '../../img/kine.png'
-import oste   from '../../img/oste.png'
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────
 const WhatsAppIcon = () => (
@@ -47,16 +45,6 @@ const PROFESSIONALS = {
       instagram: 'https://www.instagram.com/lic.florenciabertania?igsh=eHhhaG0xYWM0bHFj',
     },
     {
-      id: 'nutri2',
-      img: nutri2,
-      name: 'Carolina Giandomenico',
-      profesion: 'Lic. en Nutrición',
-      birthDate: '10/11/1986',
-      desc: 'Soy Carolina Giandomenico, tengo ##EDAD## años, licenciada en nutrición. Siempre me interesó la actividad física y muchos de los posgrados que realicé fueron de nutrición deportiva. Pero, la verdad es que muchas áreas de la profesión me encantan, y por ende mi interés abarca desde patologías crónicas como la diabetes hasta elecciones alimentarias como el vegetarianismo. Considero que lo más importante cuando hablamos de alimentación es reestablecer una manera más amorosa y amable de vincularnos con la comida, el cuerpo y la salud en general. Cuando una persona llega a la consulta, amo escuchar y conocer su contexto, historia y necesidades para poder darles herramientas y acompañar el proceso de cambio.',
-      whatsapp: 'https://wa.me/5493416216545?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
-      instagram: 'https://www.instagram.com/lic.nutricion.caro.g?igsh=c2E5eDVrMGZlNTA1',
-    },
-    {
       id: 'nutri3',
       img: nutri3,
       name: 'Julieta Martini',
@@ -79,24 +67,11 @@ const PROFESSIONALS = {
       instagram: 'https://www.instagram.com/calm.rosario?igsh=MWo0cXd3ZDZ3aGlueg==',
     },
   ],
-  osteopata: [
-    {
-      id: 'oste',
-      img: oste,
-      name: 'Ignacio Albornoz',
-      profesion: 'Osteópata Deportivo',
-      birthDate: '18/02/2001',
-      desc: 'Soy Ignacio Albornoz, tengo ##EDAD## años, licenciado en Kinesiología, certificado en Osteopatía Deportiva (TMID) y Applied Performance Coach (APCC) con una sólida trayectoria orientada al alto rendimiento, la readaptación deportiva y la preparación física. Mi enfoque integra la rehabilitación clínica con el entrenamiento de fuerza, permitiéndome abordar al deportista de forma integral, desde la prevención hasta la vuelta a la competencia. Mi objetivo es la optimización del rendimiento humano, aplicando herramientas de vanguardia en biomecánica y terapia manual para minimizar riesgos de lesión y maximizar la capacidad física de los atletas en entornos competitivos de alto nivel.',
-      whatsapp: 'https://wa.me/5493401647574?text=Hola,%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n.%20%C2%BFPodr%C3%ADan%20ayudarme%3F',
-      instagram: 'https://www.instagram.com/lic.nachoalbornoz?igsh=NDI0eHgyZ2FnMXZj',
-    },
-  ],
 }
 
 const TABS = [
   { key: 'nutricionistas', label: 'Nutricionistas' },
   { key: 'kinesiologa',    label: 'Kinesióloga'   },
-  { key: 'osteopata',      label: 'Osteópata'     },
 ]
 
 // ── ProfessionalModal ─────────────────────────────────────────────────────
@@ -514,7 +489,7 @@ function ConsultorioFBI({ theme }) {
   const currentProfessionals = PROFESSIONALS[activeTab]
   const isNutri              = activeTab === 'nutricionistas'
 
-  const indicatorLeft = `${activeIndex * (100 / 3)}%`
+  const indicatorLeft = `${activeIndex * (100 / TABS.length)}%`
 
   const isDark      = theme === 'dark'
   const tabBorder   = isDark ? 'whiteAlpha.200' : 'gray.200'
@@ -566,7 +541,7 @@ function ConsultorioFBI({ theme }) {
             textTransform="uppercase"
             color="gray.500"
           >
-            Nutrición · Kinesiología · Osteopatía
+            Nutrición · Kinesiología
           </Text>
         </Box>
       </Box>
@@ -637,7 +612,7 @@ function ConsultorioFBI({ theme }) {
             h="2px"
             bg="green.400"
             borderRadius="full"
-            w={`${100 / 3}%`}
+            w={`${100 / TABS.length}%`}
             sx={{
               left: indicatorLeft,
               transition: 'left 0.35s cubic-bezier(0.22,1,0.36,1)',
@@ -652,13 +627,14 @@ function ConsultorioFBI({ theme }) {
           display="grid"
           gridTemplateColumns={
             isNutri
-              ? ['1fr', 'repeat(2, 1fr)', 'repeat(3, 1fr)']
-              : '1fr'   /* 1 sola columna para kine/oste */
+              ? ['1fr', 'repeat(2, 1fr)']
+              : '1fr'   /* 1 sola columna para kine */
           }
           gap={['10px', '14px', '16px']}
-          /* Para kine/oste: container del mismo ancho que una card de nutri, centrado */
-          maxW={!isNutri ? ['100%', 'calc(50% - 7px)', 'calc(33.33% - 11px)'] : undefined}
-          mx={!isNutri ? 'auto' : undefined}
+          /* Nutri: 2 cards centradas con el mismo tamaño que antes en desktop.
+             Kine: container del mismo ancho que una card de nutri, centrado */
+          maxW={isNutri ? ['100%', '100%', 'calc(66.66% - 5px)'] : ['100%', 'calc(50% - 7px)', 'calc(33.33% - 11px)']}
+          mx="auto"
         >
           {currentProfessionals.map((p) => (
             <Box key={p.id} w="100%">
